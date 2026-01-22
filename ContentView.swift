@@ -1,8 +1,16 @@
 import SwiftUI
 
 struct ContentView: View {
+    @Environment(WorkoutSessionManager.self) private var sessionManager
+    
     var body: some View {
-        PlanListView()
-            .preferredColorScheme(.dark) // Force Dark Mode as per Design Specs
+        Group {
+            if sessionManager.isActive {
+                ActiveWorkoutView(manager: sessionManager)
+            } else {
+                PlanListView()
+            }
+        }
+        .preferredColorScheme(.dark)
     }
 }

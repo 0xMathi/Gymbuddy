@@ -3,6 +3,7 @@ import SwiftData
 
 struct PlanListView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(WorkoutSessionManager.self) private var sessionManager
     @Query(sort: \WorkoutPlan.createdAt, order: .reverse) private var plans: [WorkoutPlan]
     
     var body: some View {
@@ -63,6 +64,9 @@ struct PlanListView: View {
             LazyVStack(spacing: Theme.Spacing.medium) {
                 ForEach(plans) { plan in
                     PlanCard(plan: plan)
+                        .onTapGesture {
+                            sessionManager.startWorkout(plan: plan)
+                        }
                 }
             }
             .padding(Theme.Spacing.large)
