@@ -4,175 +4,132 @@
 
 ---
 
-## Target Audience
+## Design Direction
 
-Serious gym-goers (20-40), structured lifters who follow programs (PPL, 5x5, etc.), value efficiency over complexity, tech-savvy but want minimal phone interaction during workouts. They already use Spotify/podcasts and want their phone to "get out of the way."
+**Vibe:** "Apple Fitness meets Nike Training Club"
+*   **Minimal & Premium:** energetic, confident, distraction-free.
+*   **Dark Mode First:** Optimized for gym environments. Light mode supported via semantic tokens.
+*   **High Contrast:** Legible at glance.
+*   **Native Feel:** Uses iOS physics and patterns, but with a custom, bolder visual identity.
 
----
-
-## Design Inspiration
-
-| Site | Why This Audience Loves It | What to Borrow |
-|------|---------------------------|----------------|
-| **whoop.com** | Premium fitness tech, dark aesthetic, performance-focused | High-contrast typography, subtle gradients |
-| **strong.app** | Many already use it — clean, dark, no-nonsense | Workout UI patterns, familiar mental model |
-| **linear.app** | Dev-favorite, ultra-minimal dark UI | Keyboard-first feel, subtle animations |
-| **arc.net** | Modern iOS users love Arc's polish | Glass effects, haptic-feeling UI |
+**Constraints:**
+*   **No hardcoded styles:** All colors, spacing, and fonts must come from the `Theme` system.
+*   **No third-party UI libraries:** We build our own primitives to ensure perfect control and lightweight feel.
 
 ---
 
-## Color Palette
+## Theme System (SwiftUI)
 
-```
-Background:       #0A0A0B  (near black - easy on eyes in gym lighting)
-Surface:          #161618  (cards, elevated elements)
-Surface Elevated: #1E1E21  (modals, active states)
-Border:           #2A2A2E  (subtle dividers)
+We implement a central `Theme` struct (e.g., in `Theme.swift`) to manage all tokens.
 
-Text Primary:     #FAFAFA  (headings, primary content)
-Text Secondary:   #A1A1A6  (supporting text, labels)
-Text Muted:       #636366  (placeholders, disabled)
+### Colors
+| Token | Dark (Default) | Light | Usage |
+|-------|----------------|-------|-------|
+| `bg` | `#0A0A0B` (Near Black) | `#F2F2F7` | Main screen background |
+| `surface` | `#161618` | `#FFFFFF` | Cards, sheets, floating elements |
+| `surfaceElevated` | `#1E1E21` | `#FFFFFF` | Modals, active states |
+| `accent` | `#FF4F00` (Electric Orange) | `#FF4F00` | Primary actions, "Active" state |
+| `accentDim` | `#331405` | `#FFE5D6` | Backgrounds for accent content |
+| `textPrimary` | `#FAFAFA` | `#000000` | Headlines, main data |
+| `textSecondary` | `#A1A1A6` | `#636366` | Labels, supporting text |
+| `destructive` | `#FF453A` | `#FF3B30` | Delete, Stop |
+| `success` | `#32D74B` | `#34C759` | Completed |
 
-Accent:           #32D74B  (iOS green - active/go/success)
-Accent Dim:       #1B5E20  (background tint for accent)
-Warning:          #FF9F0A  (rest timer ending)
-Error:            #FF453A  (iOS red)
-```
+### Typography
+*Font: SF Pro Display (System)*
 
----
+| Style | Size | Weight | Usage |
+|-------|------|--------|-------|
+| `hero` | 56px | Bold | Session timer, main set counter |
+| `h1` | 34px | Semibold | Screen titles |
+| `h2` | 28px | Semibold | Section headers |
+| `h3` | 22px | Medium | Card titles |
+| `body` | 17px | Regular | Standard text |
+| `caption` | 13px | Regular | Hints, secondary labels |
+| `mono` | 17px | Regular | Weights, reps (SF Mono) |
 
-## Typography
-
-```
-Font Family: SF Pro Display (iOS system) / Inter (fallback)
-
-Hero:        56px / 1.1  (Bold)     — Main app title
-H1:          34px / 1.2  (Semibold) — Screen titles
-H2:          28px / 1.25 (Semibold) — Section headers
-H3:          22px / 1.3  (Medium)   — Card titles
-Body:        17px / 1.5  (Regular)  — Standard text (iOS default)
-Body Small:  15px / 1.4  (Regular)  — Secondary info
-Caption:     13px / 1.3  (Regular)  — Labels, hints
-Mono:        17px / 1.4  (SF Mono)  — Timer digits, weights, reps
-```
-
----
-
-## Key Screens
-
-### 1. Workout Active Screen (The Core Experience)
-
-```
-┌─────────────────────────────────┐
-│  ●●● 3:42 PM            🔊 ▶️  │  ← Status bar + audio indicator
-├─────────────────────────────────┤
-│                                 │
-│         BENCH PRESS             │  ← Exercise name (H1, centered)
-│           80 kg                 │  ← Weight (Mono, accent green)
-│                                 │
-│     ┌─────────────────────┐     │
-│     │                     │     │
-│     │        3/4          │     │  ← Current set (HUGE, 120px)
-│     │                     │     │
-│     │      8 reps         │     │  ← Rep target below
-│     └─────────────────────┘     │
-│                                 │
-│   ○ ● ● ○  ← set indicators     │  ← Dots: done/current/upcoming
-│                                 │
-│  ┌─────────────────────────┐    │
-│  │                         │    │
-│  │     [ DONE / NEXT ]     │    │  ← Giant tap target (full width)
-│  │                         │    │
-│  └─────────────────────────┘    │
-│                                 │
-│  Next: Incline Dumbbell 24kg    │  ← Subtle preview
-└─────────────────────────────────┘
-```
-
-### 2. Rest Timer Screen (Auto-appears after set)
-
-```
-┌─────────────────────────────────┐
-│           REST                  │  ← Label (caption, muted)
-│                                 │
-│          1:47                   │  ← Countdown (120px, mono)
-│         ━━━━━━━○━━━             │  ← Progress ring or bar
-│                                 │
-│    Tap anywhere to skip         │  ← Hint (muted)
-│                                 │
-│  ┌─────────────────────────┐    │
-│  │      [ SKIP REST ]      │    │  ← Secondary action
-│  └─────────────────────────┘    │
-└─────────────────────────────────┘
-```
-
-**Timer States:**
-- At 10 seconds: bar turns **warning orange**
-- At 0: **haptic pulse** + audio "Let's go, bench press"
-
-### 3. Workout Plan List (Home)
-
-```
-┌─────────────────────────────────┐
-│  GymBuddy              [+]      │
-├─────────────────────────────────┤
-│                                 │
-│  TODAY                          │
-│  ┌─────────────────────────┐    │
-│  │ 💪 Push Day         →   │    │
-│  │ 6 exercises · ~55 min   │    │
-│  └─────────────────────────┘    │
-│                                 │
-│  YOUR PLANS                     │
-│  ┌─────────────────────────┐    │
-│  │ Pull Day                │    │
-│  │ Leg Day                 │    │
-│  │ Upper/Lower A           │    │
-│  └─────────────────────────┘    │
-│                                 │
-└─────────────────────────────────┘
-```
+### Spacing & Layout
+*   **Scale:** 4, 8, 12, 16, 24, 32, 48, 64
+*   **Radius:**
+    *   `small`: 8px
+    *   `medium`: 12px (Cards)
+    *   **`large`: 16px (Buttons)**
+*   **Shadows:** Ultra-subtle, ambient only. `Color.black.opacity(0.2)` radius: 8 y: 4.
 
 ---
 
-## Component Specs
+## Reusable Components
 
-| Component | Specs | States |
-|-----------|-------|--------|
-| **Primary Button** | Height: 56px, radius: 14px, full-width, bg: accent green | default, pressed (scale 0.98), disabled (30% opacity) |
-| **Secondary Button** | Height: 48px, radius: 12px, border: 1px #2A2A2E | default, pressed, disabled |
-| **Exercise Card** | Padding: 16px, radius: 12px, bg: surface | default, active (accent border) |
-| **Set Indicator Dot** | 8px circle | upcoming (#2A2A2E), current (accent), done (accent, filled) |
-| **Timer Display** | SF Mono, 120px, tabular nums | running (white), warning (<10s: orange), done (green flash) |
+All screens must be built using these primitives:
+
+### 1. `<Screen>`
+*   Handles Safe Area automatically.
+*   Applies standard background color (`Theme.bg`).
+*   Manages correct padding (horizontal: 24px) for content.
+
+### 2. `<PrimaryButton>`
+*   **Specs:** Height 56px, Radius 16px.
+*   **Style:** `Theme.accent` background, `Theme.textPrimary` (White) text.
+*   **Typography:** H3 (Medium).
+*   **Interaction:** Scale down to 0.98 on press. Haptic `.light` feedback.
+
+### 3. `<SecondaryButton>`
+*   **Specs:** Height 48px, Radius 12px.
+*   **Style:** Transparent or `Theme.surface`, Border 1px `Theme.border`.
+*   **Usage:** "Skip Rest", "Cancel".
+
+### 4. `<Card>`
+*   **Usage:** **Sparingly**. Mostly for lists (Plan List), NOT for the main Session screen.
+*   **Style:** `Theme.surface`, Radius 12px.
+
+### 5. `<SetIndicator>`
+*   **Visual:** Row of dots (8px circle).
+*   **States:**
+    *   *Upcoming:* `Theme.surfaceElevated`
+    *   *Current:* `Theme.accent` (Pulsing)
+    *   *Done:* `Theme.accent` (Filled)
 
 ---
 
-## Audio/Haptic Design
+## Key Look & Feel
 
-| Event | Audio | Haptic |
-|-------|-------|--------|
-| Set complete tap | Soft "tick" | Light impact |
-| Rest timer start | None (silent) | None |
-| Rest 10s warning | Subtle tone rise | Warning haptic |
-| Rest complete | "Next up: [exercise]" | Strong double-tap |
-| Workout complete | "Workout complete. Great work." | Success pattern |
+### 1. The Session Screen (Focus Mode)
+*   **Visual Clutter: ZERO.**
+*   **Hierarchy:**
+    1.  Exercise Name (Top)
+    2.  Set Counter "3 / 4" (Center, Hero Size)
+    3.  Reps & Weight (Below, Mono)
+    4.  Primary Action Button (Bottom, specific "Thumbar Action Area")
+*   **Animation:**
+    *   When Set Complete: subtle *flash* of green.
+    *   Transition to Rest: Elements fade out, circular progress fade in.
+
+### 2. The Rest Timer
+*   **Visual:** Giant Mono Countdown.
+*   **Color:** Starts White -> turns `Warning Orange` at 10s.
+*   **Interaction:** "Tap anywhere to skip" (invisible button covering background).
+
+### 3. Home Screen (Empty State)
+*   *Before plans are added:*
+*   **Visual:** A cool, abstract gym icon or simple illustration (monochrome).
+*   **Headline:** "Start Your Journey"
+*   **Subtext:** "Create your first workout plan to get started."
+*   **Action:** `<PrimaryButton> Create Plan`
 
 ---
 
-## Design Principles
-
-1. **Glanceable** — Info readable from arm's length, sweaty fingers
-2. **One-hand, one-thumb** — All primary actions in thumb zone
-3. **Silent by default** — Only speaks when adding value
-4. **Dark-first** — Gym lighting varies; dark mode is easier
-5. **No clutter** — If it doesn't help the current set, hide it
+## Interactions & Motion
+*   **Tab Bar:** Minimal, standard iOS but with custom symbols.
+*   **Page Transitions:** Standard navigation push, but "Session" opens as a full-screen cover (modal) to maximize focus.
+*   **Haptics:**
+    *   Button Tap: `.light`
+    *   Set Done: `.success`
+    *   Timer Warning: `.warning` (pulsing)
 
 ---
 
-## iOS Native Elements
+## Implementation Rules
+1.  **SwiftUI First:** Use `ViewModifiers` for common styles.
+2.  **Theme.swift:** All colors defined in Asset Catalog but accessed via code-safe `Theme` struct.
+3.  **Dark Mode:** Test on device. Ensure true black (#000000) is avoided for background to prevent smearing on OLEDs; use #0A0A0B.
 
-- SF Pro Display / SF Mono fonts (system)
-- SF Symbols for icons
-- UINotificationFeedbackGenerator for haptics
-- Standard iOS safe areas and margins
-- Lockscreen Now Playing integration
