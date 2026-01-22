@@ -116,6 +116,21 @@ All screens must be built using these primitives:
 *   **Subtext:** "Create your first workout plan to get started."
 *   **Action:** `<PrimaryButton> Create Plan`
 
+### 4. Exercise Picker (Modal Sheet)
+*   **Vibe:** Apple Music Search. Fast, fluid, keyboard-centric.
+*   **Components:**
+    *   **Search Bar:** Integrated into navigation bar, sticky.
+    *   **Filter Chips:** Horizontal ScrollView below search. [Chest] [Back] [Legs].
+        *   *Active:* `Theme.surfaceElevated` + White Text.
+        *   *Inactive:* Transparent + Border + Grey Text.
+    *   **List Item:**
+        *   Left: Rounded square icon container (Symbol: dumbbell/figure).
+        *   Center: Exercise Name (H3) + Muscle Group (Caption, Uppercase).
+        *   Right: Selection Circle (Empty -> Filled Checkmark `Theme.accent`).
+*   **Floating Action Button:**
+    *   Appears only when selection > 0.
+    *   "Add (3) Exercises" -> animate slide up from bottom.
+
 ---
 
 ## Interactions & Motion
