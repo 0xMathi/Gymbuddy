@@ -98,10 +98,10 @@
 			isa = PBXGroup;
 			children = (
 				A0000008280A00010001 /* Exercise.swift */,
-				A0000033280A00010001 /* ExerciseDefinition.swift */,
-				A0000035280A00010001 /* ExerciseSeed.swift */,
 				A000000A280A00010001 /* WorkoutPlan.swift */,
 				A000000C280A00010001 /* WorkoutSession.swift */,
+				A0000033280A00010001 /* ExerciseDefinition.swift */,
+				A0000035280A00010001 /* ExerciseSeed.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -110,8 +110,8 @@
 			isa = PBXGroup;
 			children = (
 				A000000E280A00010001 /* AudioService.swift */,
-				A0000037280A00010001 /* ExerciseManager.swift */,
 				A0000010280A00010001 /* HapticService.swift */,
+				A0000037280A00010001 /* ExerciseManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -188,7 +188,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					A0000028280A00010001 = {
 						CreatedOnToolsVersion = 15.0;
@@ -233,8 +233,6 @@
 				A0000003280A00010001 /* ContentView.swift in Sources */,
 				A0000005280A00010001 /* Theme.swift in Sources */,
 				A0000007280A00010001 /* Exercise.swift in Sources */,
-				A0000032280A00010001 /* ExerciseDefinition.swift in Sources */,
-				A0000034280A00010001 /* ExerciseSeed.swift in Sources */,
 				A0000009280A00010001 /* WorkoutPlan.swift in Sources */,
 				A000000B280A00010001 /* WorkoutSession.swift in Sources */,
 				A000000D280A00010001 /* AudioService.swift in Sources */,
@@ -247,6 +245,8 @@
 				A0000038280A00010001 /* ExercisePickerView.swift in Sources */,
 				A000003A280A00010001 /* PlanEditView.swift in Sources */,
 				A0000019280A00010001 /* WorkoutSessionManager.swift in Sources */,
+				A0000032280A00010001 /* ExerciseDefinition.swift in Sources */,
+				A0000034280A00010001 /* ExerciseSeed.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +288,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 3B6XMGADVB;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -311,6 +312,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -351,6 +353,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 3B6XMGADVB;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -367,6 +370,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -379,25 +383,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = GymBuddy;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.gymbuddy.app;
+				PRODUCT_BUNDLE_IDENTIFIER = Mathis.GymBuddy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -411,25 +410,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = GymBuddy;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.gymbuddy.app;
+				PRODUCT_BUNDLE_IDENTIFIER = Mathis.GymBuddy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -439,20 +433,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A000002D280A00010001 /* Build configuration list for PBXProject "GymBuddy" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A000002E280A00010001 /* Debug */,
-				A000002F280A00010001 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		A0000029280A00010001 /* Build configuration list for PBXNativeTarget "GymBuddy" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A0000030280A00010001 /* Debug */,
 				A0000031280A00010001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A000002D280A00010001 /* Build configuration list for PBXProject "GymBuddy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A000002E280A00010001 /* Debug */,
+				A000002F280A00010001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

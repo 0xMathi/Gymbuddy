@@ -15,7 +15,10 @@ class WorkoutSessionManager {
 
     func startWorkout(plan: WorkoutPlan) {
         guard !plan.exercises.isEmpty else { return }
-        
+
+        // Sort exercises by orderIndex
+        let sortedExercises = plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
+
         session = WorkoutSession(
             plan: plan,
             state: .active,
@@ -23,39 +26,41 @@ class WorkoutSessionManager {
             currentSetNumber: 1,
             restTimeRemaining: 0
         )
-        
-        if let exercise = plan.exercises.first {
-            audio.announce("Starting \(plan.name). First up: \(exercise.name).")
+
+        if let exercise = sortedExercises.first {
+            audio.announceWorkoutStart(planName: plan.name, firstExercise: exercise.name)
         }
     }
 
     func completeSet() {
         guard var currentSession = session else { return }
-        
+
         haptics.medium()
-        
-        guard let currentExercise = currentSession.currentExercise else { return }
-        
+
+        let sortedExercises = currentSession.plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
+        guard sortedExercises.indices.contains(currentSession.currentExerciseIndex) else { return }
+        let currentExercise = sortedExercises[currentSession.currentExerciseIndex]
+
         if currentSession.currentSetNumber < currentExercise.sets {
             // Next Set Same Exercise
             currentSession.currentSetNumber += 1
-            audio.announce("Resting.")
+            audio.announceSetCompleted()
             startRest(session: &currentSession, duration: currentExercise.restSeconds)
-            
-        } else if currentSession.currentExerciseIndex < currentSession.plan.exercises.count - 1 {
+
+        } else if currentSession.currentExerciseIndex < sortedExercises.count - 1 {
             // Next Exercise
-            let nextExercise = currentSession.plan.exercises[currentSession.currentExerciseIndex + 1]
+            let nextExercise = sortedExercises[currentSession.currentExerciseIndex + 1]
             currentSession.currentExerciseIndex += 1
             currentSession.currentSetNumber = 1
-            
-            audio.announce("Exercise Complete. Next up: \(nextExercise.name).")
-            startRest(session: &currentSession, duration: currentExercise.restSeconds) 
-            
+
+            audio.announceExercise(nextExercise.name)
+            startRest(session: &currentSession, duration: currentExercise.restSeconds)
+
         } else {
             finishWorkout()
             return
         }
-        
+
         self.session = currentSession
     }
 
@@ -110,12 +115,12 @@ class WorkoutSessionManager {
     private func endRest() {
         stopTimer()
         guard var currentSession = session else { return }
-        
+
         currentSession.state = .active
         session = currentSession
-        
+
         haptics.success()
-        audio.announce("Let's go!")
+        audio.announceRestEnd()
     }
 
     private func stopTimer() {
@@ -128,10 +133,10 @@ class WorkoutSessionManager {
         guard var currentSession = session else { return }
         currentSession.state = .completed
         session = currentSession
-        
+
         haptics.success()
-        audio.announce("Workout Complete. Great job!")
-        
+        audio.announceWorkoutComplete()
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.session = nil
         }

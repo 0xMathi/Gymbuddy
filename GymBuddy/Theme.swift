@@ -13,31 +13,49 @@ struct Theme {
         static let destructive = Color(hex: "FF453A")
         static let success = Color(hex: "32D74B")
     }
-    
-    // MARK: - Typography
+
+    // MARK: - Typography (NIKE STYLE - BIGGER & BOLDER)
     struct Fonts {
-        static let hero = Font.system(size: 56, weight: .bold, design: .default)
-        static let h1 = Font.system(size: 34, weight: .semibold, design: .default)
-        static let h2 = Font.system(size: 28, weight: .semibold, design: .default)
-        static let h3 = Font.system(size: 22, weight: .medium, design: .default)
-        static let body = Font.system(size: 17, weight: .regular, design: .default)
-        static let caption = Font.system(size: 13, weight: .regular, design: .default)
-        static let mono = Font.system(size: 17, weight: .regular, design: .monospaced)
+        // Massive display for key numbers
+        static let hero = Font.system(size: 72, weight: .black, design: .default)
+        static let heroMono = Font.system(size: 72, weight: .black, design: .monospaced)
+
+        // Headlines - punchy and bold
+        static let h1 = Font.system(size: 40, weight: .bold, design: .default)
+        static let h2 = Font.system(size: 32, weight: .bold, design: .default)
+        static let h3 = Font.system(size: 24, weight: .semibold, design: .default)
+
+        // Body text
+        static let body = Font.system(size: 18, weight: .medium, design: .default)
+        static let bodyBold = Font.system(size: 18, weight: .bold, design: .default)
+
+        // Labels - UPPERCASE friendly
+        static let label = Font.system(size: 14, weight: .bold, design: .default)
+        static let caption = Font.system(size: 13, weight: .semibold, design: .default)
+
+        // Monospace for numbers
+        static let mono = Font.system(size: 18, weight: .medium, design: .monospaced)
+        static let monoLarge = Font.system(size: 28, weight: .bold, design: .monospaced)
     }
-    
-    // MARK: - Spacing
+
+    // MARK: - Spacing (MORE AIR)
     struct Spacing {
+        static let xs: CGFloat = 4
         static let small: CGFloat = 8
-        static let medium: CGFloat = 12
-        static let large: CGFloat = 16
-        static let xl: CGFloat = 24
-        static let xxl: CGFloat = 32
+        static let medium: CGFloat = 16
+        static let large: CGFloat = 24
+        static let xl: CGFloat = 32
+        static let xxl: CGFloat = 48
+        static let xxxl: CGFloat = 64
     }
-    
-    // MARK: - Layout
+
+    // MARK: - Layout (BIGGER BUTTONS)
     struct Layout {
-        static let buttonHeight: CGFloat = 56
+        static let buttonHeight: CGFloat = 64
+        static let buttonHeightSmall: CGFloat = 52
         static let cornerRadius: CGFloat = 16
+        static let cornerRadiusSmall: CGFloat = 12
+        static let inputHeight: CGFloat = 56
     }
 }
 

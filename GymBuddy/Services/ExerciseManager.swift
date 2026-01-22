@@ -100,7 +100,14 @@ class ExerciseManager {
 
     /// Add an exercise definition to a workout plan
     @discardableResult
-    func addExerciseToPlan(plan: WorkoutPlan, exerciseDef: ExerciseDefinition, sets: Int = 3, restSeconds: Int = 90) -> Exercise? {
+    func addExerciseToPlan(
+        plan: WorkoutPlan,
+        exerciseDef: ExerciseDefinition,
+        sets: Int = 3,
+        reps: Int = 10,
+        weight: Double = 0,
+        restSeconds: Int = 90
+    ) -> Exercise? {
         guard let context = modelContext else {
             print("ModelContext not configured")
             return nil
@@ -111,6 +118,8 @@ class ExerciseManager {
         let exercise = Exercise(
             from: exerciseDef,
             sets: sets,
+            reps: reps,
+            weight: weight,
             restSeconds: restSeconds,
             orderIndex: orderIndex
         )
@@ -125,6 +134,22 @@ class ExerciseManager {
         } catch {
             print("Failed to add exercise to plan: \(error)")
             return nil
+        }
+    }
+
+    /// Update exercise settings
+    func updateExercise(_ exercise: Exercise, sets: Int, reps: Int, weight: Double, restSeconds: Int) {
+        guard let context = modelContext else { return }
+
+        exercise.sets = sets
+        exercise.reps = reps
+        exercise.weight = weight
+        exercise.restSeconds = restSeconds
+
+        do {
+            try context.save()
+        } catch {
+            print("Failed to update exercise: \(error)")
         }
     }
 
