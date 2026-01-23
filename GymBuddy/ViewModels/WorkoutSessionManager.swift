@@ -6,10 +6,27 @@ import AVFoundation
 class WorkoutSessionManager {
     var session: WorkoutSession?
     var isActive: Bool { session != nil }
+    var isPaused: Bool = false
 
     private var timer: Timer?
     private let audio = AudioService.shared
     private let haptics = HapticService.shared
+    private let nowPlaying = NowPlayingService()
+
+    // MARK: - Initialization
+
+    init() {
+        setupRemoteCommands()
+    }
+
+    private func setupRemoteCommands() {
+        nowPlaying.onPlayPause = { [weak self] in
+            self?.togglePause()
+        }
+        nowPlaying.onSkipNext = { [weak self] in
+            self?.completeSet()
+        }
+    }
 
     // MARK: - Core Actions
 
@@ -27,13 +44,19 @@ class WorkoutSessionManager {
             restTimeRemaining: 0
         )
 
+        isPaused = false
+
+        // Activate Now Playing
+        nowPlaying.activate()
+
         if let exercise = sortedExercises.first {
             audio.announceWorkoutStart(planName: plan.name, firstExercise: exercise.name)
+            updateNowPlayingInfo()
         }
     }
 
     func completeSet() {
-        guard var currentSession = session else { return }
+        guard var currentSession = session, !isPaused else { return }
 
         haptics.medium()
 
@@ -62,15 +85,88 @@ class WorkoutSessionManager {
         }
 
         self.session = currentSession
+        updateNowPlayingInfo()
     }
 
     func skipRest() {
         endRest()
     }
-    
+
+    func togglePause() {
+        guard session != nil else { return }
+
+        isPaused.toggle()
+        haptics.light()
+
+        if isPaused {
+            // Pause the timer
+            stopTimer()
+            audio.announce("Paused")
+        } else {
+            // Resume if we were resting
+            if let currentSession = session, currentSession.state == .resting {
+                timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+                    self?.tick()
+                }
+            }
+            audio.announceRestEnd()
+        }
+
+        updateNowPlayingInfo()
+    }
+
     func cancelWorkout() {
         stopTimer()
+        nowPlaying.deactivate()
         session = nil
+        isPaused = false
+    }
+
+    // MARK: - Now Playing Updates
+
+    private func updateNowPlayingInfo() {
+        guard let currentSession = session else {
+            nowPlaying.clearNowPlayingInfo()
+            return
+        }
+
+        let sortedExercises = currentSession.plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
+        guard sortedExercises.indices.contains(currentSession.currentExerciseIndex) else { return }
+        let exercise = sortedExercises[currentSession.currentExerciseIndex]
+
+        nowPlaying.updateNowPlaying(
+            exerciseName: exercise.name,
+            currentSet: currentSession.currentSetNumber,
+            totalSets: exercise.sets,
+            isResting: currentSession.state == .resting,
+            restTimeRemaining: currentSession.state == .resting ? currentSession.restTimeRemaining : nil
+        )
+    }
+
+    private func updateRestTimerNowPlaying() {
+        guard let currentSession = session, currentSession.state == .resting else { return }
+
+        let sortedExercises = currentSession.plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
+        guard sortedExercises.indices.contains(currentSession.currentExerciseIndex) else { return }
+        let exercise = sortedExercises[currentSession.currentExerciseIndex]
+
+        // Get next exercise name if available
+        let nextExerciseName: String
+        if currentSession.currentSetNumber < exercise.sets {
+            nextExerciseName = exercise.name
+        } else if currentSession.currentExerciseIndex < sortedExercises.count - 1 {
+            nextExerciseName = sortedExercises[currentSession.currentExerciseIndex + 1].name
+        } else {
+            nextExerciseName = "Finish"
+        }
+
+        nowPlaying.updateRestTimer(
+            exerciseName: nextExerciseName,
+            currentSet: currentSession.currentSetNumber,
+            totalSets: exercise.sets,
+            remaining: currentSession.restTimeRemaining,
+            total: exercise.restSeconds
+        )
     }
 
     // MARK: - Internal Logic
@@ -78,7 +174,7 @@ class WorkoutSessionManager {
     private func startRest(session: inout WorkoutSession, duration: Int) {
         session.state = .resting
         session.restTimeRemaining = duration
-        
+
         stopTimer()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.tick()
@@ -86,17 +182,20 @@ class WorkoutSessionManager {
     }
 
     private func tick() {
-        guard var currentSession = session, currentSession.state == .resting else { return }
-        
+        guard var currentSession = session, currentSession.state == .resting, !isPaused else { return }
+
         currentSession.restTimeRemaining -= 1
-        
+
+        // Update lockscreen
+        session = currentSession
+        updateRestTimerNowPlaying()
+
         // 10 second warning
         if currentSession.restTimeRemaining == 10 {
             haptics.warning()
-            // Optional: audio.announce("Ten seconds.")
         }
-        
-        // 3 second countdown logic could go here
+
+        // 3 second countdown
         if currentSession.restTimeRemaining == 3 {
             audio.announce("Three")
         } else if currentSession.restTimeRemaining == 2 {
@@ -104,14 +203,12 @@ class WorkoutSessionManager {
         } else if currentSession.restTimeRemaining == 1 {
             audio.announce("One")
         }
-        
+
         if currentSession.restTimeRemaining <= 0 {
             endRest()
-        } else {
-            session = currentSession
         }
     }
-    
+
     private func endRest() {
         stopTimer()
         guard var currentSession = session else { return }
@@ -121,6 +218,7 @@ class WorkoutSessionManager {
 
         haptics.success()
         audio.announceRestEnd()
+        updateNowPlayingInfo()
     }
 
     private func stopTimer() {
@@ -136,6 +234,7 @@ class WorkoutSessionManager {
 
         haptics.success()
         audio.announceWorkoutComplete()
+        nowPlaying.deactivate()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.session = nil

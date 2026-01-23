@@ -26,6 +26,15 @@
 		A0000036280A00010001 /* ExerciseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000037280A00010001 /* ExerciseManager.swift */; };
 		A0000038280A00010001 /* ExercisePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000039280A00010001 /* ExercisePickerView.swift */; };
 		A000003A280A00010001 /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000003B280A00010001 /* PlanEditView.swift */; };
+		A000003C280A00010001 /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000003D280A00010001 /* NowPlayingService.swift */; };
+		A0000040280A00010001 /* DesignLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000041280A00010001 /* DesignLabView.swift */; };
+		A0000042280A00010001 /* Variant1_JustDoIt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000043280A00010001 /* Variant1_JustDoIt.swift */; };
+		A0000044280A00010001 /* Variant2_SplitCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000045280A00010001 /* Variant2_SplitCards.swift */; };
+		A0000046280A00010001 /* Variant3_StatsHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000047280A00010001 /* Variant3_StatsHero.swift */; };
+		A0000048280A00010001 /* Variant4_Editorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000049280A00010001 /* Variant4_Editorial.swift */; };
+		A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004B280A00010001 /* Variant5_MinimalPower.swift */; };
+		A000004C280A00010001 /* FinalStartScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004D280A00010001 /* FinalStartScreen.swift */; };
+		A000004E280A00010001 /* StartScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004F280A00010001 /* StartScreenView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +58,16 @@
 		A0000037280A00010001 /* ExerciseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseManager.swift; sourceTree = "<group>"; };
 		A0000039280A00010001 /* ExercisePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePickerView.swift; sourceTree = "<group>"; };
 		A000003B280A00010001 /* PlanEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditView.swift; sourceTree = "<group>"; };
+		A000003D280A00010001 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
+		A000003E280A00010001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A0000041280A00010001 /* DesignLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignLabView.swift; sourceTree = "<group>"; };
+		A0000043280A00010001 /* Variant1_JustDoIt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant1_JustDoIt.swift; sourceTree = "<group>"; };
+		A0000045280A00010001 /* Variant2_SplitCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant2_SplitCards.swift; sourceTree = "<group>"; };
+		A0000047280A00010001 /* Variant3_StatsHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant3_StatsHero.swift; sourceTree = "<group>"; };
+		A0000049280A00010001 /* Variant4_Editorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant4_Editorial.swift; sourceTree = "<group>"; };
+		A000004B280A00010001 /* Variant5_MinimalPower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant5_MinimalPower.swift; sourceTree = "<group>"; };
+		A000004D280A00010001 /* FinalStartScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalStartScreen.swift; sourceTree = "<group>"; };
+		A000004F280A00010001 /* StartScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartScreenView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,7 +100,9 @@
 				A0000023280A00010001 /* Components */,
 				A0000024280A00010001 /* Views */,
 				A0000027280A00010001 /* ViewModels */,
+				A000003F280A00010001 /* DesignLab */,
 				A000001C280A00010001 /* Assets.xcassets */,
+				A000003E280A00010001 /* Info.plist */,
 			);
 			path = GymBuddy;
 			sourceTree = "<group>";
@@ -112,6 +133,7 @@
 				A000000E280A00010001 /* AudioService.swift */,
 				A0000010280A00010001 /* HapticService.swift */,
 				A0000037280A00010001 /* ExerciseManager.swift */,
+				A000003D280A00010001 /* NowPlayingService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -127,6 +149,7 @@
 		A0000024280A00010001 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A000004F280A00010001 /* StartScreenView.swift */,
 				A0000025280A00010001 /* Workout */,
 				A0000026280A00010001 /* Plans */,
 			);
@@ -158,6 +181,20 @@
 				A000001A280A00010001 /* WorkoutSessionManager.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A000003F280A00010001 /* DesignLab */ = {
+			isa = PBXGroup;
+			children = (
+				A0000041280A00010001 /* DesignLabView.swift */,
+				A0000043280A00010001 /* Variant1_JustDoIt.swift */,
+				A0000045280A00010001 /* Variant2_SplitCards.swift */,
+				A0000047280A00010001 /* Variant3_StatsHero.swift */,
+				A0000049280A00010001 /* Variant4_Editorial.swift */,
+				A000004B280A00010001 /* Variant5_MinimalPower.swift */,
+				A000004D280A00010001 /* FinalStartScreen.swift */,
+			);
+			path = DesignLab;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -247,6 +284,15 @@
 				A0000019280A00010001 /* WorkoutSessionManager.swift in Sources */,
 				A0000032280A00010001 /* ExerciseDefinition.swift in Sources */,
 				A0000034280A00010001 /* ExerciseSeed.swift in Sources */,
+				A000003C280A00010001 /* NowPlayingService.swift in Sources */,
+				A0000040280A00010001 /* DesignLabView.swift in Sources */,
+				A0000042280A00010001 /* Variant1_JustDoIt.swift in Sources */,
+				A0000044280A00010001 /* Variant2_SplitCards.swift in Sources */,
+				A0000046280A00010001 /* Variant3_StatsHero.swift in Sources */,
+				A0000048280A00010001 /* Variant4_Editorial.swift in Sources */,
+				A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */,
+				A000004C280A00010001 /* FinalStartScreen.swift in Sources */,
+				A000004E280A00010001 /* StartScreenView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +431,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GymBuddy/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -412,6 +459,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = GymBuddy/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
