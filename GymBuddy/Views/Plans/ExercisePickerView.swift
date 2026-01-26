@@ -1,11 +1,19 @@
 import SwiftUI
 import SwiftData
 
+// MARK: - Exercise Tab Enum
+
+enum ExerciseTab: String, CaseIterable {
+    case all = "Alle"
+    case favorites = "Favoriten"
+}
+
 struct ExercisePickerView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(ExerciseManager.self) private var exerciseManager
 
     @State private var searchText = ""
+    @State private var selectedTab: ExerciseTab = .all
     @State private var selectedFilter: String? = nil
     @State private var selectedExercises: Set<UUID> = []
 
@@ -13,6 +21,11 @@ struct ExercisePickerView: View {
 
     private var filteredExercises: [ExerciseDefinition] {
         var results = exerciseManager.allExercises
+
+        // Apply favorites filter
+        if selectedTab == .favorites {
+            results = results.filter { $0.isFavorite }
+        }
 
         // Apply muscle group filter
         if let filter = selectedFilter {
@@ -37,9 +50,12 @@ struct ExercisePickerView: View {
                 Theme.Colors.bg.ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    // Filter Chips
-                    filterChipsView
+                    // Tab Picker (Alle / Favoriten)
+                    tabPickerView
                         .padding(.top, Theme.Spacing.small)
+
+                    // Muscle Group Filter Chips
+                    filterChipsView
 
                     // Exercise List
                     exerciseListView
@@ -69,6 +85,39 @@ struct ExercisePickerView: View {
             }
             .animation(.spring(response: 0.3), value: selectedExercises.isEmpty)
         }
+    }
+
+    // MARK: - Tab Picker (Alle / Favoriten)
+
+    private var tabPickerView: some View {
+        HStack(spacing: Theme.Spacing.small) {
+            ForEach(ExerciseTab.allCases, id: \.self) { tab in
+                Button {
+                    HapticService.shared.light()
+                    withAnimation(.spring(response: 0.3)) {
+                        selectedTab = tab
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        if tab == .favorites {
+                            Image(systemName: "heart.fill")
+                                .font(.system(size: 12))
+                        }
+                        Text(tab.rawValue.uppercased())
+                            .font(.system(size: 12, weight: .bold))
+                            .tracking(1)
+                    }
+                    .foregroundStyle(selectedTab == tab ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                    .padding(.horizontal, Theme.Spacing.medium)
+                    .padding(.vertical, Theme.Spacing.small)
+                    .background(selectedTab == tab ? Theme.Colors.accent : Theme.Colors.surface)
+                    .cornerRadius(8)
+                }
+            }
+            Spacer()
+        }
+        .padding(.horizontal, Theme.Spacing.large)
+        .padding(.bottom, Theme.Spacing.small)
     }
 
     // MARK: - Filter Chips
@@ -106,7 +155,9 @@ struct ExercisePickerView: View {
                     ExerciseListItem(
                         exercise: exercise,
                         isSelected: selectedExercises.contains(exercise.id),
-                        onTap: { toggleSelection(exercise) }
+                        showCategory: selectedFilter == nil,
+                        onTap: { toggleSelection(exercise) },
+                        onFavoriteToggle: { toggleFavorite(exercise) }
                     )
                 }
             }
@@ -151,6 +202,11 @@ struct ExercisePickerView: View {
         onAdd(selected)
         dismiss()
     }
+
+    private func toggleFavorite(_ exercise: ExerciseDefinition) {
+        HapticService.shared.light()
+        exercise.isFavorite.toggle()
+    }
 }
 
 // MARK: - Filter Chip Component
@@ -186,7 +242,9 @@ struct FilterChip: View {
 struct ExerciseListItem: View {
     let exercise: ExerciseDefinition
     let isSelected: Bool
+    let showCategory: Bool
     let onTap: () -> Void
+    let onFavoriteToggle: () -> Void
 
     var body: some View {
         Button(action: onTap) {
@@ -209,13 +267,25 @@ struct ExerciseListItem: View {
                         .fontWeight(.medium)
                         .foregroundStyle(Theme.Colors.textPrimary)
 
-                    Text(exercise.muscleGroup.uppercased())
-                        .font(Theme.Fonts.caption)
-                        .foregroundStyle(Theme.Colors.textSecondary)
-                        .tracking(1)
+                    // Show category only if not filtered
+                    if showCategory {
+                        Text(exercise.muscleGroup.uppercased())
+                            .font(Theme.Fonts.caption)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                            .tracking(1)
+                    }
                 }
 
                 Spacer()
+
+                // Favorite Button
+                Button(action: onFavoriteToggle) {
+                    Image(systemName: exercise.isFavorite ? "heart.fill" : "heart")
+                        .font(.system(size: 18))
+                        .foregroundStyle(exercise.isFavorite ? .red : Theme.Colors.textSecondary)
+                        .frame(width: 32, height: 32)
+                }
+                .buttonStyle(.plain)
 
                 // Selection Circle
                 ZStack {

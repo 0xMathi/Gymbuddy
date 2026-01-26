@@ -101,7 +101,7 @@ class WorkoutSessionManager {
         if isPaused {
             // Pause the timer
             stopTimer()
-            audio.announce("Paused")
+            audio.announcePaused()
         } else {
             // Resume if we were resting
             if let currentSession = session, currentSession.state == .resting {
@@ -109,7 +109,7 @@ class WorkoutSessionManager {
                     self?.tick()
                 }
             }
-            audio.announceRestEnd()
+            audio.announceResumed()
         }
 
         updateNowPlayingInfo()
@@ -195,13 +195,16 @@ class WorkoutSessionManager {
             haptics.warning()
         }
 
-        // 3 second countdown
+        // 3 second countdown - always haptic, audio respects isVoiceCountdownEnabled
         if currentSession.restTimeRemaining == 3 {
-            audio.announce("Three")
+            haptics.light()
+            audio.announceCountdown(3)
         } else if currentSession.restTimeRemaining == 2 {
-            audio.announce("Two")
+            haptics.light()
+            audio.announceCountdown(2)
         } else if currentSession.restTimeRemaining == 1 {
-            audio.announce("One")
+            haptics.medium()
+            audio.announceCountdown(1)
         }
 
         if currentSession.restTimeRemaining <= 0 {
@@ -216,7 +219,8 @@ class WorkoutSessionManager {
         currentSession.state = .active
         session = currentSession
 
-        haptics.success()
+        // Strong haptic feedback - must be noticeable even in pocket/armband
+        haptics.heavy()
         audio.announceRestEnd()
         updateNowPlayingInfo()
     }

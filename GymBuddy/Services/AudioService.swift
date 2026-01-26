@@ -4,13 +4,25 @@ import UIKit
 class AudioService: NSObject {
     static let shared = AudioService()
     private let synthesizer = AVSpeechSynthesizer()
-    private var premiumVoice: AVSpeechSynthesisVoice?
+    private var cachedVoice: AVSpeechSynthesisVoice?
+    private var cachedLanguage: AppLanguage?
 
-    // MARK: - Motivational Phrases
+    // MARK: - Phrase History (prevents repetition)
 
-    // MARK: - Motivational Phrases
+    private var phraseHistory: [PhraseCategory: [String]] = [:]
+    private let maxHistorySize = 3
 
-    private let setStartPhrases = [
+    private enum PhraseCategory {
+        case setStart
+        case setComplete
+        case restEnd
+        case workoutComplete
+        case motivationTip
+    }
+
+    // MARK: - Motivational Phrases (English)
+
+    private let setStartPhrasesEN = [
         "Let's crush this set!",
         "Focus. Power.",
         "Light weight, baby!",
@@ -19,40 +31,138 @@ class AudioService: NSObject {
         "Make it look easy.",
         "Full range of motion.",
         "Drive through!",
-        "Show me what you got!"
+        "Show me what you got!",
+        "Time to shine.",
+        "You've got this."
     ]
 
-    private let restEndPhrases = [
+    private let restEndPhrasesEN = [
         "Time to work!",
         "Get ready.",
         "Back under the bar.",
         "Let's get it.",
         "Round two, fight!",
         "Focus mode: On.",
-        "Next set starts now."
+        "Next set starts now.",
+        "Here we go.",
+        "Lock in."
     ]
 
-    private let setCompletedPhrases = [
+    private let setCompletedPhrasesEN = [
         "Good set. Rest up.",
         "Nice work. Catch your breath.",
         "Solid. Take a break.",
         "Easy money. Rest now.",
         "Strong effort. Relax.",
-        "Done. Recover."
+        "Done. Recover.",
+        "Clean reps. Rest.",
+        "That's how it's done."
     ]
 
-    private let workoutCompletePhrases = [
-        "Workout destroyed! excellent job.",
+    private let workoutCompletePhrasesEN = [
+        "Workout destroyed! Excellent job.",
         "You survived! Great session.",
         "Victory! See you next time.",
         "Session complete. Go eat.",
-        "Stronger than yesterday. Good job."
+        "Stronger than yesterday. Good job.",
+        "Another one in the books.",
+        "Beast mode complete."
     ]
+
+    private let motivationTipsEN = [
+        "Remember to breathe.",
+        "Stay hydrated.",
+        "Control the negative.",
+        "Mind-muscle connection.",
+        "Quality over quantity."
+    ]
+
+    // MARK: - Motivational Phrases (German)
+
+    private let setStartPhrasesDE = [
+        "Auf geht's!",
+        "Fokus. Kraft.",
+        "Leichtes Gewicht!",
+        "Der Satz gehört dir!",
+        "Saubere Form, los!",
+        "Zeig was du kannst.",
+        "Volle Bewegung.",
+        "Durchziehen!",
+        "Gib alles!",
+        "Jetzt wird's ernst.",
+        "Du schaffst das."
+    ]
+
+    private let restEndPhrasesDE = [
+        "Zeit zu arbeiten!",
+        "Mach dich bereit.",
+        "Zurück ans Eisen.",
+        "Los geht's.",
+        "Runde zwei!",
+        "Fokus an.",
+        "Nächster Satz.",
+        "Auf geht's.",
+        "Konzentration."
+    ]
+
+    private let setCompletedPhrasesDE = [
+        "Guter Satz. Pause.",
+        "Stark gemacht. Durchatmen.",
+        "Solide. Kurze Pause.",
+        "Sauber. Erhol dich.",
+        "Starke Leistung. Ruhe.",
+        "Fertig. Regenerieren.",
+        "Saubere Wiederholungen.",
+        "Genau so."
+    ]
+
+    private let workoutCompletePhrasesDE = [
+        "Workout erledigt! Super gemacht.",
+        "Überlebt! Starke Session.",
+        "Geschafft! Bis zum nächsten Mal.",
+        "Training komplett. Ab zum Essen.",
+        "Stärker als gestern. Gut gemacht.",
+        "Wieder eins geschafft.",
+        "Beast Mode beendet."
+    ]
+
+    private let motivationTipsDE = [
+        "Denk ans Atmen.",
+        "Trink genug Wasser.",
+        "Kontrolliere die Bewegung.",
+        "Spür den Muskel.",
+        "Qualität vor Quantität."
+    ]
+
+    // MARK: - Premium Voice Identifiers
+    // Priority order: Premium > Enhanced > Standard
+    // These voices must be downloaded by the user in iOS Settings > Accessibility > Spoken Content
+
+    private let englishVoicePriority = [
+        "com.apple.voice.premium.en-US.Zoe",
+        "com.apple.voice.enhanced.en-US.Zoe",
+        "com.apple.voice.premium.en-US.Ava",
+        "com.apple.voice.enhanced.en-US.Ava",
+        "com.apple.voice.premium.en-US.Samantha",
+        "com.apple.voice.enhanced.en-US.Samantha",
+        "com.apple.voice.premium.en-US.Evan",
+        "com.apple.voice.enhanced.en-US.Evan"
+    ]
+
+    private let germanVoicePriority = [
+        "com.apple.voice.premium.de-DE.Anna",
+        "com.apple.voice.enhanced.de-DE.Anna",
+        "com.apple.voice.premium.de-DE.Petra",
+        "com.apple.voice.enhanced.de-DE.Petra",
+        "com.apple.voice.premium.de-DE.Markus",
+        "com.apple.voice.enhanced.de-DE.Markus"
+    ]
+
+    // MARK: - Initialization
 
     override init() {
         super.init()
         configureAudioSession()
-        configurePremiumVoice()
     }
 
     private func configureAudioSession() {
@@ -64,91 +174,215 @@ class AudioService: NSObject {
             )
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-            print("Failed to configure AudioSession: \(error)")
+            print("AudioService: Failed to configure AudioSession: \(error)")
         }
     }
 
-    private func configurePremiumVoice() {
-        // Try to find a premium/enhanced voice for more natural speech
-        let preferredVoiceIdentifiers = [
-            "com.apple.voice.premium.en-US.Zoe",
-            "com.apple.voice.enhanced.en-US.Zoe",
-            "com.apple.voice.premium.en-US.Samantha",
-            "com.apple.voice.enhanced.en-US.Samantha",
-            "com.apple.voice.premium.en-US.Evan",
-            "com.apple.voice.enhanced.en-US.Evan"
-        ]
+    // MARK: - Voice Selection
 
-        for identifier in preferredVoiceIdentifiers {
+    /// Returns the best available voice based on current language setting
+    private func getBestVoice() -> AVSpeechSynthesisVoice? {
+        let settings = AppSettings.shared
+
+        // Check if user has a preferred voice set
+        if let preferredId = settings.preferredVoiceIdentifier,
+           let voice = AVSpeechSynthesisVoice(identifier: preferredId) {
+            return voice
+        }
+
+        // Use cached voice if language hasn't changed
+        if let cached = cachedVoice, cachedLanguage == settings.appLanguage {
+            return cached
+        }
+
+        // Find best voice for current language
+        let priorityList = settings.appLanguage == .german ? germanVoicePriority : englishVoicePriority
+        let fallbackLanguage = settings.appLanguage == .german ? "de-DE" : "en-US"
+
+        for identifier in priorityList {
             if let voice = AVSpeechSynthesisVoice(identifier: identifier) {
-                premiumVoice = voice
-                print("Using premium voice: \(identifier)")
-                return
+                cachedVoice = voice
+                cachedLanguage = settings.appLanguage
+                print("AudioService: Using premium voice: \(voice.name)")
+                return voice
             }
         }
 
-        // Fallback to best available en-US voice
-        premiumVoice = AVSpeechSynthesisVoice(language: "en-US")
-        print("Using default en-US voice")
+        // Fallback to default system voice for language
+        let fallbackVoice = AVSpeechSynthesisVoice(language: fallbackLanguage)
+        cachedVoice = fallbackVoice
+        cachedLanguage = settings.appLanguage
+        print("AudioService: Using fallback voice for \(fallbackLanguage)")
+        return fallbackVoice
+    }
+
+    /// Clears voice cache (call when language setting changes)
+    func invalidateVoiceCache() {
+        cachedVoice = nil
+        cachedLanguage = nil
+    }
+
+    // MARK: - Phrase Selection (with history to prevent repetition)
+
+    private func selectPhrase(from phrases: [String], category: PhraseCategory) -> String {
+        var history = phraseHistory[category] ?? []
+
+        // Filter out recently used phrases
+        let available = phrases.filter { !history.contains($0) }
+
+        // If all phrases were used recently, reset history
+        let pool = available.isEmpty ? phrases : available
+
+        guard let selected = pool.randomElement() else {
+            return phrases.first ?? ""
+        }
+
+        // Update history
+        history.append(selected)
+        if history.count > maxHistorySize {
+            history.removeFirst()
+        }
+        phraseHistory[category] = history
+
+        return selected
     }
 
     // MARK: - Basic Announce
 
     func announce(_ text: String, rate: Float = 0.52) {
-        // Stop any current speech
+        guard AppSettings.shared.isVoiceEnabled else { return }
+
         if synthesizer.isSpeaking {
             synthesizer.stopSpeaking(at: .immediate)
         }
 
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = premiumVoice
+        utterance.voice = getBestVoice()
+
+        // Optimized parameters for motivating coach voice
         utterance.rate = rate
-        utterance.pitchMultiplier = 1.05  // Slightly higher pitch for energy
+        utterance.pitchMultiplier = 1.08  // Slightly elevated for energy
         utterance.volume = 1.0
-        utterance.preUtteranceDelay = 0.1
+        utterance.preUtteranceDelay = 0.05
         utterance.postUtteranceDelay = 0.1
 
         synthesizer.speak(utterance)
     }
 
-    // MARK: - Coach Calls (Randomized Motivation)
+    // MARK: - Verbosity Helpers
 
-    /// Called when a new set is about to start (e.g. after rest)
-    func announceSetStart() {
-        let phrase = restEndPhrases.randomElement() ?? "Let's work."
-        announce(phrase, rate: 0.55)
+    private var verbosity: CoachVerbosity {
+        AppSettings.shared.coachVerbosity
     }
 
-    /// Called when rest ends
-    func announceRestEnd() {
-        // This effectively starts the set
-        announceSetStart()
+    private var isGerman: Bool {
+        AppSettings.shared.appLanguage == .german
     }
 
-    /// Called when workout is complete
-    func announceWorkoutComplete() {
-        let phrase = workoutCompletePhrases.randomElement() ?? "Workout complete!"
-        announce(phrase, rate: 0.5)
+    // MARK: - Coach Calls
+
+    /// Called when workout starts
+    func announceWorkoutStart(planName: String, firstExercise: String) {
+        guard verbosity != .minimal else { return }
+
+        let text = isGerman
+            ? "Starte \(planName). Erste Übung: \(firstExercise). Los geht's!"
+            : "Starting \(planName). First up: \(firstExercise). Let's do this."
+        announce(text, rate: 0.50)
     }
 
-    /// Announce exercise with motivation
+    /// Called when moving to next exercise
     func announceExercise(_ name: String) {
-        announce("Next up: \(name). Get ready.", rate: 0.52)
+        guard verbosity != .minimal else { return }
+
+        let text = isGerman
+            ? "Nächste Übung: \(name). Mach dich bereit."
+            : "Next up: \(name). Get ready."
+        announce(text, rate: 0.52)
     }
 
-    /// Countdown announcement
-    func announceCountdown(_ number: Int) {
-        announce("\(number)", rate: 0.6)
-    }
-
-    /// Announce set completed / start resting
+    /// Called when a set is completed and rest begins
     func announceSetCompleted() {
-        let phrase = setCompletedPhrases.randomElement() ?? "Rest."
+        guard verbosity != .minimal else { return }
+
+        let phrases = isGerman ? setCompletedPhrasesDE : setCompletedPhrasesEN
+        let phrase = selectPhrase(from: phrases, category: .setComplete)
         announce(phrase, rate: 0.53)
     }
 
-    /// Announce workout start
-    func announceWorkoutStart(planName: String, firstExercise: String) {
-        announce("Starting \(planName). First up: \(firstExercise). Let's do this.", rate: 0.5)
+    /// Called when rest ends and next set begins
+    func announceRestEnd() {
+        let phrases = isGerman ? restEndPhrasesDE : restEndPhrasesEN
+        let phrase = selectPhrase(from: phrases, category: .restEnd)
+        announce(phrase, rate: 0.55)
+    }
+
+    /// Alias for announceRestEnd (for backwards compatibility)
+    func announceSetStart() {
+        announceRestEnd()
+    }
+
+    /// Called for countdown (3, 2, 1)
+    func announceCountdown(_ number: Int) {
+        // Respect countdown setting
+        guard AppSettings.shared.isVoiceCountdownEnabled else { return }
+
+        let text: String
+        if isGerman {
+            switch number {
+            case 3: text = "Drei"
+            case 2: text = "Zwei"
+            case 1: text = "Eins"
+            default: text = "\(number)"
+            }
+        } else {
+            switch number {
+            case 3: text = "Three"
+            case 2: text = "Two"
+            case 1: text = "One"
+            default: text = "\(number)"
+            }
+        }
+        announce(text, rate: 0.58)
+    }
+
+    /// Called when entire workout is complete
+    func announceWorkoutComplete() {
+        let phrases = isGerman ? workoutCompletePhrasesDE : workoutCompletePhrasesEN
+        let phrase = selectPhrase(from: phrases, category: .workoutComplete)
+        announce(phrase, rate: 0.48)
+    }
+
+    /// Called for extra motivation (only in high verbosity)
+    func announceMotivationTip() {
+        guard verbosity == .high else { return }
+
+        let tips = isGerman ? motivationTipsDE : motivationTipsEN
+        let tip = selectPhrase(from: tips, category: .motivationTip)
+        announce(tip, rate: 0.50)
+    }
+
+    /// Announce pause state
+    func announcePaused() {
+        guard verbosity != .minimal else { return }
+
+        let text = isGerman ? "Pausiert" : "Paused"
+        announce(text, rate: 0.52)
+    }
+
+    /// Announce resume state
+    func announceResumed() {
+        guard verbosity != .minimal else { return }
+
+        let text = isGerman ? "Weiter geht's" : "Let's continue"
+        announce(text, rate: 0.52)
+    }
+
+    // MARK: - Stop
+
+    func stop() {
+        if synthesizer.isSpeaking {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
     }
 }

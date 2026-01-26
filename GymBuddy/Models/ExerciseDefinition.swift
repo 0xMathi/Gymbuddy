@@ -8,6 +8,7 @@ final class ExerciseDefinition {
     var muscleGroup: String
     var equipment: String
     var isCustom: Bool = false
+    var isFavorite: Bool = false
     var createdAt: Date = Date()
 
     init(name: String, muscleGroup: String, equipment: String, isCustom: Bool = false) {
