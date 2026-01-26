@@ -133,8 +133,14 @@ struct PlanEditView: View {
                 }
                 .listRowBackground(Theme.Colors.surface)
                 .listRowSeparatorTint(Theme.Colors.surfaceElevated)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        deleteExercise(exercise)
+                    } label: {
+                        Label("Delete", systemImage: "trash.fill")
+                    }
+                }
             }
-            .onDelete(perform: deleteExercises)
             .onMove(perform: moveExercises)
         }
         .listStyle(.plain)
@@ -176,9 +182,8 @@ struct PlanEditView: View {
         }
     }
 
-    private func deleteExercises(at offsets: IndexSet) {
-        let exercisesToDelete = offsets.map { sortedExercises[$0] }
-        for exercise in exercisesToDelete {
+    private func deleteExercise(_ exercise: Exercise) {
+        withAnimation {
             exerciseManager.removeExerciseFromPlan(exercise: exercise, plan: plan)
         }
     }

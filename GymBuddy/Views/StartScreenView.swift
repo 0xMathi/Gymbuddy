@@ -8,8 +8,8 @@ struct StartScreenView: View {
     @Query(sort: \WorkoutPlan.createdAt, order: .reverse) private var plans: [WorkoutPlan]
 
     @State private var isAnimating = false
-    @State private var selectedPlan: WorkoutPlan?
     @State private var planToEdit: WorkoutPlan?
+    @State private var showSettings = false
 
     // Map plan names to icons (fallback to dumbbell)
     private func iconFor(_ name: String) -> String {
@@ -64,6 +64,9 @@ struct StartScreenView: View {
             .sheet(item: $planToEdit) { plan in
                 PlanEditView(plan: plan)
             }
+            .sheet(isPresented: $showSettings) {
+                SettingsView()
+            }
         }
     }
 
@@ -84,6 +87,16 @@ struct StartScreenView: View {
                     .foregroundStyle(.white)
 
                 Spacer()
+
+                // Settings button
+                Button(action: { showSettings = true }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .frame(width: 36, height: 36)
+                        .background(Theme.Colors.surface)
+                        .cornerRadius(8)
+                }
 
                 // Add plan button
                 Button(action: createNewPlan) {
@@ -221,85 +234,66 @@ struct StartScreenView: View {
             .padding(.horizontal, Theme.Spacing.xl)
             .padding(.bottom, Theme.Spacing.large)
 
-            // Plan Cards
-            VStack(spacing: Theme.Spacing.medium) {
+            // Plan Cards with Swipe-to-Delete
+            List {
                 ForEach(plans) { plan in
                     StartPlanCard(
                         plan: plan,
                         icon: iconFor(plan.name),
                         muscles: musclesFor(plan),
-                        isSelected: selectedPlan?.id == plan.id,
                         onTap: {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                                selectedPlan = plan
+                            if plan.exercises.isEmpty {
+                                // Open edit view for empty plans
+                                planToEdit = plan
+                            } else {
+                                // Start workout directly
+                                HapticService.shared.heavy()
+                                sessionManager.startWorkout(plan: plan)
                             }
                         },
                         onEdit: {
                             planToEdit = plan
                         }
                     )
-                }
-            }
-            .padding(.horizontal, Theme.Spacing.xl)
-
-            Spacer()
-                .frame(height: Theme.Spacing.xl)
-
-            // Start Button
-            if let plan = selectedPlan, !plan.exercises.isEmpty {
-                Button(action: {
-                    HapticService.shared.heavy()
-                    sessionManager.startWorkout(plan: plan)
-                }) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("START")
-                                .font(.system(size: 12, weight: .bold))
-                                .tracking(2)
-
-                            Text(plan.name.uppercased())
-                                .font(.system(size: 24, weight: .black))
-                                .tracking(-1)
+                    .listRowInsets(EdgeInsets(top: Theme.Spacing.small, leading: Theme.Spacing.xl, bottom: Theme.Spacing.small, trailing: Theme.Spacing.xl))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            deletePlan(plan)
+                        } label: {
+                            Label("Delete", systemImage: "trash.fill")
                         }
-
-                        Spacer()
-
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 24, weight: .bold))
                     }
-                    .foregroundStyle(.black)
-                    .padding(.horizontal, Theme.Spacing.xl)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 80)
-                    .background(Theme.Colors.accent)
                 }
-                .padding(.horizontal, Theme.Spacing.xl)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if let plan = selectedPlan, plan.exercises.isEmpty {
-                Button(action: { planToEdit = plan }) {
+
+                // Large "+" Button for new plans
+                Button(action: createNewPlan) {
                     HStack {
-                        Text("ADD EXERCISES TO START")
-                            .font(.system(size: 14, weight: .black))
-                            .tracking(2)
-
-                        Spacer()
-
                         Image(systemName: "plus")
-                            .font(.system(size: 20, weight: .bold))
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundStyle(Theme.Colors.accent)
                     }
-                    .foregroundStyle(Theme.Colors.accent)
-                    .padding(.horizontal, Theme.Spacing.xl)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 64)
-                    .background(Theme.Colors.surface)
+                    .frame(height: 100)
+                    .background(Theme.Colors.surfaceElevated.opacity(0.5))
                     .overlay(
-                        Rectangle()
-                            .stroke(Theme.Colors.accent, lineWidth: 2)
+                        RoundedRectangle(cornerRadius: 0)
+                            .strokeBorder(
+                                style: StrokeStyle(lineWidth: 2, dash: [8, 6])
+                            )
+                            .foregroundStyle(Theme.Colors.surfaceElevated)
                     )
                 }
-                .padding(.horizontal, Theme.Spacing.xl)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .buttonStyle(.plain)
+                .listRowInsets(EdgeInsets(top: Theme.Spacing.small, leading: Theme.Spacing.xl, bottom: Theme.Spacing.small, trailing: Theme.Spacing.xl))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .scrollDisabled(true)
+            .frame(minHeight: CGFloat(plans.count + 1) * 116)
 
             Spacer()
                 .frame(height: Theme.Spacing.xxxl)
@@ -323,6 +317,13 @@ struct StartScreenView: View {
             planToEdit = newPlan
         }
     }
+
+    private func deletePlan(_ plan: WorkoutPlan) {
+        HapticService.shared.medium()
+        withAnimation {
+            modelContext.delete(plan)
+        }
+    }
 }
 
 // MARK: - Plan Card Component
@@ -331,7 +332,6 @@ private struct StartPlanCard: View {
     let plan: WorkoutPlan
     let icon: String
     let muscles: String
-    let isSelected: Bool
     let onTap: () -> Void
     let onEdit: () -> Void
 
@@ -349,22 +349,16 @@ private struct StartPlanCard: View {
                             )
                         )
 
-                    if isSelected {
-                        Theme.Colors.accent.opacity(0.5)
-                            .transition(.opacity)
-                    }
-
                     Image(systemName: icon)
                         .font(.system(size: 28, weight: .bold))
-                        .foregroundStyle(isSelected ? .white : .white.opacity(0.4))
+                        .foregroundStyle(.white.opacity(0.6))
                 }
                 .frame(width: 100, height: 100)
 
                 // Accent bar
                 Rectangle()
-                    .fill(isSelected ? Theme.Colors.accent : Theme.Colors.surfaceElevated)
-                    .frame(width: isSelected ? 4 : 2)
-                    .animation(.spring(response: 0.3), value: isSelected)
+                    .fill(Theme.Colors.surfaceElevated)
+                    .frame(width: 2)
 
                 // Text content
                 VStack(alignment: .leading, spacing: 4) {
@@ -404,8 +398,6 @@ private struct StartPlanCard: View {
                 .padding(.trailing, Theme.Spacing.medium)
             }
             .background(Theme.Colors.surface)
-            .scaleEffect(isSelected ? 1.02 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         }
         .buttonStyle(.plain)
     }

@@ -35,6 +35,9 @@
 		A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004B280A00010001 /* Variant5_MinimalPower.swift */; };
 		A000004C280A00010001 /* FinalStartScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004D280A00010001 /* FinalStartScreen.swift */; };
 		A000004E280A00010001 /* StartScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004F280A00010001 /* StartScreenView.swift */; };
+		C7660E042F278286007D9059 /* VoiceSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E022F278286007D9059 /* VoiceSelectionView.swift */; };
+		C7660E052F278286007D9059 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E012F278286007D9059 /* SettingsView.swift */; };
+		C7660E072F2782AA007D9059 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E062F2782AA007D9059 /* AppSettings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,6 +71,9 @@
 		A000004B280A00010001 /* Variant5_MinimalPower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant5_MinimalPower.swift; sourceTree = "<group>"; };
 		A000004D280A00010001 /* FinalStartScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalStartScreen.swift; sourceTree = "<group>"; };
 		A000004F280A00010001 /* StartScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartScreenView.swift; sourceTree = "<group>"; };
+		C7660E012F278286007D9059 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C7660E022F278286007D9059 /* VoiceSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSelectionView.swift; sourceTree = "<group>"; };
+		C7660E062F2782AA007D9059 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +124,7 @@
 		A0000021280A00010001 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				C7660E062F2782AA007D9059 /* AppSettings.swift */,
 				A0000008280A00010001 /* Exercise.swift */,
 				A000000A280A00010001 /* WorkoutPlan.swift */,
 				A000000C280A00010001 /* WorkoutSession.swift */,
@@ -149,6 +156,7 @@
 		A0000024280A00010001 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C7660E032F278286007D9059 /* Settings */,
 				A000004F280A00010001 /* StartScreenView.swift */,
 				A0000025280A00010001 /* Workout */,
 				A0000026280A00010001 /* Plans */,
@@ -195,6 +203,15 @@
 				A000004D280A00010001 /* FinalStartScreen.swift */,
 			);
 			path = DesignLab;
+			sourceTree = "<group>";
+		};
+		C7660E032F278286007D9059 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				C7660E012F278286007D9059 /* SettingsView.swift */,
+				C7660E022F278286007D9059 /* VoiceSelectionView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -274,6 +291,7 @@
 				A000000B280A00010001 /* WorkoutSession.swift in Sources */,
 				A000000D280A00010001 /* AudioService.swift in Sources */,
 				A0000036280A00010001 /* ExerciseManager.swift in Sources */,
+				C7660E072F2782AA007D9059 /* AppSettings.swift in Sources */,
 				A000000F280A00010001 /* HapticService.swift in Sources */,
 				A0000011280A00010001 /* PrimaryButton.swift in Sources */,
 				A0000013280A00010001 /* RestTimerView.swift in Sources */,
@@ -289,6 +307,8 @@
 				A0000042280A00010001 /* Variant1_JustDoIt.swift in Sources */,
 				A0000044280A00010001 /* Variant2_SplitCards.swift in Sources */,
 				A0000046280A00010001 /* Variant3_StatsHero.swift in Sources */,
+				C7660E042F278286007D9059 /* VoiceSelectionView.swift in Sources */,
+				C7660E052F278286007D9059 /* SettingsView.swift in Sources */,
 				A0000048280A00010001 /* Variant4_Editorial.swift in Sources */,
 				A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */,
 				A000004C280A00010001 /* FinalStartScreen.swift in Sources */,
