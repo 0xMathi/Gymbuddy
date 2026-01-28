@@ -6,16 +6,18 @@ struct VoiceSelectionView: View {
     @State private var synthesizer = AVSpeechSynthesizer()
     @State private var playingVoiceId: String?
 
-    /// Sorted voices: Premium first, then Enhanced, then Standard
+    /// Sorted voices: Premium first, then Enhanced (no standard voices)
     private var sortedVoices: [AVSpeechSynthesisVoice] {
-        settings.availableVoices.sorted { v1, v2 in
-            let q1 = qualityRank(v1)
-            let q2 = qualityRank(v2)
-            if q1 != q2 {
-                return q1 > q2  // Higher quality first
+        settings.availableVoices
+            .filter { qualityRank($0) >= 2 }  // Only Premium (3) and Enhanced (2)
+            .sorted { v1, v2 in
+                let q1 = qualityRank(v1)
+                let q2 = qualityRank(v2)
+                if q1 != q2 {
+                    return q1 > q2  // Higher quality first
+                }
+                return v1.name < v2.name  // Alphabetical within same quality
             }
-            return v1.name < v2.name  // Alphabetical within same quality
-        }
     }
 
     /// Returns quality rank: Premium=3, Enhanced=2, Default=1
@@ -101,7 +103,7 @@ struct VoiceSelectionView: View {
                 }
             }
         } footer: {
-            Text("Premium voices sound most natural. Download them in iOS Settings → Accessibility → Spoken Content → Voices.")
+            Text("Only Premium and Enhanced voices are shown.")
                 .font(.system(size: 11))
                 .foregroundStyle(Theme.Colors.textSecondary.opacity(0.7))
         }

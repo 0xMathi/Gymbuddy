@@ -7,6 +7,12 @@ class AudioService: NSObject {
     private var cachedVoice: AVSpeechSynthesisVoice?
     private var cachedLanguage: AppLanguage?
 
+    // MARK: - ElevenLabs Integration
+
+    private var audioPlayer: AVAudioPlayer?
+    private let elevenLabs = ElevenLabsService.shared
+    private let audioCache = AudioCacheService.shared
+
     // MARK: - Phrase History (prevents repetition)
 
     private var phraseHistory: [PhraseCategory: [String]] = [:]
@@ -23,115 +29,254 @@ class AudioService: NSObject {
     // MARK: - Motivational Phrases (English)
 
     private let setStartPhrasesEN = [
+        // Power phrases
         "Let's crush this set!",
-        "Focus. Power.",
         "Light weight, baby!",
         "Own this set!",
+        "Time to dominate!",
+        "Show me what you got!",
+        "You've got this!",
+        "Let's go beast mode!",
+        "This is your moment!",
+        "Attack this set!",
+        "No excuses. Just results.",
+        // Focus phrases
+        "Focus. Power. Go!",
         "Strong form, let's go.",
         "Make it look easy.",
         "Full range of motion.",
         "Drive through!",
-        "Show me what you got!",
         "Time to shine.",
-        "You've got this."
+        "Lock it in!",
+        "Eyes on the prize.",
+        "Mental focus, physical power.",
+        "Channel your inner beast!",
+        // Motivational
+        "You're stronger than you think!",
+        "Pain is temporary, gains are forever.",
+        "Champions are made here.",
+        "Push past your limits!",
+        "This set defines you!",
+        "Leave nothing in the tank!",
+        "Make yourself proud!",
+        "Embrace the grind!"
     ]
 
     private let restEndPhrasesEN = [
+        // Action calls
         "Time to work!",
-        "Get ready.",
-        "Back under the bar.",
-        "Let's get it.",
+        "Let's get it!",
+        "Back under the bar!",
+        "Next set starts now!",
+        "Here we go!",
         "Round two, fight!",
+        "Game time!",
+        "Rise and grind!",
+        "Get after it!",
+        "Attack mode activated!",
+        // Focus phrases
+        "Get ready.",
         "Focus mode: On.",
-        "Next set starts now.",
-        "Here we go.",
-        "Lock in."
+        "Lock in.",
+        "Concentration time.",
+        "Clear your mind.",
+        "Deep breath and go!",
+        "Reset. Refocus. Repeat.",
+        // Motivation
+        "You rested. Now dominate!",
+        "Rest is over. Time to earn it!",
+        "Your muscles are ready!",
+        "Channel that energy!"
     ]
 
     private let setCompletedPhrasesEN = [
+        // Praise
         "Good set. Rest up.",
-        "Nice work. Catch your breath.",
-        "Solid. Take a break.",
+        "Nice work! Catch your breath.",
+        "Solid work. Take a break.",
+        "Strong effort! Relax.",
+        "Clean reps! Rest.",
+        "That's how it's done!",
+        "Excellent execution!",
+        "Perfect form!",
+        "You killed it!",
+        "Crushed it!",
+        // Rest reminders
         "Easy money. Rest now.",
-        "Strong effort. Relax.",
         "Done. Recover.",
-        "Clean reps. Rest.",
-        "That's how it's done."
+        "Take your break. You earned it.",
+        "Breathe. Recover. Repeat.",
+        "Shake it off. Rest up.",
+        "Great work. Hydrate!",
+        // Motivation
+        "One step closer to your goals!",
+        "That's progress right there!",
+        "Building muscle, building character."
     ]
 
     private let workoutCompletePhrasesEN = [
-        "Workout destroyed! Excellent job.",
-        "You survived! Great session.",
-        "Victory! See you next time.",
-        "Session complete. Go eat.",
-        "Stronger than yesterday. Good job.",
+        // Celebration
+        "Workout destroyed! Excellent job!",
+        "You survived! Great session!",
+        "Victory! See you next time!",
+        "Beast mode complete!",
+        "Champion workout!",
+        "Absolutely crushed it!",
+        "Mission accomplished!",
+        "That was epic!",
+        // Reflection
+        "Session complete. Go eat!",
+        "Stronger than yesterday!",
         "Another one in the books.",
-        "Beast mode complete."
+        "You showed up. You delivered.",
+        "Progress made. Gains incoming!",
+        // Motivation for next time
+        "Rest well. Come back stronger!",
+        "Recovery time. You've earned it!",
+        "Today you won. Tomorrow you conquer!",
+        "The grind never stops!"
     ]
 
     private let motivationTipsEN = [
-        "Remember to breathe.",
-        "Stay hydrated.",
-        "Control the negative.",
-        "Mind-muscle connection.",
-        "Quality over quantity."
+        "Remember to breathe!",
+        "Stay hydrated!",
+        "Control the negative!",
+        "Mind-muscle connection!",
+        "Quality over quantity!",
+        "Squeeze at the top!",
+        "Core tight!",
+        "Shoulders back!",
+        "Drive through your heels!",
+        "Full extension!",
+        "Slow and controlled!",
+        "Feel the burn!",
+        "Trust the process!",
+        "Consistency is key!"
     ]
 
     // MARK: - Motivational Phrases (German)
 
     private let setStartPhrasesDE = [
+        // Power Phrasen
         "Auf geht's!",
-        "Fokus. Kraft.",
         "Leichtes Gewicht!",
         "Der Satz gehört dir!",
+        "Zeit zu dominieren!",
+        "Zeig was du kannst!",
+        "Du schaffst das!",
+        "Beast Mode an!",
+        "Das ist dein Moment!",
+        "Attacke!",
+        "Keine Ausreden. Nur Ergebnisse!",
+        // Fokus Phrasen
+        "Fokus. Kraft. Los!",
         "Saubere Form, los!",
-        "Zeig was du kannst.",
-        "Volle Bewegung.",
+        "Mach es einfach aussehen!",
+        "Volle Bewegung!",
         "Durchziehen!",
+        "Jetzt wird's ernst!",
+        "Bleib fokussiert!",
+        "Augen aufs Ziel!",
+        "Mental fokus, körperliche Kraft!",
+        "Entfessle dein inneres Biest!",
+        // Motivation
+        "Du bist stärker als du denkst!",
+        "Schmerz ist temporär, Gains sind für immer!",
+        "Champions werden hier gemacht!",
+        "Überschreite deine Grenzen!",
+        "Dieser Satz definiert dich!",
         "Gib alles!",
-        "Jetzt wird's ernst.",
-        "Du schaffst das."
+        "Mach dich selbst stolz!",
+        "Umarme den Grind!"
     ]
 
     private let restEndPhrasesDE = [
+        // Action Calls
         "Zeit zu arbeiten!",
-        "Mach dich bereit.",
-        "Zurück ans Eisen.",
-        "Los geht's.",
+        "Los geht's!",
+        "Zurück ans Eisen!",
+        "Nächster Satz jetzt!",
+        "Auf geht's!",
         "Runde zwei!",
+        "Showtime!",
+        "Aufstehen und kämpfen!",
+        "Gib Gas!",
+        "Angriffsmodus aktiviert!",
+        // Fokus Phrasen
+        "Mach dich bereit.",
         "Fokus an.",
-        "Nächster Satz.",
-        "Auf geht's.",
-        "Konzentration."
+        "Konzentration.",
+        "Tief durchatmen und los!",
+        "Reset. Refokus. Wiederholen.",
+        // Motivation
+        "Du hast geruht. Jetzt dominieren!",
+        "Pause vorbei. Zeit es zu verdienen!",
+        "Deine Muskeln sind bereit!"
     ]
 
     private let setCompletedPhrasesDE = [
-        "Guter Satz. Pause.",
-        "Stark gemacht. Durchatmen.",
-        "Solide. Kurze Pause.",
+        // Lob
+        "Guter Satz! Pause.",
+        "Stark gemacht! Durchatmen.",
+        "Solide! Kurze Pause.",
+        "Starke Leistung! Ruhe.",
+        "Saubere Wiederholungen!",
+        "Genau so!",
+        "Exzellente Ausführung!",
+        "Perfekte Form!",
+        "Du hast es gekillt!",
+        "Zerstört!",
+        // Pausen-Reminder
         "Sauber. Erhol dich.",
-        "Starke Leistung. Ruhe.",
         "Fertig. Regenerieren.",
-        "Saubere Wiederholungen.",
-        "Genau so."
+        "Nimm dir die Pause. Du hast sie verdient.",
+        "Atmen. Erholen. Wiederholen.",
+        "Abschütteln. Ausruhen.",
+        "Super Arbeit. Trink was!",
+        // Motivation
+        "Ein Schritt näher an deinen Zielen!",
+        "Das ist Fortschritt!",
+        "Muskeln aufbauen, Charakter bilden."
     ]
 
     private let workoutCompletePhrasesDE = [
-        "Workout erledigt! Super gemacht.",
-        "Überlebt! Starke Session.",
-        "Geschafft! Bis zum nächsten Mal.",
-        "Training komplett. Ab zum Essen.",
-        "Stärker als gestern. Gut gemacht.",
+        // Feier
+        "Workout erledigt! Super gemacht!",
+        "Überlebt! Starke Session!",
+        "Geschafft! Bis zum nächsten Mal!",
+        "Beast Mode beendet!",
+        "Champion-Workout!",
+        "Absolut zerstört!",
+        "Mission erfüllt!",
+        "Das war episch!",
+        // Reflexion
+        "Training komplett. Ab zum Essen!",
+        "Stärker als gestern!",
         "Wieder eins geschafft.",
-        "Beast Mode beendet."
+        "Du bist erschienen. Du hast geliefert.",
+        "Fortschritt gemacht. Gains kommen!",
+        // Motivation für nächstes Mal
+        "Ruh dich aus. Komm stärker zurück!",
+        "Erholungszeit. Du hast es verdient!",
+        "Heute gewonnen. Morgen erobern!",
+        "Der Grind stoppt nie!"
     ]
 
     private let motivationTipsDE = [
-        "Denk ans Atmen.",
-        "Trink genug Wasser.",
-        "Kontrolliere die Bewegung.",
-        "Spür den Muskel.",
-        "Qualität vor Quantität."
+        "Denk ans Atmen!",
+        "Trink genug Wasser!",
+        "Kontrolliere die Bewegung!",
+        "Spür den Muskel!",
+        "Qualität vor Quantität!",
+        "Oben zusammendrücken!",
+        "Core anspannen!",
+        "Schultern zurück!",
+        "Durch die Fersen drücken!",
+        "Volle Extension!",
+        "Langsam und kontrolliert!",
+        "Spür das Brennen!",
+        "Vertraue dem Prozess!",
+        "Konstanz ist der Schlüssel!"
     ]
 
     // MARK: - Premium Voice Identifiers
@@ -252,6 +397,66 @@ class AudioService: NSObject {
     func announce(_ text: String, rate: Float = 0.52) {
         guard AppSettings.shared.isVoiceEnabled else { return }
 
+        // Stop any current playback
+        stopCurrentPlayback()
+
+        // Check if ElevenLabs is enabled
+        if AppSettings.shared.useElevenLabs {
+            Task { @MainActor in
+                await announceWithElevenLabs(text, fallbackRate: rate)
+            }
+        } else {
+            announceWithNativeVoice(text, rate: rate)
+        }
+    }
+
+    // MARK: - ElevenLabs Speech
+
+    @MainActor
+    private func announceWithElevenLabs(_ text: String, fallbackRate: Float) async {
+        // Check cache first
+        if let cachedData = audioCache.getCachedAudio(for: text) {
+            playAudioData(cachedData)
+            return
+        }
+
+        // Try to generate with ElevenLabs
+        do {
+            let audioData = try await elevenLabs.generateSpeech(text: text)
+
+            // Cache the result for future use
+            audioCache.cacheAudio(audioData, for: text)
+
+            // Play the audio
+            playAudioData(audioData)
+
+        } catch {
+            // Log the error
+            print("AudioService: ElevenLabs failed, falling back to native voice: \(error.localizedDescription)")
+
+            // Fallback to native Apple voice
+            announceWithNativeVoice(text, rate: fallbackRate)
+        }
+    }
+
+    private func playAudioData(_ data: Data) {
+        do {
+            // Ensure audio session is configured
+            configureAudioSession()
+
+            audioPlayer = try AVAudioPlayer(data: data)
+            audioPlayer?.volume = 1.0
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
+
+        } catch {
+            print("AudioService: Failed to play audio data: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: - Native Voice Speech
+
+    private func announceWithNativeVoice(_ text: String, rate: Float) {
         if synthesizer.isSpeaking {
             synthesizer.stopSpeaking(at: .immediate)
         }
@@ -267,6 +472,19 @@ class AudioService: NSObject {
         utterance.postUtteranceDelay = 0.1
 
         synthesizer.speak(utterance)
+    }
+
+    private func stopCurrentPlayback() {
+        // Stop AVAudioPlayer if playing
+        if let player = audioPlayer, player.isPlaying {
+            player.stop()
+        }
+        audioPlayer = nil
+
+        // Stop synthesizer if speaking
+        if synthesizer.isSpeaking {
+            synthesizer.stopSpeaking(at: .immediate)
+        }
     }
 
     // MARK: - Verbosity Helpers
@@ -381,8 +599,6 @@ class AudioService: NSObject {
     // MARK: - Stop
 
     func stop() {
-        if synthesizer.isSpeaking {
-            synthesizer.stopSpeaking(at: .immediate)
-        }
+        stopCurrentPlayback()
     }
 }

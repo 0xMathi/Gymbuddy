@@ -88,6 +88,10 @@ final class AppSettings {
         static let isVoiceCountdownEnabled = "isVoiceCountdownEnabled"
         static let preferredVoiceIdentifier = "preferredVoiceIdentifier"
         static let defaultRestSeconds = "defaultRestSeconds"
+        // ElevenLabs
+        static let useElevenLabs = "useElevenLabs"
+        static let elevenLabsApiKey = "elevenLabsApiKey"
+        static let elevenLabsVoiceId = "elevenLabsVoiceId"
     }
 
     // MARK: - Properties
@@ -118,6 +122,28 @@ final class AppSettings {
 
     var defaultRestSeconds: Int {
         didSet { save(defaultRestSeconds, forKey: Keys.defaultRestSeconds) }
+    }
+
+    // MARK: - ElevenLabs Properties
+
+    var useElevenLabs: Bool {
+        didSet { save(useElevenLabs, forKey: Keys.useElevenLabs) }
+    }
+
+    /// API Key stored securely in Keychain (not UserDefaults)
+    var elevenLabsApiKey: String? {
+        get { KeychainService.shared.get(.elevenLabsApiKey) }
+        set {
+            if let value = newValue, !value.isEmpty {
+                KeychainService.shared.save(value, for: .elevenLabsApiKey)
+            } else {
+                KeychainService.shared.delete(.elevenLabsApiKey)
+            }
+        }
+    }
+
+    var elevenLabsVoiceId: String {
+        didSet { save(elevenLabsVoiceId, forKey: Keys.elevenLabsVoiceId) }
     }
 
     // MARK: - Computed Properties
@@ -189,6 +215,24 @@ final class AppSettings {
         // Load default rest seconds (default: 90)
         let storedRest = defaults.integer(forKey: Keys.defaultRestSeconds)
         self.defaultRestSeconds = storedRest > 0 ? storedRest : 90
+
+        // Load ElevenLabs settings (default: enabled)
+        if defaults.object(forKey: Keys.useElevenLabs) != nil {
+            self.useElevenLabs = defaults.bool(forKey: Keys.useElevenLabs)
+        } else {
+            self.useElevenLabs = true  // ElevenLabs is now the default
+        }
+
+        // Migrate API key from UserDefaults to Keychain (one-time migration)
+        if let oldKey = defaults.string(forKey: Keys.elevenLabsApiKey), !oldKey.isEmpty {
+            KeychainService.shared.save(oldKey, for: .elevenLabsApiKey)
+            defaults.removeObject(forKey: Keys.elevenLabsApiKey)
+            print("AppSettings: Migrated API key to Keychain")
+        }
+
+        // elevenLabsApiKey is now a computed property that reads from Keychain
+
+        self.elevenLabsVoiceId = defaults.string(forKey: Keys.elevenLabsVoiceId) ?? "21m00Tcm4TlvDq8ikWAM"
     }
 
     // MARK: - Persistence Helpers

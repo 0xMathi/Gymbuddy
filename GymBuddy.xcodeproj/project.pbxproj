@@ -38,6 +38,10 @@
 		C7660E042F278286007D9059 /* VoiceSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E022F278286007D9059 /* VoiceSelectionView.swift */; };
 		C7660E052F278286007D9059 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E012F278286007D9059 /* SettingsView.swift */; };
 		C7660E072F2782AA007D9059 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E062F2782AA007D9059 /* AppSettings.swift */; };
+		C7660E0A2F27AD5C007D9059 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E092F27AD5C007D9059 /* ElevenLabsService.swift */; };
+		C7660E0B2F27AD5C007D9059 /* AudioCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E082F27AD5C007D9059 /* AudioCacheService.swift */; };
+		C7660E0D2F27B3D9007D9059 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E0C2F27B3D9007D9059 /* KeychainService.swift */; };
+		C7660E0F2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E0E2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -74,6 +78,10 @@
 		C7660E012F278286007D9059 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C7660E022F278286007D9059 /* VoiceSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSelectionView.swift; sourceTree = "<group>"; };
 		C7660E062F2782AA007D9059 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		C7660E082F27AD5C007D9059 /* AudioCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCacheService.swift; sourceTree = "<group>"; };
+		C7660E092F27AD5C007D9059 /* ElevenLabsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsService.swift; sourceTree = "<group>"; };
+		C7660E0C2F27B3D9007D9059 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		C7660E0E2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsVoicePickerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +145,9 @@
 		A0000022280A00010001 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				C7660E0C2F27B3D9007D9059 /* KeychainService.swift */,
+				C7660E082F27AD5C007D9059 /* AudioCacheService.swift */,
+				C7660E092F27AD5C007D9059 /* ElevenLabsService.swift */,
 				A000000E280A00010001 /* AudioService.swift */,
 				A0000010280A00010001 /* HapticService.swift */,
 				A0000037280A00010001 /* ExerciseManager.swift */,
@@ -208,6 +219,7 @@
 		C7660E032F278286007D9059 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				C7660E0E2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift */,
 				C7660E012F278286007D9059 /* SettingsView.swift */,
 				C7660E022F278286007D9059 /* VoiceSelectionView.swift */,
 			);
@@ -307,9 +319,13 @@
 				A0000042280A00010001 /* Variant1_JustDoIt.swift in Sources */,
 				A0000044280A00010001 /* Variant2_SplitCards.swift in Sources */,
 				A0000046280A00010001 /* Variant3_StatsHero.swift in Sources */,
+				C7660E0F2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift in Sources */,
 				C7660E042F278286007D9059 /* VoiceSelectionView.swift in Sources */,
 				C7660E052F278286007D9059 /* SettingsView.swift in Sources */,
+				C7660E0D2F27B3D9007D9059 /* KeychainService.swift in Sources */,
 				A0000048280A00010001 /* Variant4_Editorial.swift in Sources */,
+				C7660E0A2F27AD5C007D9059 /* ElevenLabsService.swift in Sources */,
+				C7660E0B2F27AD5C007D9059 /* AudioCacheService.swift in Sources */,
 				A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */,
 				A000004C280A00010001 /* FinalStartScreen.swift in Sources */,
 				A000004E280A00010001 /* StartScreenView.swift in Sources */,
