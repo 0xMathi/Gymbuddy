@@ -10,7 +10,6 @@ enum ElevenLabsVoice: String, CaseIterable, Identifiable {
     case bella = "EXAVITQu4vr4xnSDxMaL"       // Bella - Soft, warm
     case elli = "MF3mGyEYCl7XYWbV9V6O"        // Elli - Young, energetic
     case charlotte = "XB0fDUnXU5powFXDhCwa"   // Charlotte - Swedish, clear
-    case gabi = "2a4hHlsDTKftHftAn2dR"        // Gabi - Custom voice
 
     // Male Voices
     case adam = "pNInz6obpgDQGcFmaJgB"        // Adam - Deep, authoritative
@@ -28,7 +27,6 @@ enum ElevenLabsVoice: String, CaseIterable, Identifiable {
         case .bella: return "Bella"
         case .elli: return "Elli"
         case .charlotte: return "Charlotte"
-        case .gabi: return "Gabi"
         case .adam: return "Adam"
         case .antoni: return "Antoni"
         case .josh: return "Josh"
@@ -44,7 +42,6 @@ enum ElevenLabsVoice: String, CaseIterable, Identifiable {
         case .bella: return "Soft & Warm"
         case .elli: return "Young & Energetic"
         case .charlotte: return "Swedish Accent"
-        case .gabi: return "Motivating & Friendly"
         case .adam: return "Deep & Authoritative"
         case .antoni: return "Warm & Friendly"
         case .josh: return "Young & Dynamic"
@@ -55,7 +52,7 @@ enum ElevenLabsVoice: String, CaseIterable, Identifiable {
 
     var gender: String {
         switch self {
-        case .rachel, .domi, .bella, .elli, .charlotte, .gabi:
+        case .rachel, .domi, .bella, .elli, .charlotte:
             return "Female"
         case .adam, .antoni, .josh, .arnold, .sam:
             return "Male"
@@ -69,7 +66,7 @@ enum ElevenLabsVoice: String, CaseIterable, Identifiable {
     /// Recommended for gym coaching
     var isRecommended: Bool {
         switch self {
-        case .adam, .josh, .domi, .sam, .gabi: return true
+        case .adam, .josh, .domi, .sam: return true
         default: return false
         }
     }

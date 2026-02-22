@@ -4,9 +4,10 @@ import SwiftData
 struct PlanListView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(WorkoutSessionManager.self) private var sessionManager
-    @Query(sort: \WorkoutPlan.createdAt, order: .reverse) private var plans: [WorkoutPlan]
+    @Query(sort: \WorkoutPlan.orderIndex, order: .forward) private var plans: [WorkoutPlan]
 
     @State private var planToEdit: WorkoutPlan?
+    @State private var isEditMode: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -22,6 +23,20 @@ struct PlanListView: View {
             .navigationTitle("GymBuddy")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if !plans.isEmpty {
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3)) {
+                                isEditMode.toggle()
+                            }
+                            HapticService.shared.light()
+                        }) {
+                            Text(isEditMode ? "Fertig" : "Sortieren")
+                                .font(Theme.Fonts.body)
+                                .foregroundStyle(Theme.Colors.accent)
+                        }
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(action: createNewPlan) {
                         Image(systemName: "plus.circle.fill")
@@ -65,35 +80,65 @@ struct PlanListView: View {
     }
 
     private var planListView: some View {
-        ScrollView {
-            LazyVStack(spacing: Theme.Spacing.medium) {
-                ForEach(plans) { plan in
-                    PlanCard(
-                        plan: plan,
-                        onStart: {
-                            if !plan.exercises.isEmpty {
-                                sessionManager.startWorkout(plan: plan)
-                            } else {
-                                planToEdit = plan
-                            }
-                        },
-                        onEdit: {
+        List {
+            ForEach(plans) { plan in
+                PlanCard(
+                    plan: plan,
+                    isEditMode: isEditMode,
+                    onStart: {
+                        if !plan.exercises.isEmpty {
+                            sessionManager.startWorkout(plan: plan)
+                        } else {
                             planToEdit = plan
-                        },
-                        onDelete: {
-                            deletePlan(plan)
                         }
-                    )
-                }
+                    },
+                    onEdit: {
+                        planToEdit = plan
+                    },
+                    onDelete: {
+                        deletePlan(plan)
+                    }
+                )
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             }
-            .padding(Theme.Spacing.large)
+            .onMove(perform: movePlans)
+        }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .environment(\.editMode, .constant(isEditMode ? .active : .inactive))
+    }
+
+    // MARK: - Reorder
+
+    private func movePlans(from source: IndexSet, to destination: Int) {
+        // Create mutable copy
+        var reorderedPlans = Array(plans)
+        reorderedPlans.move(fromOffsets: source, toOffset: destination)
+
+        // Update orderIndex for all plans in SwiftData
+        for (index, plan) in reorderedPlans.enumerated() {
+            plan.orderIndex = index
+        }
+
+        // Haptic feedback
+        HapticService.shared.medium()
+
+        do {
+            try modelContext.save()
+            print("Reordered plans saved successfully")
+        } catch {
+            print("Failed to save reordered plans: \(error)")
         }
     }
 
     // MARK: - Actions
 
     private func createNewPlan() {
-        let newPlan = WorkoutPlan(name: "New Plan")
+        // New plans get the highest orderIndex (appear at the end)
+        let maxOrderIndex = plans.map { $0.orderIndex }.max() ?? -1
+        let newPlan = WorkoutPlan(name: "New Plan", orderIndex: maxOrderIndex + 1)
         modelContext.insert(newPlan)
 
         // Small delay to ensure the plan is inserted before opening the editor
@@ -112,12 +157,22 @@ struct PlanListView: View {
 
 struct PlanCard: View {
     let plan: WorkoutPlan
+    var isEditMode: Bool = false
     let onStart: () -> Void
     let onEdit: () -> Void
     let onDelete: () -> Void
 
     var body: some View {
-        Button(action: onStart) {
+        HStack(spacing: 12) {
+            // Drag handle (visible in edit mode)
+            if isEditMode {
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .frame(width: 24)
+            }
+
+            // Main card content
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(plan.name)
@@ -136,49 +191,64 @@ struct PlanCard: View {
                 }
                 Spacer()
 
-                // Edit Button
-                Button(action: {
-                    HapticService.shared.light()
-                    onEdit()
-                }) {
-                    Image(systemName: "pencil")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Theme.Colors.textSecondary)
-                        .frame(width: 36, height: 36)
-                        .background(Theme.Colors.surfaceElevated)
-                        .cornerRadius(8)
-                }
-                .buttonStyle(.plain)
+                if !isEditMode {
+                    // Edit Button
+                    Button(action: {
+                        HapticService.shared.light()
+                        onEdit()
+                    }) {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                            .frame(width: 36, height: 36)
+                            .background(Theme.Colors.surfaceElevated)
+                            .cornerRadius(8)
+                    }
+                    .buttonStyle(.plain)
 
-                // Play Button (only if has exercises)
-                if !plan.exercises.isEmpty {
-                    Image(systemName: "play.fill")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Theme.Colors.accent)
-                        .frame(width: 36, height: 36)
-                        .background(Theme.Colors.accentDim)
-                        .cornerRadius(8)
+                    // Play Button (only if has exercises)
+                    if !plan.exercises.isEmpty {
+                        Button(action: {
+                            HapticService.shared.light()
+                            onStart()
+                        }) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(Theme.Colors.accent)
+                                .frame(width: 36, height: 36)
+                                .background(Theme.Colors.accentDim)
+                                .cornerRadius(8)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
             .padding(Theme.Spacing.large)
             .background(Theme.Colors.surface)
             .cornerRadius(Theme.Layout.cornerRadius)
         }
-        .buttonStyle(.plain)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if !isEditMode {
+                onStart()
+            }
+        }
         .contextMenu {
-            Button(action: onEdit) {
-                Label("Edit Plan", systemImage: "pencil")
-            }
+            if !isEditMode {
+                Button(action: onEdit) {
+                    Label("Edit Plan", systemImage: "pencil")
+                }
 
-            Button(action: onStart) {
-                Label("Start Workout", systemImage: "play.fill")
-            }
-            .disabled(plan.exercises.isEmpty)
+                Button(action: onStart) {
+                    Label("Start Workout", systemImage: "play.fill")
+                }
+                .disabled(plan.exercises.isEmpty)
 
-            Divider()
+                Divider()
 
-            Button(role: .destructive, action: onDelete) {
-                Label("Delete Plan", systemImage: "trash")
+                Button(role: .destructive, action: onDelete) {
+                    Label("Delete Plan", systemImage: "trash")
+                }
             }
         }
     }

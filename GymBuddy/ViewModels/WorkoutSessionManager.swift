@@ -92,6 +92,50 @@ class WorkoutSessionManager {
         endRest()
     }
 
+    func jumpToExercise(index: Int) {
+        guard var currentSession = session else { return }
+        let exercises = currentSession.sortedExercises
+        guard exercises.indices.contains(index) else { return }
+
+        stopTimer()
+
+        currentSession.currentExerciseIndex = index
+        currentSession.currentSetNumber = 1
+        currentSession.state = .active
+        currentSession.restTimeRemaining = 0
+
+        self.session = currentSession
+        isPaused = false
+        haptics.medium()
+
+        let exercise = exercises[index]
+        audio.announceExercise(exercise.name)
+        updateNowPlayingInfo()
+    }
+
+    func markExerciseComplete(index: Int) {
+        guard var currentSession = session else { return }
+        let exercises = currentSession.sortedExercises
+        guard exercises.indices.contains(index) else { return }
+
+        stopTimer()
+
+        if index + 1 < exercises.count {
+            currentSession.currentExerciseIndex = index + 1
+            currentSession.currentSetNumber = 1
+            currentSession.state = .active
+            currentSession.restTimeRemaining = 0
+            self.session = currentSession
+            haptics.success()
+            let next = exercises[index + 1]
+            audio.announceExercise(next.name)
+            updateNowPlayingInfo()
+        } else {
+            // Last exercise — finish the workout
+            finishWorkout()
+        }
+    }
+
     func togglePause() {
         guard session != nil else { return }
 
@@ -174,11 +218,31 @@ class WorkoutSessionManager {
     private func startRest(session: inout WorkoutSession, duration: Int) {
         session.state = .resting
         session.restTimeRemaining = duration
+        session.originalRestDuration = duration
 
         stopTimer()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.tick()
         }
+    }
+
+    func adjustRest(by seconds: Int) {
+        guard var currentSession = session,
+              currentSession.state == .resting,
+              !isPaused else { return }
+
+        let newTime = currentSession.restTimeRemaining + seconds
+        let maxTime = currentSession.originalRestDuration + 60
+        currentSession.restTimeRemaining = max(5, min(newTime, maxTime))
+
+        // Extend originalRestDuration if user adds time (keeps bar proportion correct)
+        if currentSession.restTimeRemaining > currentSession.originalRestDuration {
+            currentSession.originalRestDuration = currentSession.restTimeRemaining
+        }
+
+        self.session = currentSession
+        haptics.light()
+        updateRestTimerNowPlaying()
     }
 
     private func tick() {
@@ -233,15 +297,20 @@ class WorkoutSessionManager {
     private func finishWorkout() {
         stopTimer()
         guard var currentSession = session else { return }
+
+        currentSession.plan.lastUsedAt = Date()
         currentSession.state = .completed
+        currentSession.endTime = Date()
         session = currentSession
 
         haptics.success()
         audio.announceWorkoutComplete()
         nowPlaying.deactivate()
+    }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.session = nil
-        }
+    /// Called from WorkoutSummaryView to dismiss and reset
+    func dismissSummary() {
+        session = nil
+        isPaused = false
     }
 }

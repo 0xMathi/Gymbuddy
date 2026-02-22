@@ -8,5 +8,20 @@
 	</array>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>GymBuddy needs audio access for workout announcements.</string>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Workout Plan</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.gymbuddy.workoutplan</string>
+			<key>UTTypeTagSpecification</key>
+			<dict/>
+		</dict>
+	</array>
 </dict>
 </plist>

@@ -34,6 +34,7 @@ struct GymBuddyApp: App {
                 .environment(exerciseManager)
                 .onAppear {
                     exerciseManager.configure(with: modelContainer.mainContext)
+                    seedDefaultPlans(modelContext: modelContainer.mainContext)
                 }
         }
         .modelContainer(modelContainer)

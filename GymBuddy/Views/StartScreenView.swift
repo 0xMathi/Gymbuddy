@@ -5,11 +5,12 @@ import SwiftData
 struct StartScreenView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(WorkoutSessionManager.self) private var sessionManager
-    @Query(sort: \WorkoutPlan.createdAt, order: .reverse) private var plans: [WorkoutPlan]
+    @Query(sort: \WorkoutPlan.orderIndex, order: .forward) private var plans: [WorkoutPlan]
 
     @State private var isAnimating = false
     @State private var planToEdit: WorkoutPlan?
     @State private var showSettings = false
+    @State private var isEditMode = false
 
     // Map plan names to icons (fallback to dumbbell)
     private func iconFor(_ name: String) -> String {
@@ -116,7 +117,7 @@ struct StartScreenView: View {
 
             // Giant Typography
             VStack(alignment: .leading, spacing: -8) {
-                Text("START")
+                Text("CHOOSE")
                     .font(.system(size: 72, weight: .black))
                     .tracking(-3)
                     .foregroundStyle(.white.opacity(0.15))
@@ -131,21 +132,15 @@ struct StartScreenView: View {
                     .opacity(isAnimating ? 1 : 0)
                     .animation(.easeOut(duration: 0.6).delay(0.1), value: isAnimating)
 
-                Text("WORK")
+                Text("BATTLE")
                     .font(.system(size: 90, weight: .black))
                     .tracking(-4)
+                    .minimumScaleFactor(0.6)
+                    .lineLimit(1)
                     .foregroundStyle(Theme.Colors.accent)
                     .offset(x: isAnimating ? 0 : -80)
                     .opacity(isAnimating ? 1 : 0)
                     .animation(.easeOut(duration: 0.6).delay(0.2), value: isAnimating)
-
-                Text("OUT")
-                    .font(.system(size: 90, weight: .black))
-                    .tracking(-4)
-                    .foregroundStyle(.white)
-                    .offset(x: isAnimating ? 0 : -100)
-                    .opacity(isAnimating ? 1 : 0)
-                    .animation(.easeOut(duration: 0.6).delay(0.3), value: isAnimating)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, Theme.Spacing.large)
@@ -230,25 +225,41 @@ struct StartScreenView: View {
                     .foregroundStyle(.white)
 
                 Spacer()
+
+                // Sort button
+                Button(action: {
+                    withAnimation(.spring(response: 0.3)) {
+                        isEditMode.toggle()
+                    }
+                    HapticService.shared.light()
+                }) {
+                    Text(isEditMode ? "FERTIG" : "SORTIEREN")
+                        .font(.system(size: 10, weight: .bold))
+                        .tracking(2)
+                        .foregroundStyle(Theme.Colors.accent)
+                }
             }
             .padding(.horizontal, Theme.Spacing.xl)
             .padding(.bottom, Theme.Spacing.large)
 
-            // Plan Cards with Swipe-to-Delete
+            // Plan Cards with Swipe-to-Delete and Reorder
             List {
                 ForEach(plans) { plan in
                     StartPlanCard(
                         plan: plan,
                         icon: iconFor(plan.name),
                         muscles: musclesFor(plan),
+                        isEditMode: isEditMode,
                         onTap: {
-                            if plan.exercises.isEmpty {
-                                // Open edit view for empty plans
-                                planToEdit = plan
-                            } else {
-                                // Start workout directly
-                                HapticService.shared.heavy()
-                                sessionManager.startWorkout(plan: plan)
+                            if !isEditMode {
+                                if plan.exercises.isEmpty {
+                                    // Open edit view for empty plans
+                                    planToEdit = plan
+                                } else {
+                                    // Start workout directly
+                                    HapticService.shared.heavy()
+                                    sessionManager.startWorkout(plan: plan)
+                                }
                             }
                         },
                         onEdit: {
@@ -258,14 +269,17 @@ struct StartScreenView: View {
                     .listRowInsets(EdgeInsets(top: Theme.Spacing.small, leading: Theme.Spacing.xl, bottom: Theme.Spacing.small, trailing: Theme.Spacing.xl))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            deletePlan(plan)
-                        } label: {
-                            Label("Delete", systemImage: "trash.fill")
+                    .swipeActions(edge: .trailing, allowsFullSwipe: !isEditMode) {
+                        if !isEditMode {
+                            Button(role: .destructive) {
+                                deletePlan(plan)
+                            } label: {
+                                Label("Delete", systemImage: "trash.fill")
+                            }
                         }
                     }
                 }
+                .onMove(perform: movePlans)
 
                 // Large "+" Button for new plans
                 Button(action: createNewPlan) {
@@ -294,6 +308,7 @@ struct StartScreenView: View {
             .scrollContentBackground(.hidden)
             .scrollDisabled(true)
             .frame(minHeight: CGFloat(plans.count + 1) * 116)
+            .environment(\.editMode, .constant(isEditMode ? .active : .inactive))
 
             Spacer()
                 .frame(height: Theme.Spacing.xxxl)
@@ -311,7 +326,8 @@ struct StartScreenView: View {
     // MARK: - Actions
 
     private func createNewPlan() {
-        let newPlan = WorkoutPlan(name: "New Plan")
+        let maxOrderIndex = plans.map { $0.orderIndex }.max() ?? -1
+        let newPlan = WorkoutPlan(name: "New Plan", orderIndex: maxOrderIndex + 1)
         modelContext.insert(newPlan)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             planToEdit = newPlan
@@ -324,6 +340,23 @@ struct StartScreenView: View {
             modelContext.delete(plan)
         }
     }
+
+    private func movePlans(from source: IndexSet, to destination: Int) {
+        var reorderedPlans = Array(plans)
+        reorderedPlans.move(fromOffsets: source, toOffset: destination)
+
+        for (index, plan) in reorderedPlans.enumerated() {
+            plan.orderIndex = index
+        }
+
+        HapticService.shared.medium()
+
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to save reordered plans: \(error)")
+        }
+    }
 }
 
 // MARK: - Plan Card Component
@@ -332,12 +365,22 @@ private struct StartPlanCard: View {
     let plan: WorkoutPlan
     let icon: String
     let muscles: String
+    var isEditMode: Bool = false
     let onTap: () -> Void
     let onEdit: () -> Void
 
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 0) {
+                // Drag handle (visible in edit mode)
+                if isEditMode {
+                    Image(systemName: "line.3.horizontal")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .frame(width: 32)
+                        .padding(.leading, 8)
+                }
+
                 // Image placeholder
                 ZStack {
                     Rectangle()
@@ -353,7 +396,7 @@ private struct StartPlanCard: View {
                         .font(.system(size: 28, weight: .bold))
                         .foregroundStyle(.white.opacity(0.6))
                 }
-                .frame(width: 100, height: 100)
+                .frame(width: isEditMode ? 70 : 100, height: 100)
 
                 // Accent bar
                 Rectangle()
@@ -368,7 +411,7 @@ private struct StartPlanCard: View {
                         .foregroundStyle(plan.exercises.isEmpty ? Theme.Colors.accent : Theme.Colors.textSecondary)
 
                     Text(plan.name.uppercased())
-                        .font(.system(size: 28, weight: .black))
+                        .font(.system(size: isEditMode ? 22 : 28, weight: .black))
                         .tracking(-1)
                         .foregroundStyle(.white)
                         .lineLimit(1)
@@ -382,20 +425,22 @@ private struct StartPlanCard: View {
 
                 Spacer()
 
-                // Edit button
-                Button(action: {
-                    HapticService.shared.light()
-                    onEdit()
-                }) {
-                    Image(systemName: "pencil")
-                        .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(Theme.Colors.textSecondary)
-                        .frame(width: 32, height: 32)
-                        .background(Theme.Colors.surfaceElevated)
-                        .cornerRadius(6)
+                // Edit button (hidden in edit mode)
+                if !isEditMode {
+                    Button(action: {
+                        HapticService.shared.light()
+                        onEdit()
+                    }) {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                            .frame(width: 32, height: 32)
+                            .background(Theme.Colors.surfaceElevated)
+                            .cornerRadius(6)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, Theme.Spacing.medium)
                 }
-                .buttonStyle(.plain)
-                .padding(.trailing, Theme.Spacing.medium)
             }
             .background(Theme.Colors.surface)
         }
