@@ -1,7 +1,7 @@
 # GymBuddy
 
-Got a little too loosy goosy with my workouts. No app felt right —
-too bloated, too many upsells. So I built my own.
+Got sloppy with my workouts and was too proud to pay for a training app.
+So I built the one I actually wanted to use.
 
 GymBuddy is a clean, Nike-inspired iOS training app built with SwiftUI
 and SwiftData. No subscriptions. No noise. Just you and the gym.
