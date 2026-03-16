@@ -224,9 +224,9 @@ struct ActiveWorkoutView: View {
     private func activeSection(session: WorkoutSession, exercises: [Exercise]) -> some View {
         if let exercise = session.currentExercise {
             VStack(alignment: .leading, spacing: Theme.Spacing.large) {
-                // EXERCISE HEADER (Thumbnail + Name)
-                HStack(alignment: .center, spacing: Theme.Spacing.large) {
-                    // Larger Thumbnail
+                // EXERCISE HERO HEADER
+                VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
+                    // Large Hero Image
                     ZStack {
                         Rectangle()
                             .fill(Theme.Colors.surfaceElevated)
@@ -237,26 +237,26 @@ struct ActiveWorkoutView: View {
                                 .aspectRatio(contentMode: .fill)
                         } else {
                             Image(systemName: exercise.fallbackIcon)
-                                .font(.system(size: 32, weight: .thin))
+                                .font(.system(size: 64, weight: .thin))
                                 .foregroundStyle(Theme.Colors.textSecondary.opacity(0.4))
                         }
                     }
-                    .frame(width: 88, height: 88)
-                    .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusSmall))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 180)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusLarge))
                     
                     VStack(alignment: .leading, spacing: 6) {
                         Text(exercise.name)
-                            .font(.system(size: 24, weight: .bold))
+                            .font(.system(size: 28, weight: .bold))
                             .foregroundStyle(Theme.Colors.textPrimary)
                             .lineLimit(2)
                             .fixedSize(horizontal: false, vertical: true)
                         
                         Text("\(exercise.sets) Sätze")
-                            .font(Theme.Fonts.caption)
+                            .font(Theme.Fonts.body)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
-                    
-                    Spacer()
+                    .padding(.horizontal, 4)
                 }
                 
                 // SET LIST (Tabular Layout)
