@@ -7,7 +7,7 @@ import time
 import urllib.request
 import urllib.error
 
-HF_TOKEN = "***REMOVED***"
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
 API_URL = "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell"
 ASSETS_DIR = "/Users/mathias/GymBuddy/GymBuddy/Assets.xcassets"
 
