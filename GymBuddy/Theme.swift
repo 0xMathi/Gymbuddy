@@ -55,6 +55,7 @@ struct Theme {
         static let buttonHeightSmall: CGFloat = 52
         static let cornerRadius: CGFloat = 16
         static let cornerRadiusSmall: CGFloat = 12
+        static let cornerRadiusLarge: CGFloat = 24
         static let inputHeight: CGFloat = 56
     }
 }

@@ -368,60 +368,65 @@ private struct StartPlanCard: View {
     var isEditMode: Bool = false
     let onTap: () -> Void
     let onEdit: () -> Void
+    
+    @State private var isPressed = false
 
     var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 0) {
+        Button(action: {
+            HapticService.shared.medium()
+            onTap()
+        }) {
+            HStack(spacing: Theme.Spacing.medium) {
                 // Drag handle (visible in edit mode)
                 if isEditMode {
                     Image(systemName: "line.3.horizontal")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundStyle(Theme.Colors.textSecondary)
-                        .frame(width: 32)
-                        .padding(.leading, 8)
+                        .padding(.leading, Theme.Spacing.small)
                 }
 
-                // Image placeholder
+                // Small Image/Icon Thumbnail
                 ZStack {
                     Rectangle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.gray.opacity(0.25), Color.gray.opacity(0.1)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
+                        .fill(Theme.Colors.surfaceElevated)
 
                     Image(systemName: icon)
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.8))
                 }
-                .frame(width: isEditMode ? 70 : 100, height: 100)
-
-                // Accent bar
-                Rectangle()
-                    .fill(Theme.Colors.surfaceElevated)
-                    .frame(width: 2)
+                .frame(width: 64, height: 64)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusSmall))
+                .padding(.leading, isEditMode ? 0 : Theme.Spacing.medium)
 
                 // Text content
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(plan.exercises.isEmpty ? "NO EXERCISES" : "\(plan.exercises.count) EXERCISES")
-                        .font(.system(size: 10, weight: .bold))
-                        .tracking(2)
-                        .foregroundStyle(plan.exercises.isEmpty ? Theme.Colors.accent : Theme.Colors.textSecondary)
-
-                    Text(plan.name.uppercased())
-                        .font(.system(size: isEditMode ? 22 : 28, weight: .black))
-                        .tracking(-1)
-                        .foregroundStyle(.white)
+                    Text(plan.name)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(Theme.Colors.textPrimary)
                         .lineLimit(1)
 
-                    Text(muscles)
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Theme.Colors.textSecondary)
-                        .lineLimit(1)
+                    HStack(spacing: 8) {
+                        Text("\(plan.exercises.count) Übungen")
+                            .font(Theme.Fonts.caption)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                        
+                        Text("•")
+                            .font(Theme.Fonts.caption)
+                            .foregroundStyle(Theme.Colors.surfaceElevated)
+                        
+                        if let lastUsed = plan.lastUsedAt {
+                            Text("Letztes Training: \(formattedDate(lastUsed))")
+                                .font(Theme.Fonts.caption)
+                                .foregroundStyle(Theme.Colors.textSecondary)
+                                .lineLimit(1)
+                        } else {
+                            Text(muscles)
+                                .font(Theme.Fonts.caption)
+                                .foregroundStyle(Theme.Colors.textSecondary)
+                                .lineLimit(1)
+                        }
+                    }
                 }
-                .padding(.leading, Theme.Spacing.medium)
 
                 Spacer()
 
@@ -431,20 +436,39 @@ private struct StartPlanCard: View {
                         HapticService.shared.light()
                         onEdit()
                     }) {
-                        Image(systemName: "pencil")
-                            .font(.system(size: 14, weight: .medium))
+                        Image(systemName: "ellipsis.circle")
+                            .font(.system(size: 20))
                             .foregroundStyle(Theme.Colors.textSecondary)
-                            .frame(width: 32, height: 32)
-                            .background(Theme.Colors.surfaceElevated)
-                            .cornerRadius(6)
+                            .padding(.trailing, Theme.Spacing.medium)
                     }
                     .buttonStyle(.plain)
-                    .padding(.trailing, Theme.Spacing.medium)
                 }
             }
+            .padding(.vertical, Theme.Spacing.medium)
             .background(Theme.Colors.surface)
+            .cornerRadius(Theme.Layout.cornerRadius)
+            .scaleEffect(isPressed ? 0.98 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(SquishableButtonStyle(isPressed: $isPressed))
+    }
+    
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd.MM.yyyy"
+        return formatter.string(from: date)
+    }
+}
+
+// Custom button style to capture the press state for scaling
+struct SquishableButtonStyle: ButtonStyle {
+    @Binding var isPressed: Bool
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .onChange(of: configuration.isPressed) { oldValue, newValue in
+                isPressed = newValue
+            }
     }
 }
 

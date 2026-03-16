@@ -224,115 +224,150 @@ struct ActiveWorkoutView: View {
     private func activeSection(session: WorkoutSession, exercises: [Exercise]) -> some View {
         if let exercise = session.currentExercise {
             VStack(alignment: .leading, spacing: Theme.Spacing.large) {
-                VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                    if !exercise.muscleGroup.isEmpty {
-                        Text(exercise.muscleGroup.uppercased())
-                            .font(Theme.Fonts.caption)
-                            .tracking(2)
-                            .foregroundStyle(Theme.Colors.accent)
+                // EXERCISE HEADER (Thumbnail + Name)
+                HStack(alignment: .center, spacing: Theme.Spacing.large) {
+                    // Larger Thumbnail
+                    ZStack {
+                        Rectangle()
+                            .fill(Theme.Colors.surfaceElevated)
+                        
+                        if let localImage = UIImage(named: exercise.imageName) {
+                            Image(uiImage: localImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            Image(systemName: exercise.fallbackIcon)
+                                .font(.system(size: 32, weight: .thin))
+                                .foregroundStyle(Theme.Colors.textSecondary.opacity(0.4))
+                        }
                     }
-
-                    Text(exercise.name.uppercased())
-                        .font(Theme.Fonts.h1)
-                        .foregroundStyle(Theme.Colors.textPrimary)
-                        .tracking(0.5)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    if exercise.weight > 0 {
-                        Text(exercise.weightFormatted)
-                            .font(Theme.Fonts.body)
+                    .frame(width: 88, height: 88)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusSmall))
+                    
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(exercise.name)
+                            .font(.system(size: 24, weight: .bold))
+                            .foregroundStyle(Theme.Colors.textPrimary)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                        
+                        Text("\(exercise.sets) Sätze")
+                            .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
+                    
+                    Spacer()
                 }
-
-                expandedExerciseCard(exercise: exercise, currentSet: session.currentSetNumber)
-
-                PrimaryButton(title: "COMPLETE SET", icon: "checkmark") {
-                    manager.completeSet()
-                }
-                .disabled(manager.isPaused)
-                .opacity(manager.isPaused ? 0.4 : 1.0)
-            }
-        }
-    }
-
-    // MARK: - Fallback Icon View
-
-    private func fallbackIconView(exercise: Exercise) -> some View {
-        Image(systemName: exercise.fallbackIcon)
-            .font(.system(size: 56, weight: .thin))
-            .foregroundStyle(Theme.Colors.textSecondary.opacity(0.4))
-    }
-
-    // MARK: - Expanded Exercise Card
-
-    private func expandedExerciseCard(exercise: Exercise, currentSet: Int) -> some View {
-        VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
-            // Exercise image (wger.de API or fallback icon)
-            ZStack {
-                Rectangle()
-                    .fill(Theme.Colors.surfaceElevated)
-                    .frame(height: 180)
-
-                if let localImage = UIImage(named: exercise.imageName) {
-                    Image(uiImage: localImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 180)
-                        .clipped()
-                } else {
-                    fallbackIconView(exercise: exercise)
-                }
-            }
-            .frame(height: 180)
-            .cornerRadius(Theme.Layout.cornerRadius)
-            .overlay(
-                RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius)
-                    .stroke(Theme.Colors.surfaceElevated, lineWidth: 1)
-            )
-
-            HStack {
-                Text("SET  \(currentSet) / \(exercise.sets)")
-                    .font(Theme.Fonts.label)
-                    .tracking(2)
-                    .foregroundStyle(Theme.Colors.textSecondary)
-
-                Spacer()
-
-                HStack(spacing: 6) {
-                    ForEach(1...max(exercise.sets, 1), id: \.self) { i in
-                        Circle()
-                            .fill(
-                                i < currentSet ? Theme.Colors.success :
-                                i == currentSet ? Theme.Colors.accent :
-                                Theme.Colors.surfaceElevated
-                            )
-                            .frame(
-                                width: i == currentSet ? 13 : 9,
-                                height: i == currentSet ? 13 : 9
-                            )
-                            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentSet)
+                
+                // SET LIST (Tabular Layout)
+                VStack(spacing: 0) {
+                    ForEach(1...max(exercise.sets, 1), id: \.self) { setNum in
+                        let isActive = setNum == session.currentSetNumber
+                        let isDone = setNum < session.currentSetNumber
+                        
+                        HStack(spacing: Theme.Spacing.medium) {
+                            // "1. Satz"
+                            Text("\(setNum). Satz")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                                .frame(width: 60, alignment: .leading)
+                            
+                            // "10 x 35 kg"
+                            HStack(spacing: 4) {
+                                Text("\(exercise.reps)")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                                
+                                Text("×")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Theme.Colors.textSecondary)
+                                
+                                Text(exercise.weight > 0 ? exercise.weightFormatted : "—")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                            }
+                            
+                            Text("•")
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.Colors.textSecondary)
+                            
+                            // "1:30 min Pause"
+                            Text("\(formatRestTime(exercise.restSeconds)) Pause")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Theme.Colors.textSecondary)
+                            
+                            Spacer()
+                            
+                            // Checkbox (Action to complete set)
+                            Button {
+                                if isActive && !manager.isPaused {
+                                    HapticService.shared.heavy()
+                                    manager.completeSet()
+                                }
+                            } label: {
+                                ZStack {
+                                    Circle()
+                                        .strokeBorder(isDone ? Theme.Colors.accent : Theme.Colors.surfaceElevated, lineWidth: 2)
+                                        .frame(width: 24, height: 24)
+                                    
+                                    if isDone {
+                                        Circle()
+                                            .fill(Theme.Colors.accent)
+                                            .frame(width: 16, height: 16)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!isActive || manager.isPaused)
+                        }
+                        .padding(.vertical, Theme.Spacing.medium)
+                        .padding(.horizontal, Theme.Spacing.large)
+                        .background(isActive ? Theme.Colors.surfaceElevated.opacity(0.3) : Color.clear)
+                        
+                        // Separator between rows
+                        if setNum < exercise.sets {
+                            Rectangle()
+                                .fill(Theme.Colors.surface)
+                                .frame(height: 1)
+                                .padding(.horizontal, Theme.Spacing.large)
+                        }
                     }
+                    
+                    // Add Set Button Row
+                    Button {
+                        // Add set logic (could modify exercise.sets)
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus")
+                            Text("Satz hinzufügen")
+                        }
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Theme.Colors.accent)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, Theme.Spacing.large)
+                    }
+                    .buttonStyle(.plain)
                 }
-            }
+                .background(Theme.Colors.surfaceElevated.opacity(0.1))
+                .cornerRadius(Theme.Layout.cornerRadiusLarge)
+                .overlay(
+                    RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusLarge)
+                        .stroke(Theme.Colors.surface, lineWidth: 1)
+                )
 
-            HStack(spacing: Theme.Spacing.small) {
-                if exercise.weight > 0 {
-                    metaPill(icon: "scalemass", value: exercise.weightFormatted)
-                }
-                metaPill(icon: "arrow.up.arrow.down", value: "\(exercise.reps) REPS")
-                metaPill(icon: "timer", value: "\(exercise.restSeconds)s REST")
+                // The old generic "COMPLETE SET" button is removed in favor of the row checkboxes.
+                // But we still need an End Workout button prominently here (or at bottom of scrollview).
             }
         }
-        .padding(Theme.Spacing.medium)
-        .background(Theme.Colors.surfaceElevated)
-        .cornerRadius(Theme.Layout.cornerRadius)
-        .overlay(
-            RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius)
-                .stroke(Theme.Colors.accent.opacity(0.25), lineWidth: 1)
-        )
+    }
+
+    private func formatRestTime(_ seconds: Int) -> String {
+        let mins = seconds / 60
+        let secs = seconds % 60
+        if mins > 0 {
+            return secs > 0 ? "\(mins):\(String(format: "%02d", secs)) min" : "\(mins) min"
+        }
+        return "\(secs) s"
     }
 
     // MARK: - STATE B: Rest Section

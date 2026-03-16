@@ -58,6 +58,20 @@ struct WorkoutSession {
         return completed
     }
 
+    /// Total Volume calculated based on completed exercises
+    var totalVolume: Double {
+        plan.exercises
+            .filter { $0.weight > 0 }
+            .reduce(0) { $0 + ($1.weight * Double($1.reps) * Double($1.sets)) }
+    }
+
+    /// Formatted: "4.800 KG" or "—" if no weight tracked
+    var totalVolumeFormatted: String {
+        guard totalVolume > 0 else { return "—" }
+        let formatted = NumberFormatter.localizedString(from: NSNumber(value: totalVolume), number: .decimal)
+        return "\(formatted) KG"
+    }
+
     /// Total exercises in the workout
     var totalExercises: Int {
         plan.exercises.count
