@@ -209,61 +209,60 @@ struct ExerciseRowView: View {
 
     var body: some View {
         Button(action: onTap) {
-            VStack(alignment: .leading, spacing: Theme.Spacing.small) {
-                // Exercise Name
-                Text(exercise.name.uppercased())
-                    .font(Theme.Fonts.bodyBold)
-                    .foregroundStyle(Theme.Colors.textPrimary)
-                    .tracking(0.5)
-
-                // Summary Line
-                HStack(spacing: Theme.Spacing.medium) {
-                    // Sets x Reps
-                    HStack(spacing: 4) {
-                        Text("\(exercise.sets)")
-                            .font(Theme.Fonts.monoLarge)
-                            .foregroundStyle(Theme.Colors.accent)
-                        Text("×")
-                            .font(Theme.Fonts.body)
-                            .foregroundStyle(Theme.Colors.textSecondary)
-                        Text("\(exercise.reps)")
-                            .font(Theme.Fonts.monoLarge)
-                            .foregroundStyle(Theme.Colors.accent)
+            HStack(alignment: .center, spacing: Theme.Spacing.medium) {
+                // Small Thumbnail
+                ZStack {
+                    Rectangle()
+                        .fill(Theme.Colors.surfaceElevated)
+                    
+                    if let localImage = UIImage(named: exercise.imageName) {
+                        Image(uiImage: localImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } else {
+                        Image(systemName: exercise.fallbackIcon)
+                            .font(.system(size: 24, weight: .thin))
+                            .foregroundStyle(Theme.Colors.textSecondary.opacity(0.4))
                     }
-
-                    // Weight
-                    if exercise.weight > 0 {
-                        Text("@")
-                            .font(Theme.Fonts.body)
-                            .foregroundStyle(Theme.Colors.textSecondary)
-                        Text(exercise.weightFormatted)
-                            .font(Theme.Fonts.mono)
-                            .foregroundStyle(Theme.Colors.textPrimary)
-                    }
-
-                    Spacer()
-
-                    // Rest Time Badge
-                    HStack(spacing: 4) {
-                        Image(systemName: "timer")
-                            .font(.system(size: 12, weight: .medium))
-                        Text("\(exercise.restSeconds)s")
-                            .font(Theme.Fonts.caption)
-                    }
-                    .foregroundStyle(Theme.Colors.textSecondary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Theme.Colors.surfaceElevated)
-                    .cornerRadius(8)
                 }
-
-                // Muscle Group Tag
-                Text(exercise.muscleGroup.uppercased())
-                    .font(.system(size: 11, weight: .bold))
-                    .tracking(1)
-                    .foregroundStyle(Theme.Colors.accent)
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusSmall))
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(exercise.name)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(Theme.Colors.textPrimary)
+                        .lineLimit(1)
+                        
+                    HStack(spacing: 6) {
+                        Text("\(exercise.sets) × \(exercise.reps)")
+                            .font(Theme.Fonts.caption)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                        
+                        if exercise.weight > 0 {
+                            Text("•")
+                                .font(Theme.Fonts.caption)
+                                .foregroundStyle(Theme.Colors.surfaceElevated)
+                            Text(exercise.weightFormatted)
+                                .font(Theme.Fonts.caption)
+                                .foregroundStyle(Theme.Colors.textSecondary)
+                        }
+                        
+                        Text("•")
+                            .font(Theme.Fonts.caption)
+                            .foregroundStyle(Theme.Colors.surfaceElevated)
+                        Text("\(exercise.restSeconds)s Pause")
+                            .font(Theme.Fonts.caption)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                    }
+                }
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.Colors.surfaceElevated)
             }
-            .padding(.vertical, Theme.Spacing.medium)
+            .padding(.vertical, Theme.Spacing.small)
         }
         .buttonStyle(.plain)
     }
