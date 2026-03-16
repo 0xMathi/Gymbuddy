@@ -5,10 +5,42 @@ struct ExerciseSeedData {
     let name: String
     let muscleGroup: String
     let equipment: String
+    var wgerBaseId: Int? = nil
 }
 
+// MARK: - wger.de Exercise ID Mapping
+// Source: https://wger.de/api/v2/exerciseinfo/?format=json&language=2
+private let wgerIdMap: [String: Int] = [
+    "Bankdrücken": 192,
+    "Schrägbankdrücken": 234,
+    "Kurzhantel-Flys": 68,
+    "Schulterdrücken": 69,
+    "Seitheben": 78,
+    "Trizepsdrücken am Kabel": 81,
+    "Skull Crushers": 112,
+    "Kreuzheben": 184,
+    "Klimmzüge": 475,
+    "Langhantel-Rudern": 90,
+    "Kabelrudern": 91,
+    "Face Pulls": 254,
+    "Langhantel-Curls": 85,
+    "Hammer Curls": 88,
+    "Kniebeugen": 111,
+    "Rumänisches Kreuzheben": 193,
+    "Beinpresse": 105,
+    "Beinstrecker": 225,
+    "Beinbeuger": 110,
+    "Wadenheben stehend": 156,
+]
+
 // MARK: - Default Exercise Library
-let defaultExercises: [ExerciseSeedData] = [
+let defaultExercises: [ExerciseSeedData] = defaultExercisesRaw.map { seed in
+    var s = seed
+    s.wgerBaseId = wgerIdMap[seed.name]
+    return s
+}
+
+private let defaultExercisesRaw: [ExerciseSeedData] = [
     // MARK: Brust (Chest)
     ExerciseSeedData(name: "Bankdrücken", muscleGroup: "Brust", equipment: "Langhantel"),
     ExerciseSeedData(name: "Schrägbankdrücken", muscleGroup: "Brust", equipment: "Langhantel"),
@@ -110,6 +142,7 @@ func seedDefaultExercises(modelContext: ModelContext) {
                 equipment: exerciseData.equipment,
                 isCustom: false
             )
+            exercise.wgerBaseId = exerciseData.wgerBaseId
             modelContext.insert(exercise)
         }
 
@@ -119,5 +152,42 @@ func seedDefaultExercises(modelContext: ModelContext) {
 
     } catch {
         print("Failed to seed exercises: \(error)")
+    }
+}
+
+// MARK: - Patch wger IDs for existing Exercise objects (Copy-on-Write in WorkoutPlans)
+func patchExerciseWgerIds(modelContext: ModelContext) {
+    let descriptor = FetchDescriptor<Exercise>()
+    guard let exercises = try? modelContext.fetch(descriptor) else { return }
+
+    var patched = 0
+    for exercise in exercises {
+        if exercise.wgerBaseId == nil, let id = wgerIdMap[exercise.name] {
+            exercise.wgerBaseId = id
+            patched += 1
+        }
+    }
+    if patched > 0 {
+        try? modelContext.save()
+        print("Patched wger IDs for \(patched) Exercise object(s) in WorkoutPlans")
+    }
+}
+
+// MARK: - Patch wger IDs for existing installs
+func patchWgerIds(modelContext: ModelContext) {
+    let descriptor = FetchDescriptor<ExerciseDefinition>()
+    guard let definitions = try? modelContext.fetch(descriptor) else { return }
+
+    var patched = 0
+    for definition in definitions {
+        if definition.wgerBaseId == nil, let id = wgerIdMap[definition.name] {
+            definition.wgerBaseId = id
+            patched += 1
+        }
+    }
+
+    if patched > 0 {
+        try? modelContext.save()
+        print("Patched wger IDs for \(patched) exercise(s)")
     }
 }

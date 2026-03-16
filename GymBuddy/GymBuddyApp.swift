@@ -18,7 +18,7 @@ struct GymBuddyApp: App {
             let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
 
-            // Seed default exercises on first launch
+            // Seed default exercises on first launch + patch wger IDs for existing installs
             let context = modelContainer.mainContext
             seedDefaultExercises(modelContext: context)
 

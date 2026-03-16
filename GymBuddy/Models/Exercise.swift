@@ -20,6 +20,10 @@ final class Exercise {
     // Optional reference to original definition (for updates)
     var definitionId: UUID?
 
+    // wger.de image integration (copied from ExerciseDefinition)
+    var wgerBaseId: Int? = nil
+    var cachedImageUrl: String? = nil
+
     @Relationship(inverse: \WorkoutPlan.exercises)
     var plan: WorkoutPlan?
 
@@ -32,7 +36,9 @@ final class Exercise {
         orderIndex: Int,
         muscleGroup: String = "",
         equipment: String = "",
-        definitionId: UUID? = nil
+        definitionId: UUID? = nil,
+        wgerBaseId: Int? = nil,
+        cachedImageUrl: String? = nil
     ) {
         self.name = name
         self.sets = sets
@@ -43,6 +49,8 @@ final class Exercise {
         self.muscleGroup = muscleGroup
         self.equipment = equipment
         self.definitionId = definitionId
+        self.wgerBaseId = wgerBaseId
+        self.cachedImageUrl = cachedImageUrl
     }
 
     /// Create Exercise from ExerciseDefinition (Copy-on-Write)
@@ -63,8 +71,44 @@ final class Exercise {
             orderIndex: orderIndex,
             muscleGroup: definition.muscleGroup,
             equipment: definition.equipment,
-            definitionId: definition.id
+            definitionId: definition.id,
+            wgerBaseId: definition.wgerBaseId,
+            cachedImageUrl: definition.cachedImageUrl
         )
+    }
+
+    // MARK: - Media
+
+    /// Asset catalog name derived from exercise name (e.g. "exercise_bankdruecken")
+    var imageName: String {
+        "exercise_" + name
+            .lowercased()
+            .replacingOccurrences(of: "ä", with: "ae")
+            .replacingOccurrences(of: "ö", with: "oe")
+            .replacingOccurrences(of: "ü", with: "ue")
+            .replacingOccurrences(of: "ß", with: "ss")
+            .replacingOccurrences(of: " ", with: "_")
+            .replacingOccurrences(of: "-", with: "_")
+            .replacingOccurrences(of: "(", with: "")
+            .replacingOccurrences(of: ")", with: "")
+            .replacingOccurrences(of: "&", with: "und")
+    }
+
+    /// SF Symbol fallback when no image asset is available
+    var fallbackIcon: String {
+        switch muscleGroup {
+        case "Brust":       return "figure.strengthtraining.traditional"
+        case "Rücken":      return "figure.pull.ups"
+        case "Schultern":   return "figure.boxing"
+        case "Bizeps":      return "figure.arms.open"
+        case "Trizeps":     return "figure.arms.open"
+        case "Beine":       return "figure.run"
+        case "Gesäß":       return "figure.run"
+        case "Core":        return "figure.core.training"
+        case "Ganzkörper":  return "figure.mixed.cardio"
+        case "Cardio":      return "figure.walk"
+        default:            return "dumbbell.fill"
+        }
     }
 
     // MARK: - Formatted Display

@@ -257,10 +257,42 @@ struct ActiveWorkoutView: View {
         }
     }
 
+    // MARK: - Fallback Icon View
+
+    private func fallbackIconView(exercise: Exercise) -> some View {
+        Image(systemName: exercise.fallbackIcon)
+            .font(.system(size: 56, weight: .thin))
+            .foregroundStyle(Theme.Colors.textSecondary.opacity(0.4))
+    }
+
     // MARK: - Expanded Exercise Card
 
     private func expandedExerciseCard(exercise: Exercise, currentSet: Int) -> some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
+            // Exercise image (wger.de API or fallback icon)
+            ZStack {
+                Rectangle()
+                    .fill(Theme.Colors.surfaceElevated)
+                    .frame(height: 180)
+
+                if let localImage = UIImage(named: exercise.imageName) {
+                    Image(uiImage: localImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 180)
+                        .clipped()
+                } else {
+                    fallbackIconView(exercise: exercise)
+                }
+            }
+            .frame(height: 180)
+            .cornerRadius(Theme.Layout.cornerRadius)
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius)
+                    .stroke(Theme.Colors.surfaceElevated, lineWidth: 1)
+            )
+
             HStack {
                 Text("SET  \(currentSet) / \(exercise.sets)")
                     .font(Theme.Fonts.label)
@@ -474,7 +506,7 @@ struct ActiveWorkoutView: View {
 // MARK: - Exercise Index Wrapper
 
 private struct ExerciseIndexWrapper: Identifiable {
-    let id = UUID()
+    var id: Int { index }
     let index: Int
 }
 
