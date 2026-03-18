@@ -1,4 +1,6 @@
 import SwiftUI
+import SwiftData
+import UniformTypeIdentifiers
 
 struct ActiveWorkoutView: View {
     @Bindable var manager: WorkoutSessionManager
@@ -6,6 +8,7 @@ struct ActiveWorkoutView: View {
     @State private var showCancelConfirmation = false
     @State private var selectedExerciseIndex: Int? = nil
     @State private var editSetPayload: EditSetPayload? = nil
+    @State private var draggedExercise: Exercise?
 
     var body: some View {
         ZStack {
@@ -56,10 +59,20 @@ struct ActiveWorkoutView: View {
                                 insertion: .move(edge: .top).combined(with: .opacity),
                                 removal: .opacity
                             ))
+                            .onDrop(of: [UTType.text], delegate: ActiveWorkoutDropDelegate(
+                                item: exercises[session.currentExerciseIndex],
+                                session: session,
+                                draggedItem: $draggedExercise
+                            ))
                     } else {
                         activeSection(session: session, exercises: exercises)
                             .padding(.horizontal, Theme.Spacing.xl)
                             .transition(.opacity)
+                            .onDrop(of: [UTType.text], delegate: ActiveWorkoutDropDelegate(
+                                item: exercises[session.currentExerciseIndex],
+                                session: session,
+                                draggedItem: $draggedExercise
+                            ))
                     }
 
                     if exercises.count > 1 {
@@ -77,6 +90,18 @@ struct ActiveWorkoutView: View {
                                         isCompleted: idx < session.currentExerciseIndex
                                     )
                                     .padding(.horizontal, Theme.Spacing.xl)
+                                    .onDrag {
+                                        if idx > session.currentExerciseIndex {
+                                            self.draggedExercise = exercise
+                                            return NSItemProvider(object: exercise.id.uuidString as NSString)
+                                        }
+                                        return NSItemProvider()
+                                    }
+                                    .onDrop(of: [UTType.text], delegate: ActiveWorkoutDropDelegate(
+                                        item: exercise,
+                                        session: session,
+                                        draggedItem: $draggedExercise
+                                    ))
                                 }
                             }
                         }
@@ -465,36 +490,37 @@ struct ActiveWorkoutView: View {
             HStack(spacing: Theme.Spacing.medium) {
                 Circle()
                     .fill(isCompleted ? Theme.Colors.success : Theme.Colors.surfaceElevated)
-                    .frame(width: 8, height: 8)
+                    .frame(width: 10, height: 10)
 
                 Text(exercise.name.uppercased())
-                    .font(Theme.Fonts.label)
+                    .font(Theme.Fonts.bodyBold)
                     .tracking(0.5)
                     .foregroundStyle(isCompleted ? Theme.Colors.textSecondary : Theme.Colors.textPrimary)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.6)
 
-                Spacer()
+                Spacer(minLength: Theme.Spacing.medium)
 
                 Text("\(exercise.sets)×\(exercise.reps)")
-                    .font(Theme.Fonts.caption)
+                    .font(Theme.Fonts.body)
                     .foregroundStyle(Theme.Colors.textSecondary)
 
                 if exercise.weight > 0 {
                     Text("·")
                         .foregroundStyle(Theme.Colors.textSecondary)
                     Text(exercise.weightFormatted)
-                        .font(Theme.Fonts.caption)
+                        .font(Theme.Fonts.body)
                         .foregroundStyle(Theme.Colors.textSecondary)
                 }
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .bold))
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Theme.Colors.surfaceElevated)
             }
-            .padding(.horizontal, Theme.Spacing.medium)
-            .padding(.vertical, Theme.Spacing.small + 2)
+            .padding(.horizontal, Theme.Spacing.large)
+            .padding(.vertical, Theme.Spacing.medium)
             .background(Theme.Colors.surface)
-            .cornerRadius(Theme.Layout.cornerRadiusSmall)
+            .cornerRadius(Theme.Layout.cornerRadius)
             .opacity(isCompleted ? 0.5 : 1.0)
         }
         .buttonStyle(.plain)
@@ -796,6 +822,42 @@ struct EditSetSheet: View {
                     }
                     .font(Theme.Fonts.label)
                     .foregroundStyle(Theme.Colors.accent)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Active Workout Drop Delegate
+
+struct ActiveWorkoutDropDelegate: DropDelegate {
+    let item: Exercise
+    let session: WorkoutSession
+    @Binding var draggedItem: Exercise?
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        return DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        draggedItem = nil
+        return true
+    }
+
+    func dropEntered(info: DropInfo) {
+        guard let draggedItem = self.draggedItem else { return }
+        if draggedItem != item {
+            var sorted = session.sortedExercises
+            guard let from = sorted.firstIndex(of: draggedItem),
+                  let to = sorted.firstIndex(of: item) else { return }
+            
+            // Allow dropping anywhere from currentExerciseIndex onwards
+            if from > session.currentExerciseIndex && to >= session.currentExerciseIndex {
+                withAnimation(.default) {
+                    sorted.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+                    for (idx, exercise) in sorted.enumerated() {
+                        exercise.orderIndex = idx
+                    }
                 }
             }
         }

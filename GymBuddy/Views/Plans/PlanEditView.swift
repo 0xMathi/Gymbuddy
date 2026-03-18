@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 struct PlanEditView: View {
     @Environment(\.dismiss) private var dismiss
@@ -11,6 +12,7 @@ struct PlanEditView: View {
     @State private var showExercisePicker = false
     @State private var exerciseToEdit: Exercise?
     @State private var editMode: EditMode = .inactive
+    @State private var draggedExercise: Exercise?
     @FocusState private var isNameFocused: Bool
 
     private var sortedExercises: [Exercise] {
@@ -140,6 +142,16 @@ struct PlanEditView: View {
                         Label("Delete", systemImage: "trash.fill")
                     }
                 }
+                .onDrag {
+                    self.draggedExercise = exercise
+                    return NSItemProvider(object: exercise.id.uuidString as NSString)
+                }
+                .onDrop(of: [UTType.text], delegate: ExerciseDropDelegate(
+                    item: exercise,
+                    plan: plan,
+                    draggedItem: $draggedExercise,
+                    exerciseManager: exerciseManager
+                ))
             }
             .onMove(perform: moveExercises)
         }
@@ -602,6 +614,37 @@ private struct ScaleButtonStyle: ButtonStyle {
         configuration.label
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.easeOut(duration: 0.1), value: configuration.isPressed)
+    }
+}
+// MARK: - Drag and Drop Delegate
+
+struct ExerciseDropDelegate: DropDelegate {
+    let item: Exercise
+    let plan: WorkoutPlan
+    @Binding var draggedItem: Exercise?
+    let exerciseManager: ExerciseManager
+
+    func dropUpdated(info: DropInfo) -> DropProposal? {
+        return DropProposal(operation: .move)
+    }
+
+    func performDrop(info: DropInfo) -> Bool {
+        draggedItem = nil
+        return true
+    }
+
+    func dropEntered(info: DropInfo) {
+        guard let draggedItem = self.draggedItem else { return }
+        if draggedItem != item {
+            let sorted = plan.exercises.sorted(by: { $0.orderIndex < $1.orderIndex })
+            guard let from = sorted.firstIndex(of: draggedItem),
+                  let to = sorted.firstIndex(of: item) else { return }
+
+            withAnimation(.default) {
+                // Ensure the database is updated with new order
+                exerciseManager.reorderExercises(in: plan, from: IndexSet(integer: from), to: to > from ? to + 1 : to)
+            }
+        }
     }
 }
 
