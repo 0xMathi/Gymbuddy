@@ -5,6 +5,7 @@ struct ActiveWorkoutView: View {
 
     @State private var showCancelConfirmation = false
     @State private var selectedExerciseIndex: Int? = nil
+    @State private var editSetPayload: EditSetPayload? = nil
 
     var body: some View {
         ZStack {
@@ -129,6 +130,17 @@ struct ActiveWorkoutView: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
             }
+        }
+        .sheet(item: $editSetPayload) { payload in
+            EditSetSheet(
+                payload: payload,
+                onSave: { reps, weight, restSeconds in
+                    payload.exercise.updateSet(at: payload.setIndex, reps: reps, weight: weight, restSeconds: restSeconds)
+                    editSetPayload = nil
+                }
+            )
+            .presentationDetents([.height(380)])
+            .presentationDragIndicator(.visible)
         }
 
         if manager.isPaused {
@@ -261,40 +273,60 @@ struct ActiveWorkoutView: View {
                 
                 // SET LIST (Tabular Layout)
                 VStack(spacing: 0) {
-                    ForEach(1...max(exercise.sets, 1), id: \.self) { setNum in
+                    let setsArray = exercise.resolvedSets
+                    ForEach(Array(setsArray.enumerated()), id: \.offset) { index, exerciseSet in
+                        let setNum = index + 1
                         let isActive = setNum == session.currentSetNumber
                         let isDone = setNum < session.currentSetNumber
                         
                         HStack(spacing: Theme.Spacing.medium) {
-                            // "1. Satz"
-                            Text("\(setNum). Satz")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-                                .frame(width: 60, alignment: .leading)
-                            
-                            // "10 x 35 kg"
-                            HStack(spacing: 4) {
-                                Text("\(exercise.reps)")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-                                
-                                Text("×")
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Theme.Colors.textSecondary)
-                                
-                                Text(exercise.weight > 0 ? exercise.weightFormatted : "—")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                            Button {
+                                editSetPayload = EditSetPayload(
+                                    exercise: exercise,
+                                    setIndex: index,
+                                    reps: exerciseSet.reps,
+                                    weight: exerciseSet.weight,
+                                    restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
+                                )
+                            } label: {
+                                HStack(spacing: Theme.Spacing.medium) {
+                                    // "1. Satz"
+                                    Text("\(setNum). Satz")
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                                        .frame(width: 60, alignment: .leading)
+                                    
+                                    // "10 x 35 kg"
+                                    HStack(spacing: 4) {
+                                        Text("\(exerciseSet.reps)")
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                                        
+                                        Text("×")
+                                            .font(.system(size: 12))
+                                            .foregroundStyle(Theme.Colors.textSecondary)
+                                        
+                                        Text(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.8)
+                                            .fixedSize(horizontal: true, vertical: false)
+                                    }
+                                    
+                                    Text("•")
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(Theme.Colors.textSecondary)
+                                    
+                                    // "1:30 min"
+                                    Text(formatRestTime(exerciseSet.restSeconds ?? exercise.restSeconds))
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(Theme.Colors.textSecondary)
+                                        .lineLimit(1)
+                                        .fixedSize(horizontal: true, vertical: false)
+                                }
                             }
-                            
-                            Text("•")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.Colors.textSecondary)
-                            
-                            // "1:30 min Pause"
-                            Text("\(formatRestTime(exercise.restSeconds)) Pause")
-                                .font(.system(size: 14))
-                                .foregroundStyle(Theme.Colors.textSecondary)
+                            .buttonStyle(.plain)
                             
                             Spacer()
                             
@@ -335,7 +367,13 @@ struct ActiveWorkoutView: View {
                     
                     // Add Set Button Row
                     Button {
-                        // Add set logic (could modify exercise.sets)
+                        var sets = exercise.resolvedSets
+                        let lastSet = sets.last ?? ExerciseSet(index: 1, reps: exercise.reps, weight: exercise.weight)
+                        let newSet = ExerciseSet(index: sets.count + 1, reps: lastSet.reps, weight: lastSet.weight)
+                        sets.append(newSet)
+                        exercise.specificSets = sets
+                        exercise.sets = sets.count
+                        HapticService.shared.light()
                     } label: {
                         HStack {
                             Image(systemName: "plus")
@@ -624,6 +662,142 @@ private struct ExerciseQuickActionSheet: View {
                 .font(Theme.Fonts.caption)
                 .tracking(2)
                 .foregroundStyle(Theme.Colors.textSecondary)
+        }
+    }
+}
+
+// MARK: - Edit Set Modal Components
+
+struct EditSetPayload: Identifiable {
+    let id = UUID()
+    let exercise: Exercise
+    let setIndex: Int
+    let reps: Int
+    let weight: Double
+    let restSeconds: Int
+}
+
+struct EditSetSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let payload: EditSetPayload
+    let onSave: (Int, Double, Int) -> Void
+
+    @State private var reps: Int
+    @State private var weight: Double
+    @State private var restSeconds: Int
+
+    // Picker ranges
+    private let repsRange = Array(1...100)
+    private let weightRange: [Double] = {
+        var weights: [Double] = [0]
+        weights += stride(from: 2.5, through: 300, by: 2.5).map { $0 }
+        return weights
+    }()
+    private let restRange = Array(stride(from: 0, through: 600, by: 15))
+
+    init(payload: EditSetPayload, onSave: @escaping (Int, Double, Int) -> Void) {
+        self.payload = payload
+        self.onSave = onSave
+        _reps = State(initialValue: payload.reps)
+        _weight = State(initialValue: payload.weight)
+        _restSeconds = State(initialValue: payload.restSeconds)
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Theme.Colors.bg.ignoresSafeArea()
+
+                VStack(spacing: Theme.Spacing.large) {
+                    Text("\(payload.setIndex + 1). SATZ BEARBEITEN")
+                        .font(Theme.Fonts.label)
+                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .tracking(1)
+
+                    HStack(spacing: Theme.Spacing.medium) {
+                        // Reps Picker
+                        VStack {
+                            Text("REPS")
+                                .font(Theme.Fonts.caption)
+                                .tracking(1)
+                                .foregroundStyle(Theme.Colors.textSecondary)
+                            
+                            Picker("Reps", selection: $reps) {
+                                ForEach(repsRange, id: \.self) { num in
+                                    Text("\(num)").tag(num)
+                                }
+                            }
+                            .pickerStyle(.wheel)
+                            .frame(height: 140)
+                        }
+                        .padding()
+                        .background(Theme.Colors.surface)
+                        .cornerRadius(Theme.Layout.cornerRadiusSmall)
+
+                        // Weight Picker
+                        VStack {
+                            Text("WEIGHT")
+                                .font(Theme.Fonts.caption)
+                                .tracking(1)
+                                .foregroundStyle(Theme.Colors.textSecondary)
+                            
+                            Picker("Weight", selection: $weight) {
+                                Text("—").tag(Double(0))
+                                ForEach(weightRange.dropFirst(), id: \.self) { w in
+                                    Text(w.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(w)) kg" : String(format: "%.1f kg", w)).tag(w)
+                                }
+                            }
+                            .pickerStyle(.wheel)
+                            .frame(height: 140)
+                        }
+                        .padding()
+                        .background(Theme.Colors.surface)
+                        .cornerRadius(Theme.Layout.cornerRadiusSmall)
+
+                        // Rest Picker
+                        VStack {
+                            Text("REST")
+                                .font(Theme.Fonts.caption)
+                                .tracking(1)
+                                .foregroundStyle(Theme.Colors.textSecondary)
+                            
+                            Picker("Rest", selection: $restSeconds) {
+                                ForEach(restRange, id: \.self) { seconds in
+                                    Text("\(seconds / 60):\(String(format: "%02d", seconds % 60))").tag(seconds)
+                                }
+                            }
+                            .pickerStyle(.wheel)
+                            .frame(height: 140)
+                        }
+                        .padding()
+                        .background(Theme.Colors.surface)
+                        .cornerRadius(Theme.Layout.cornerRadiusSmall)
+                    }
+                    .padding(.horizontal, Theme.Spacing.large)
+                    
+                    Spacer()
+                }
+                .padding(.top, Theme.Spacing.xl)
+            }
+            .navigationTitle(payload.exercise.name.uppercased())
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("CANCEL") {
+                        dismiss()
+                    }
+                    .font(Theme.Fonts.label)
+                    .foregroundStyle(Theme.Colors.textSecondary)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("SAVE") {
+                        onSave(reps, weight, restSeconds)
+                        dismiss()
+                    }
+                    .font(Theme.Fonts.label)
+                    .foregroundStyle(Theme.Colors.accent)
+                }
+            }
         }
     }
 }

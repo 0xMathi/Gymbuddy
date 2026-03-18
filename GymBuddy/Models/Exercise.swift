@@ -1,6 +1,24 @@
 import Foundation
 import SwiftData
 
+struct ExerciseSet: Codable, Identifiable, Hashable {
+    var id: UUID = UUID()
+    var index: Int
+    var reps: Int
+    var weight: Double
+    var restSeconds: Int? = nil
+
+    var weightFormatted: String {
+        if weight == 0 {
+            return "—"
+        } else if weight.truncatingRemainder(dividingBy: 1) == 0 {
+            return "\(Int(weight)) KG"
+        } else {
+            return String(format: "%.1f KG", weight)
+        }
+    }
+}
+
 @Model
 final class Exercise {
     var id: UUID = UUID()
@@ -23,6 +41,9 @@ final class Exercise {
     // wger.de image integration (copied from ExerciseDefinition)
     var wgerBaseId: Int? = nil
     var cachedImageUrl: String? = nil
+
+    // Optional array of individually edited sets
+    var specificSets: [ExerciseSet]? = nil
 
     @Relationship(inverse: \WorkoutPlan.exercises)
     var plan: WorkoutPlan?
@@ -129,5 +150,32 @@ final class Exercise {
 
     var summaryText: String {
         "\(sets) × \(reps) @ \(weightFormatted)"
+    }
+
+    // MARK: - Set Management
+
+    /// Returns the user-edited specific sets if they exist, otherwise generates default sets.
+    var resolvedSets: [ExerciseSet] {
+        if let specific = specificSets, !specific.isEmpty {
+            return specific
+        }
+        
+        // Generate defaults
+        return (1...max(1, sets)).map { i in
+            ExerciseSet(index: i, reps: reps, weight: weight, restSeconds: self.restSeconds)
+        }
+    }
+
+    // Helper to update individual set details
+    func updateSet(at index: Int, reps: Int, weight: Double, restSeconds: Int? = nil) {
+        var setsArray = resolvedSets
+        if index >= 0 && index < setsArray.count {
+            setsArray[index].reps = reps
+            setsArray[index].weight = weight
+            if let rs = restSeconds {
+                setsArray[index].restSeconds = rs
+            }
+            self.specificSets = setsArray
+        }
     }
 }

@@ -275,6 +275,8 @@ struct ExerciseDetailSheet: View {
     @Bindable var exercise: Exercise
     let onSave: () -> Void
 
+    @State private var editSetPayload: EditSetPayload? = nil
+
     // Picker ranges
     private let setsRange = Array(1...10)
     private let repsRange = Array(1...30)
@@ -304,7 +306,22 @@ struct ExerciseDetailSheet: View {
                                     value: "\(exercise.sets)",
                                     icon: "repeat"
                                 ) {
-                                    Picker("Sets", selection: $exercise.sets) {
+                                    Picker("Sets", selection: Binding(
+                                        get: { exercise.sets },
+                                        set: { newVal in
+                                            exercise.sets = newVal
+                                            var specific = exercise.resolvedSets
+                                            if newVal > specific.count {
+                                                let last = specific.last ?? ExerciseSet(index: 1, reps: exercise.reps, weight: exercise.weight)
+                                                for i in specific.count..<newVal {
+                                                    specific.append(ExerciseSet(index: i+1, reps: last.reps, weight: last.weight))
+                                                }
+                                            } else if newVal < specific.count {
+                                                specific.removeLast(specific.count - newVal)
+                                            }
+                                            exercise.specificSets = specific
+                                        }
+                                    )) {
                                         ForEach(setsRange, id: \.self) { num in
                                             Text("\(num)").tag(num)
                                         }
@@ -318,7 +335,16 @@ struct ExerciseDetailSheet: View {
                                     value: "\(exercise.reps)",
                                     icon: "arrow.up.arrow.down"
                                 ) {
-                                    Picker("Reps", selection: $exercise.reps) {
+                                    Picker("Reps", selection: Binding(
+                                        get: { exercise.reps },
+                                        set: { newVal in
+                                            exercise.reps = newVal
+                                            if var specific = exercise.specificSets {
+                                                for i in 0..<specific.count { specific[i].reps = newVal }
+                                                exercise.specificSets = specific
+                                            }
+                                        }
+                                    )) {
                                         ForEach(repsRange, id: \.self) { num in
                                             Text("\(num)").tag(num)
                                         }
@@ -334,7 +360,16 @@ struct ExerciseDetailSheet: View {
                                 value: exercise.weight == 0 ? "—" : String(format: exercise.weight.truncatingRemainder(dividingBy: 1) == 0 ? "%.0f KG" : "%.1f KG", exercise.weight),
                                 icon: "scalemass"
                             ) {
-                                Picker("Weight", selection: $exercise.weight) {
+                                Picker("Weight", selection: Binding(
+                                    get: { exercise.weight },
+                                    set: { newVal in
+                                        exercise.weight = newVal
+                                        if var specific = exercise.specificSets {
+                                            for i in 0..<specific.count { specific[i].weight = newVal }
+                                            exercise.specificSets = specific
+                                        }
+                                    }
+                                )) {
                                     Text("—").tag(Double(0))
                                     ForEach(weightRange.dropFirst(), id: \.self) { weight in
                                         Text(weight.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(weight)) kg" : String(format: "%.1f kg", weight)).tag(weight)
@@ -357,6 +392,76 @@ struct ExerciseDetailSheet: View {
                                 }
                                 .pickerStyle(.wheel)
                                 .frame(height: 120)
+                            }
+
+                            // Specific Sets Card
+                            VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
+                                Text("INDIVIDUAL SETS")
+                                    .font(Theme.Fonts.label)
+                                    .tracking(1)
+                                    .foregroundStyle(Theme.Colors.textSecondary)
+
+                                VStack(spacing: 0) {
+                                    let setsArray = exercise.resolvedSets
+                                    ForEach(Array(setsArray.enumerated()), id: \.offset) { index, exerciseSet in
+                                        Button {
+                                            editSetPayload = EditSetPayload(
+                                                exercise: exercise,
+                                                setIndex: index,
+                                                reps: exerciseSet.reps,
+                                                weight: exerciseSet.weight,
+                                                restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
+                                            )
+                                        } label: {
+                                            HStack {
+                                                Text("\(index + 1). Satz")
+                                                    .font(Theme.Fonts.body)
+                                                    .foregroundStyle(Theme.Colors.textPrimary)
+                                                Spacer()
+                                                let rest = exerciseSet.restSeconds ?? exercise.restSeconds
+                                                Text("\(exerciseSet.reps) × \(exerciseSet.weightFormatted) • \(formatRestTime(rest))")
+                                                    .font(Theme.Fonts.body)
+                                                    .foregroundStyle(Theme.Colors.accent)
+                                                    .lineLimit(1)
+                                                    .minimumScaleFactor(0.8)
+                                                Image(systemName: "chevron.right")
+                                                    .font(.system(size: 12))
+                                                    .foregroundStyle(Theme.Colors.textSecondary)
+                                                    .padding(.leading, 4)
+                                            }
+                                            .padding(Theme.Spacing.large)
+                                            .background(Theme.Colors.surface)
+                                        }
+                                        .buttonStyle(.plain)
+
+                                        if index < setsArray.count - 1 {
+                                            Divider().background(Theme.Colors.surfaceElevated)
+                                        }
+                                    }
+                                }
+                                .cornerRadius(Theme.Layout.cornerRadiusLarge)
+
+                                Button {
+                                    var sets = exercise.resolvedSets
+                                    let lastSet = sets.last ?? ExerciseSet(index: 1, reps: exercise.reps, weight: exercise.weight)
+                                    let newSet = ExerciseSet(index: sets.count + 1, reps: lastSet.reps, weight: lastSet.weight)
+                                    sets.append(newSet)
+                                    exercise.specificSets = sets
+                                    exercise.sets = sets.count
+                                } label: {
+                                    HStack(spacing: Theme.Spacing.small) {
+                                        Image(systemName: "plus")
+                                        Text("ADD SET")
+                                            .tracking(1)
+                                    }
+                                    .font(Theme.Fonts.label)
+                                    .foregroundStyle(Theme.Colors.accent)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(Theme.Spacing.large)
+                                    .background(Theme.Colors.surface)
+                                    .cornerRadius(Theme.Layout.cornerRadiusLarge)
+                                }
+                                .buttonStyle(ScaleButtonStyle())
                             }
                         }
                         .padding(.horizontal, Theme.Spacing.large)
@@ -383,6 +488,17 @@ struct ExerciseDetailSheet: View {
                     .font(Theme.Fonts.label)
                     .foregroundStyle(Theme.Colors.accent)
                 }
+            }
+            .sheet(item: $editSetPayload) { payload in
+                EditSetSheet(
+                    payload: payload,
+                    onSave: { reps, weight, restSeconds in
+                        payload.exercise.updateSet(at: payload.setIndex, reps: reps, weight: weight, restSeconds: restSeconds)
+                        editSetPayload = nil
+                    }
+                )
+                .presentationDetents([.height(380)])
+                .presentationDragIndicator(.visible)
             }
         }
     }
