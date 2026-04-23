@@ -257,7 +257,7 @@ struct ExerciseRowView: View {
                                 .cornerRadius(4)
                         }
 
-                        Text("\(exercise.sets) × \(exercise.reps)")
+                        Text("\(exercise.sets) Sätze")
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                         
@@ -273,7 +273,7 @@ struct ExerciseRowView: View {
                         Text("•")
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.surfaceElevated)
-                        Text("\(exercise.restSeconds)s Pause")
+                        Text("\(exercise.reps) Wdh")
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
