@@ -8,6 +8,7 @@ private struct PlanExerciseSeed {
     let sets: Int
     let reps: Int
     let restSeconds: Int
+    var supersetId: String? = nil
 }
 
 private struct PlanSeed {
@@ -16,39 +17,49 @@ private struct PlanSeed {
     let exercises: [PlanExerciseSeed]
 }
 
-// MARK: - Default PPL Plans
+// MARK: - Default Superset Plans
 
 private let defaultPPLPlans: [PlanSeed] = [
-    // MARK: Push
-    PlanSeed(name: "Push", orderIndex: 0, exercises: [
-        PlanExerciseSeed(exerciseName: "Bankdrücken", sets: 4, reps: 8, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Schrägbankdrücken", sets: 3, reps: 10, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Kurzhantel-Flys", sets: 3, reps: 12, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Schulterdrücken", sets: 4, reps: 8, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Seitheben", sets: 3, reps: 15, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Trizepsdrücken am Kabel", sets: 3, reps: 12, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Skull Crushers", sets: 3, reps: 10, restSeconds: 90),
+    // MARK: Montag (Push-Pull)
+    PlanSeed(name: "Montag (Schwer)", orderIndex: 0, exercises: [
+        PlanExerciseSeed(exerciseName: "Kurzhantel-Bankdrücken", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS1"),
+        PlanExerciseSeed(exerciseName: "Kurzhantel-Rudern", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS1"),
+        PlanExerciseSeed(exerciseName: "Schrägbankdrücken", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS2"),
+        PlanExerciseSeed(exerciseName: "Klimmzüge", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS2"),
+        PlanExerciseSeed(exerciseName: "Rumänisches Kreuzheben", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS3"),
+        PlanExerciseSeed(exerciseName: "Langhantel-Rudern", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS3"),
+        PlanExerciseSeed(exerciseName: "Seitheben", sets: 3, reps: 15, restSeconds: 60, supersetId: "SS4"),
+        PlanExerciseSeed(exerciseName: "Face Pulls", sets: 3, reps: 15, restSeconds: 60, supersetId: "SS4"),
+        PlanExerciseSeed(exerciseName: "Kabelzug-Curls", sets: 3, reps: 15, restSeconds: 60, supersetId: "FINISHER"),
+        PlanExerciseSeed(exerciseName: "Trizepsdrücken am Kabel", sets: 3, reps: 15, restSeconds: 60, supersetId: "FINISHER")
     ]),
 
-    // MARK: Pull
-    PlanSeed(name: "Pull", orderIndex: 1, exercises: [
-        PlanExerciseSeed(exerciseName: "Kreuzheben", sets: 4, reps: 6, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Klimmzüge", sets: 4, reps: 8, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Langhantel-Rudern", sets: 3, reps: 10, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Kabelrudern", sets: 3, reps: 12, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Face Pulls", sets: 3, reps: 15, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Langhantel-Curls", sets: 3, reps: 10, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Hammer Curls", sets: 3, reps: 12, restSeconds: 90),
+    // MARK: Mittwoch (Hypertrophie)
+    PlanSeed(name: "Mittwoch (Hypertrophie)", orderIndex: 1, exercises: [
+        PlanExerciseSeed(exerciseName: "Beinstrecker", sets: 4, reps: 12, restSeconds: 75, supersetId: "SS1"),
+        PlanExerciseSeed(exerciseName: "Beinbeuger", sets: 4, reps: 12, restSeconds: 75, supersetId: "SS1"),
+        PlanExerciseSeed(exerciseName: "Frontkniebeugen", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS2"),
+        PlanExerciseSeed(exerciseName: "Ausfallschritte", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS2"),
+        PlanExerciseSeed(exerciseName: "Kurzhantel-Flys", sets: 3, reps: 12, restSeconds: 75, supersetId: "SS3"),
+        PlanExerciseSeed(exerciseName: "Kurzhantel-Rudern", sets: 3, reps: 12, restSeconds: 75, supersetId: "SS3"),
+        PlanExerciseSeed(exerciseName: "Ausfallschritte", sets: 3, reps: 10, restSeconds: 60, supersetId: "SS4"),
+        PlanExerciseSeed(exerciseName: "Wadenheben stehend", sets: 3, reps: 15, restSeconds: 60, supersetId: "SS4"),
+        PlanExerciseSeed(exerciseName: "Kurzhantel-Curls", sets: 3, reps: 15, restSeconds: 60, supersetId: "FINISHER"),
+        PlanExerciseSeed(exerciseName: "Trizepsdrücken am Kabel", sets: 3, reps: 15, restSeconds: 60, supersetId: "FINISHER")
     ]),
 
-    // MARK: Legs
-    PlanSeed(name: "Legs", orderIndex: 2, exercises: [
-        PlanExerciseSeed(exerciseName: "Kniebeugen", sets: 4, reps: 8, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Rumänisches Kreuzheben", sets: 4, reps: 10, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Beinpresse", sets: 3, reps: 12, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Beinstrecker", sets: 3, reps: 12, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Beinbeuger", sets: 3, reps: 12, restSeconds: 90),
-        PlanExerciseSeed(exerciseName: "Wadenheben stehend", sets: 4, reps: 15, restSeconds: 90),
+    // MARK: Freitag (Power)
+    PlanSeed(name: "Freitag (Power)", orderIndex: 2, exercises: [
+        PlanExerciseSeed(exerciseName: "Kurzhantel-Bankdrücken", sets: 4, reps: 8, restSeconds: 120, supersetId: "SS1"),
+        PlanExerciseSeed(exerciseName: "Kreuzheben", sets: 4, reps: 8, restSeconds: 120, supersetId: "SS1"),
+        PlanExerciseSeed(exerciseName: "Kniebeugen", sets: 4, reps: 8, restSeconds: 120, supersetId: "SS2"),
+        PlanExerciseSeed(exerciseName: "T-Bar Rudern", sets: 4, reps: 8, restSeconds: 120, supersetId: "SS2"),
+        PlanExerciseSeed(exerciseName: "Kurzhantel-Schulterdrücken", sets: 3, reps: 10, restSeconds: 90, supersetId: "SS3"),
+        PlanExerciseSeed(exerciseName: "Latzug", sets: 3, reps: 10, restSeconds: 90, supersetId: "SS3"),
+        PlanExerciseSeed(exerciseName: "Ausfallschritte", sets: 3, reps: 8, restSeconds: 60, supersetId: "SS4"),
+        PlanExerciseSeed(exerciseName: "Seitheben", sets: 3, reps: 12, restSeconds: 60, supersetId: "SS4"),
+        PlanExerciseSeed(exerciseName: "Dips (Brust)", sets: 2, reps: 8, restSeconds: 60, supersetId: "FINISHER"),
+        PlanExerciseSeed(exerciseName: "Kettlebell Swings", sets: 2, reps: 15, restSeconds: 60, supersetId: "FINISHER")
     ]),
 ]
 
@@ -124,7 +135,8 @@ private func createPlan(
             reps: exerciseSeed.reps,
             weight: 0,
             restSeconds: exerciseSeed.restSeconds,
-            orderIndex: index
+            orderIndex: index,
+            supersetId: exerciseSeed.supersetId
         )
 
         exercise.plan = plan
@@ -142,6 +154,8 @@ private func cleanupInvalidPlans(modelContext: ModelContext) {
     var toDelete: [WorkoutPlan] = []
     for plan in allPlans {
         if plan.name == "New Plan" {
+            toDelete.append(plan)
+        } else if plan.name == "Push" || plan.name == "Pull" || plan.name == "Legs" {
             toDelete.append(plan)
         } else if plan.name.hasPrefix("Tag ") && plan.name.contains(" – ") {
             // Old German-named PPL plans ("Tag 1 – PUSH", "Tag 2 – PULL", "Tag 3 – LEGS")

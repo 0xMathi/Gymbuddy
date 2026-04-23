@@ -27,24 +27,37 @@ struct WorkoutSummaryView: View {
 
                 Spacer()
 
-                // Center Image/Icon (Placeholder for Muscle Heatmap)
+                // Center Image/Icon (Achievement)
                 ZStack {
-                    Image(systemName: "figure.strengthtraining.traditional")
-                        .font(.system(size: 80, weight: .thin))
-                        .foregroundStyle(Theme.Colors.surfaceElevated)
+                    Circle()
+                        .fill(Theme.Colors.surfaceElevated.opacity(0.3))
+                        .frame(width: 140, height: 140)
+                        .scaleEffect(isAnimating ? 1 : 0.5)
+                        .opacity(isAnimating ? 1 : 0)
+                        .animation(.spring(response: 0.6, dampingFraction: 0.6).delay(0.1), value: isAnimating)
+
+                    Image(systemName: "trophy.fill")
+                        .font(.system(size: 64))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [Theme.Colors.accent, Theme.Colors.accent.opacity(0.5)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                         .scaleEffect(isAnimating ? 1 : 0.8)
                         .opacity(isAnimating ? 1 : 0)
                         .animation(.spring(response: 0.6, dampingFraction: 0.6).delay(0.2), value: isAnimating)
                     
-                    // Simple "Brust" Label below image
-                    Text("Brust")
-                        .font(.system(size: 16, weight: .bold))
+                    Text("BEAST MODE COMPLETED")
+                        .font(.system(size: 16, weight: .black))
+                        .tracking(2)
                         .foregroundStyle(.white)
-                        .offset(y: 80)
+                        .offset(y: 100)
                         .opacity(isAnimating ? 1 : 0)
                         .animation(.easeOut(duration: 0.6).delay(0.3), value: isAnimating)
                 }
-                .frame(height: 200)
+                .frame(height: 240)
 
                 Spacer()
 

@@ -38,6 +38,9 @@ final class Exercise {
     // Optional reference to original definition (for updates)
     var definitionId: UUID?
 
+    // Optional Superset Grouping
+    var supersetId: String?
+
     // wger.de image integration (copied from ExerciseDefinition)
     var wgerBaseId: Int? = nil
     var cachedImageUrl: String? = nil
@@ -59,7 +62,8 @@ final class Exercise {
         equipment: String = "",
         definitionId: UUID? = nil,
         wgerBaseId: Int? = nil,
-        cachedImageUrl: String? = nil
+        cachedImageUrl: String? = nil,
+        supersetId: String? = nil
     ) {
         self.name = name
         self.sets = sets
@@ -72,6 +76,7 @@ final class Exercise {
         self.definitionId = definitionId
         self.wgerBaseId = wgerBaseId
         self.cachedImageUrl = cachedImageUrl
+        self.supersetId = supersetId
     }
 
     /// Create Exercise from ExerciseDefinition (Copy-on-Write)
@@ -81,7 +86,8 @@ final class Exercise {
         reps: Int = 10,
         weight: Double = 0,
         restSeconds: Int = 90,
-        orderIndex: Int = 0
+        orderIndex: Int = 0,
+        supersetId: String? = nil
     ) {
         self.init(
             name: definition.name,
@@ -94,7 +100,8 @@ final class Exercise {
             equipment: definition.equipment,
             definitionId: definition.id,
             wgerBaseId: definition.wgerBaseId,
-            cachedImageUrl: definition.cachedImageUrl
+            cachedImageUrl: definition.cachedImageUrl,
+            supersetId: supersetId
         )
     }
 

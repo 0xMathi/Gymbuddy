@@ -64,24 +64,73 @@ class WorkoutSessionManager {
         guard sortedExercises.indices.contains(currentSession.currentExerciseIndex) else { return }
         let currentExercise = sortedExercises[currentSession.currentExerciseIndex]
 
-        if currentSession.currentSetNumber < currentExercise.sets {
-            // Next Set Same Exercise
-            currentSession.currentSetNumber += 1
-            audio.announceSetCompleted()
-            startRest(session: &currentSession, duration: currentExercise.restSeconds)
+        // 1. Check Superset Status
+        let hasNextInSuperset: Bool = {
+            if let ssid = currentExercise.supersetId,
+               currentSession.currentExerciseIndex + 1 < sortedExercises.count {
+                return sortedExercises[currentSession.currentExerciseIndex + 1].supersetId == ssid
+            }
+            return false
+        }()
+        
+        let hasPrevInSuperset: Bool = {
+            if let ssid = currentExercise.supersetId,
+               currentSession.currentExerciseIndex > 0 {
+                return sortedExercises[currentSession.currentExerciseIndex - 1].supersetId == ssid
+            }
+            return false
+        }()
 
-        } else if currentSession.currentExerciseIndex < sortedExercises.count - 1 {
-            // Next Exercise
-            let nextExercise = sortedExercises[currentSession.currentExerciseIndex + 1]
+        if hasNextInSuperset {
+            // Jump to next exercise in superset, SAME set number, NO REST
             currentSession.currentExerciseIndex += 1
-            currentSession.currentSetNumber = 1
-
-            audio.announceExercise(nextExercise.name)
-            startRest(session: &currentSession, duration: currentExercise.restSeconds)
-
-        } else {
-            finishWorkout()
+            audio.announceExercise(sortedExercises[currentSession.currentExerciseIndex].name)
+            self.session = currentSession
+            updateNowPlayingInfo()
             return
+            
+        } else if hasPrevInSuperset {
+            // We just finished the last exercise in the superset
+            if currentSession.currentSetNumber < currentExercise.sets {
+                // Next Set for the entire Superset: go back to the first exercise
+                currentSession.currentSetNumber += 1
+                
+                var firstIndex = currentSession.currentExerciseIndex
+                while firstIndex > 0 && sortedExercises[firstIndex - 1].supersetId == currentExercise.supersetId {
+                    firstIndex -= 1
+                }
+                currentSession.currentExerciseIndex = firstIndex
+                
+                audio.announceSetCompleted()
+                startRest(session: &currentSession, duration: currentExercise.restSeconds)
+            } else {
+                // Superset completely done. Move to next block.
+                if currentSession.currentExerciseIndex < sortedExercises.count - 1 {
+                    currentSession.currentExerciseIndex += 1
+                    currentSession.currentSetNumber = 1
+                    audio.announceExercise(sortedExercises[currentSession.currentExerciseIndex].name)
+                    startRest(session: &currentSession, duration: currentExercise.restSeconds)
+                } else {
+                    finishWorkout()
+                    return
+                }
+            }
+            
+        } else {
+            // Normal (Non-Superset) logic
+            if currentSession.currentSetNumber < currentExercise.sets {
+                currentSession.currentSetNumber += 1
+                audio.announceSetCompleted()
+                startRest(session: &currentSession, duration: currentExercise.restSeconds)
+            } else if currentSession.currentExerciseIndex < sortedExercises.count - 1 {
+                currentSession.currentExerciseIndex += 1
+                currentSession.currentSetNumber = 1
+                audio.announceExercise(sortedExercises[currentSession.currentExerciseIndex].name)
+                startRest(session: &currentSession, duration: currentExercise.restSeconds)
+            } else {
+                finishWorkout()
+                return
+            }
         }
 
         self.session = currentSession

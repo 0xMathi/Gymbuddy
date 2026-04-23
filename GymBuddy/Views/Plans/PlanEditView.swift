@@ -247,6 +247,16 @@ struct ExerciseRowView: View {
                         .lineLimit(1)
                         
                     HStack(spacing: 6) {
+                        if let ssid = exercise.supersetId {
+                            Text(ssid.uppercased())
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundStyle(Theme.Colors.accent)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Theme.Colors.accent.opacity(0.15))
+                                .cornerRadius(4)
+                        }
+
                         Text("\(exercise.sets) × \(exercise.reps)")
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)

@@ -66,8 +66,12 @@ struct ActiveWorkoutView: View {
                             ))
                     } else {
                         activeSection(session: session, exercises: exercises)
+                            .id("active-\(session.currentExerciseIndex)")
                             .padding(.horizontal, Theme.Spacing.xl)
-                            .transition(.opacity)
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .trailing).combined(with: .opacity),
+                                removal: .move(edge: .leading).combined(with: .opacity)
+                            ))
                             .onDrop(of: [UTType.text], delegate: ActiveWorkoutDropDelegate(
                                 item: exercises[session.currentExerciseIndex],
                                 session: session,
@@ -78,7 +82,11 @@ struct ActiveWorkoutView: View {
                     if exercises.count > 1 {
                         let hasOthers = exercises.indices.contains(where: { $0 != session.currentExerciseIndex })
                         if hasOthers {
-                            sectionDivider(title: session.state == .resting ? "COMING UP" : "NEXT UP")
+                            let nextEx = session.currentExerciseIndex + 1 < exercises.count ? exercises[session.currentExerciseIndex + 1] : nil
+                            let isSupersetNext = session.state != .resting && nextEx?.supersetId != nil && nextEx?.supersetId == exercises[session.currentExerciseIndex].supersetId
+                            let titleStr = session.state == .resting ? "COMING UP" : (isSupersetNext ? "NEXT IN SUPERSET (NO REST)" : "NEXT UP")
+
+                            sectionDivider(title: titleStr)
                                 .padding(.horizontal, Theme.Spacing.xl)
                                 .padding(.top, Theme.Spacing.small)
 
@@ -283,6 +291,13 @@ struct ActiveWorkoutView: View {
                     .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusLarge))
                     
                     VStack(alignment: .leading, spacing: 6) {
+                        if let ssid = exercise.supersetId {
+                            Text("SUPERSET • \(ssid)")
+                                .font(.system(size: 12, weight: .black))
+                                .tracking(2)
+                                .foregroundStyle(Theme.Colors.accent)
+                        }
+
                         Text(exercise.name)
                             .font(.system(size: 28, weight: .bold))
                             .foregroundStyle(Theme.Colors.textPrimary)
@@ -492,12 +507,23 @@ struct ActiveWorkoutView: View {
                     .fill(isCompleted ? Theme.Colors.success : Theme.Colors.surfaceElevated)
                     .frame(width: 10, height: 10)
 
-                Text(exercise.name.uppercased())
-                    .font(Theme.Fonts.bodyBold)
-                    .tracking(0.5)
-                    .foregroundStyle(isCompleted ? Theme.Colors.textSecondary : Theme.Colors.textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                HStack(spacing: 6) {
+                    if let ssid = exercise.supersetId {
+                        Text(ssid.uppercased())
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(Theme.Colors.accent)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 2)
+                            .background(Theme.Colors.accent.opacity(0.15))
+                            .cornerRadius(3)
+                    }
+                    Text(exercise.name.uppercased())
+                        .font(Theme.Fonts.bodyBold)
+                        .tracking(0.5)
+                        .foregroundStyle(isCompleted ? Theme.Colors.textSecondary : Theme.Colors.textPrimary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                }
 
                 Spacer(minLength: Theme.Spacing.medium)
 
