@@ -269,47 +269,29 @@ struct ActiveWorkoutView: View {
     private func activeSection(session: WorkoutSession, exercises: [Exercise]) -> some View {
         if let exercise = session.currentExercise {
             VStack(alignment: .leading, spacing: Theme.Spacing.large) {
-                // EXERCISE HERO HEADER
-                VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
-                    // Large Hero Image
-                    ZStack {
-                        Rectangle()
-                            .fill(Theme.Colors.surfaceElevated)
-                        
-                        if let localImage = UIImage(named: exercise.imageName) {
-                            Image(uiImage: localImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        } else {
-                            Image(systemName: exercise.fallbackIcon)
-                                .font(.system(size: 64, weight: .thin))
-                                .foregroundStyle(Theme.Colors.textSecondary.opacity(0.4))
-                        }
+                // EXERCISE HERO HEADER (Image Removed for cleaner look)
+                VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                    if let ssid = exercise.supersetId {
+                        Text("SUPERSET • \(ssid)")
+                            .font(.system(size: 14, weight: .black))
+                            .tracking(2)
+                            .foregroundStyle(Theme.Colors.accent)
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 180)
-                    .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusLarge))
-                    
-                    VStack(alignment: .leading, spacing: 6) {
-                        if let ssid = exercise.supersetId {
-                            Text("SUPERSET • \(ssid)")
-                                .font(.system(size: 12, weight: .black))
-                                .tracking(2)
-                                .foregroundStyle(Theme.Colors.accent)
-                        }
 
-                        Text(exercise.name)
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundStyle(Theme.Colors.textPrimary)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                        
-                        Text("\(exercise.sets) Sätze")
-                            .font(Theme.Fonts.body)
-                            .foregroundStyle(Theme.Colors.textSecondary)
-                    }
-                    .padding(.horizontal, 4)
+                    Text(exercise.name.uppercased())
+                        .font(.system(size: 40, weight: .black, design: .default))
+                        .foregroundStyle(Theme.Colors.textPrimary)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.5)
+                        .fixedSize(horizontal: false, vertical: true)
+                    
+                    Text("\(exercise.sets) SÄTZE • \(exercise.reps) WDH")
+                        .font(Theme.Fonts.bodyBold)
+                        .tracking(1)
+                        .foregroundStyle(Theme.Colors.textSecondary)
                 }
+                .padding(.top, Theme.Spacing.medium)
+                .padding(.horizontal, 4)
                 
                 // SET LIST (Tabular Layout)
                 VStack(spacing: 0) {
@@ -329,46 +311,42 @@ struct ActiveWorkoutView: View {
                                     restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
                                 )
                             } label: {
-                                HStack(spacing: Theme.Spacing.medium) {
-                                    // "1. Satz"
-                                    Text("\(setNum). Satz")
-                                        .font(.system(size: 14, weight: .bold))
-                                        .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-                                        .frame(width: 60, alignment: .leading)
+                                HStack(spacing: 0) {
+                                    // "SET 1"
+                                    Text("SET \(setNum)")
+                                        .font(.system(size: isActive ? 20 : 16, weight: .black))
+                                        .foregroundStyle(isActive ? Theme.Colors.accent : Theme.Colors.textSecondary)
+                                        .frame(width: 65, alignment: .leading)
                                     
-                                    // "10 x 35 kg"
-                                    HStack(spacing: 4) {
-                                        Text("\(exerciseSet.reps)")
-                                            .font(.system(size: 16, weight: .bold))
-                                            .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-                                        
-                                        Text("×")
-                                            .font(.system(size: 12))
-                                            .foregroundStyle(Theme.Colors.textSecondary)
-                                        
-                                        Text(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")
-                                            .font(.system(size: 16, weight: .bold))
-                                            .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.8)
-                                            .fixedSize(horizontal: true, vertical: false)
-                                    }
+                                    Spacer(minLength: 4)
+                                    
+                                    // "35 kg"
+                                    Text(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")
+                                        .font(.system(size: isActive ? 34 : 26, weight: .bold))
+                                        .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.5)
+                                    
+                                    Spacer(minLength: 4)
                                     
                                     Text("•")
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(Theme.Colors.textSecondary)
+                                        .font(.system(size: 16))
+                                        .foregroundStyle(Theme.Colors.surfaceElevated)
+                                    
+                                    Spacer(minLength: 4)
                                     
                                     // "1:30 min"
                                     Text(formatRestTime(exerciseSet.restSeconds ?? exercise.restSeconds))
-                                        .font(.system(size: 14))
+                                        .font(.system(size: isActive ? 18 : 14, weight: .semibold))
                                         .foregroundStyle(Theme.Colors.textSecondary)
                                         .lineLimit(1)
-                                        .fixedSize(horizontal: true, vertical: false)
+                                        .minimumScaleFactor(0.8)
+                                        .frame(width: 60, alignment: .trailing)
                                 }
                             }
                             .buttonStyle(.plain)
                             
-                            Spacer()
+                            Spacer(minLength: 4)
                             
                             // Checkbox (Action to complete set)
                             Button {
@@ -379,20 +357,20 @@ struct ActiveWorkoutView: View {
                             } label: {
                                 ZStack {
                                     Circle()
-                                        .strokeBorder(isDone ? Theme.Colors.accent : Theme.Colors.surfaceElevated, lineWidth: 2)
-                                        .frame(width: 24, height: 24)
+                                        .strokeBorder(isDone ? Theme.Colors.accent : Theme.Colors.surfaceElevated, lineWidth: 3)
+                                        .frame(width: 36, height: 36)
                                     
                                     if isDone {
                                         Circle()
                                             .fill(Theme.Colors.accent)
-                                            .frame(width: 16, height: 16)
+                                            .frame(width: 20, height: 20)
                                     }
                                 }
                             }
                             .buttonStyle(.plain)
                             .disabled(!isActive || manager.isPaused)
                         }
-                        .padding(.vertical, Theme.Spacing.medium)
+                        .padding(.vertical, 20)
                         .padding(.horizontal, Theme.Spacing.large)
                         .background(isActive ? Theme.Colors.surfaceElevated.opacity(0.3) : Color.clear)
                         

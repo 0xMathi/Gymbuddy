@@ -399,33 +399,13 @@ private struct StartPlanCard: View {
                 .padding(.leading, isEditMode ? 0 : Theme.Spacing.medium)
 
                 // Text content
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(plan.name)
-                        .font(.system(size: 18, weight: .bold))
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(plan.name.uppercased())
+                        .font(.system(size: 24, weight: .black))
+                        .tracking(1)
                         .foregroundStyle(Theme.Colors.textPrimary)
-                        .lineLimit(1)
-
-                    HStack(spacing: 8) {
-                        Text("\(plan.exercises.count) Übungen")
-                            .font(Theme.Fonts.caption)
-                            .foregroundStyle(Theme.Colors.textSecondary)
-                        
-                        Text("•")
-                            .font(Theme.Fonts.caption)
-                            .foregroundStyle(Theme.Colors.surfaceElevated)
-                        
-                        if let lastUsed = plan.lastUsedAt {
-                            Text("Letztes Training: \(formattedDate(lastUsed))")
-                                .font(Theme.Fonts.caption)
-                                .foregroundStyle(Theme.Colors.textSecondary)
-                                .lineLimit(1)
-                        } else {
-                            Text(muscles)
-                                .font(Theme.Fonts.caption)
-                                .foregroundStyle(Theme.Colors.textSecondary)
-                                .lineLimit(1)
-                        }
-                    }
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
                 }
 
                 Spacer()
