@@ -455,10 +455,17 @@ struct ActiveWorkoutView: View {
         let exercise = exercises.indices.contains(session.currentExerciseIndex)
             ? exercises[session.currentExerciseIndex] : nil
 
-        let nextLabel: String = {
+        let topLabel: String = {
+            if let ex = exercise, session.currentSetNumber <= ex.sets {
+                return "RESTING: SET \(session.currentSetNumber)"
+            }
+            return "RESTING"
+        }()
+        
+        let mainLabel: String = {
             guard let ex = exercise else { return "FINISH" }
             if session.currentSetNumber <= ex.sets {
-                return "\(ex.name.uppercased()) — SET \(session.currentSetNumber)"
+                return ex.name.uppercased()
             } else if session.currentExerciseIndex + 1 < exercises.count {
                 return exercises[session.currentExerciseIndex + 1].name.uppercased()
             } else {
@@ -466,34 +473,117 @@ struct ActiveWorkoutView: View {
             }
         }()
 
-        VStack(spacing: Theme.Spacing.large) {
-            VStack(spacing: Theme.Spacing.xs) {
-                Text("RESTING")
-                    .font(Theme.Fonts.label)
-                    .tracking(4)
-                    .foregroundStyle(Theme.Colors.textSecondary)
+        let nextLabel: String? = {
+            guard let ex = exercise else { return nil }
+            if session.currentSetNumber <= ex.sets {
+                if session.currentExerciseIndex + 1 < exercises.count {
+                    return "NEXT: \(exercises[session.currentExerciseIndex + 1].name.uppercased())"
+                }
+            } else if session.currentExerciseIndex + 2 < exercises.count {
+                return "NEXT: \(exercises[session.currentExerciseIndex + 2].name.uppercased())"
+            }
+            return nil
+        }()
 
-                Text(nextLabel)
-                    .font(Theme.Fonts.h2)
+        VStack(spacing: Theme.Spacing.xxl) {
+            // Header
+            VStack(spacing: 6) {
+                Text(topLabel)
+                    .font(.system(size: 34, weight: .bold, design: .default))
+                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+
+                Text(mainLabel)
+                    .font(.system(size: 34, weight: .bold, design: .default))
                     .foregroundStyle(Theme.Colors.textPrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .minimumScaleFactor(0.5)
+
+                if let next = nextLabel {
+                    Text(next)
+                        .font(Theme.Fonts.label)
+                        .tracking(2)
+                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .padding(.top, Theme.Spacing.small)
+                }
             }
+            .padding(.top, Theme.Spacing.medium)
 
-            RestTimerBar(
-                timeRemaining: session.restTimeRemaining,
-                totalDuration: max(session.originalRestDuration, 1),
-                onAdjust: { seconds in manager.adjustRest(by: seconds) }
-            )
-            .padding(Theme.Spacing.large)
-            .background(Theme.Colors.surface)
-            .cornerRadius(Theme.Layout.cornerRadius)
+            // Circular Timer
+            ZStack {
+                Circle()
+                    .stroke(Theme.Colors.surfaceElevated, lineWidth: 16)
+                
+                Circle()
+                    .trim(from: 0, to: CGFloat(session.restTimeRemaining) / CGFloat(max(session.originalRestDuration, 1)))
+                    .stroke(Theme.Colors.accent, style: StrokeStyle(lineWidth: 16, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(.linear(duration: 1.0), value: session.restTimeRemaining)
+                
+                Text(formatRestTimeDigital(session.restTimeRemaining))
+                    .font(.system(size: 72, weight: .bold, design: .default))
+                    .foregroundStyle(Theme.Colors.accent)
+                    .monospacedDigit()
+            }
+            .frame(width: 260, height: 260)
+            
+            VStack(spacing: Theme.Spacing.large) {
+                HStack(spacing: Theme.Spacing.xl) {
+                    Button {
+                        manager.adjustRest(by: -15)
+                    } label: {
+                        Text("-15")
+                            .font(Theme.Fonts.label)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                            .frame(width: 44, height: 44)
+                            .background(Theme.Colors.surfaceElevated)
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
 
-            SecondaryButton(title: "SKIP REST", icon: "forward.fill") {
-                manager.skipRest()
+                    Text("REMAINING REST")
+                        .font(Theme.Fonts.label)
+                        .tracking(2)
+                        .foregroundStyle(Theme.Colors.textSecondary)
+
+                    Button {
+                        manager.adjustRest(by: 15)
+                    } label: {
+                        Text("+15")
+                            .font(Theme.Fonts.label)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                            .frame(width: 44, height: 44)
+                            .background(Theme.Colors.surfaceElevated)
+                            .clipShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Button {
+                    manager.skipRest()
+                } label: {
+                    Text("SKIP REST")
+                        .font(Theme.Fonts.bodyBold)
+                        .tracking(1)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: Theme.Layout.buttonHeight)
+                        .background(Theme.Colors.accent)
+                        .foregroundStyle(Theme.Colors.bg)
+                        .cornerRadius(Theme.Layout.buttonHeight / 2)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, Theme.Spacing.large)
             }
         }
+        .padding(.vertical, Theme.Spacing.medium)
+    }
+
+    private func formatRestTimeDigital(_ seconds: Int) -> String {
+        let mins = seconds / 60
+        let secs = seconds % 60
+        return String(format: "%d:%02d", mins, secs)
     }
 
     // MARK: - Collapsed Exercise Row (tappable)

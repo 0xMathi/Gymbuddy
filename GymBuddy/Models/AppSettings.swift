@@ -135,7 +135,7 @@ final class AppSettings {
         get { KeychainService.shared.get(.elevenLabsApiKey) }
         set {
             if let value = newValue, !value.isEmpty {
-                KeychainService.shared.save(value, for: .elevenLabsApiKey)
+                 KeychainService.shared.save(value, for: .elevenLabsApiKey)
             } else {
                 KeychainService.shared.delete(.elevenLabsApiKey)
             }
