@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct GymBuddyApp: App {
@@ -33,6 +34,7 @@ struct GymBuddyApp: App {
                 .environment(sessionManager)
                 .environment(exerciseManager)
                 .onAppear {
+                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
                     exerciseManager.configure(with: modelContainer.mainContext)
                     seedDefaultPlans(modelContext: modelContainer.mainContext)
                 }

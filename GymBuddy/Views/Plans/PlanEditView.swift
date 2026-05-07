@@ -426,35 +426,47 @@ struct ExerciseDetailSheet: View {
                                 VStack(spacing: 0) {
                                     let setsArray = exercise.resolvedSets
                                     ForEach(Array(setsArray.enumerated()), id: \.offset) { index, exerciseSet in
-                                        Button {
-                                            editSetPayload = EditSetPayload(
-                                                exercise: exercise,
-                                                setIndex: index,
-                                                reps: exerciseSet.reps,
-                                                weight: exerciseSet.weight,
-                                                restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
-                                            )
-                                        } label: {
-                                            HStack {
-                                                Text("\(index + 1). Satz")
-                                                    .font(Theme.Fonts.body)
-                                                    .foregroundStyle(Theme.Colors.textPrimary)
-                                                Spacer()
-                                                let rest = exerciseSet.restSeconds ?? exercise.restSeconds
-                                                Text("\(exerciseSet.reps) × \(exerciseSet.weightFormatted) • \(formatRestTime(rest))")
-                                                    .font(Theme.Fonts.body)
-                                                    .foregroundStyle(Theme.Colors.accent)
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.8)
-                                                Image(systemName: "chevron.right")
-                                                    .font(.system(size: 12))
-                                                    .foregroundStyle(Theme.Colors.textSecondary)
-                                                    .padding(.leading, 4)
+                                        SwipeToDeleteView(action: {
+                                            var specific = exercise.resolvedSets
+                                            if specific.count > 1 {
+                                                specific.remove(at: index)
+                                                for i in 0..<specific.count {
+                                                    specific[i].index = i + 1
+                                                }
+                                                exercise.specificSets = specific
+                                                exercise.sets = specific.count
                                             }
-                                            .padding(Theme.Spacing.large)
-                                            .background(Theme.Colors.surface)
+                                        }) {
+                                            Button {
+                                                editSetPayload = EditSetPayload(
+                                                    exercise: exercise,
+                                                    setIndex: index,
+                                                    reps: exerciseSet.reps,
+                                                    weight: exerciseSet.weight,
+                                                    restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
+                                                )
+                                            } label: {
+                                                HStack {
+                                                    Text("\(index + 1). Satz")
+                                                        .font(Theme.Fonts.body)
+                                                        .foregroundStyle(Theme.Colors.textPrimary)
+                                                    Spacer()
+                                                    let rest = exerciseSet.restSeconds ?? exercise.restSeconds
+                                                    Text("\(exerciseSet.reps) × \(exerciseSet.weightFormatted) • \(formatRestTime(rest))")
+                                                        .font(Theme.Fonts.body)
+                                                        .foregroundStyle(Theme.Colors.accent)
+                                                        .lineLimit(1)
+                                                        .minimumScaleFactor(0.8)
+                                                    Image(systemName: "chevron.right")
+                                                        .font(.system(size: 12))
+                                                        .foregroundStyle(Theme.Colors.textSecondary)
+                                                        .padding(.leading, 4)
+                                                }
+                                                .padding(Theme.Spacing.large)
+                                                .background(Theme.Colors.surface)
+                                            }
+                                            .buttonStyle(.plain)
                                         }
-                                        .buttonStyle(.plain)
 
                                         if index < setsArray.count - 1 {
                                             Divider().background(Theme.Colors.surfaceElevated)
@@ -655,6 +667,60 @@ struct ExerciseDropDelegate: DropDelegate {
                 exerciseManager.reorderExercises(in: plan, from: IndexSet(integer: from), to: to > from ? to + 1 : to)
             }
         }
+    }
+}
+
+// MARK: - Swipe To Delete View
+
+struct SwipeToDeleteView<Content: View>: View {
+    let action: () -> Void
+    @ViewBuilder let content: () -> Content
+    
+    @State private var offset: CGFloat = 0
+    @State private var isSwiped: Bool = false
+    
+    var body: some View {
+        ZStack(alignment: .trailing) {
+            Color.red
+            
+            Button {
+                withAnimation {
+                    offset = 0
+                    isSwiped = false
+                }
+                action()
+            } label: {
+                Image(systemName: "trash.fill")
+                    .foregroundColor(.white)
+                    .frame(width: 80, alignment: .center)
+            }
+            
+            content()
+                .background(Theme.Colors.surface)
+                .offset(x: offset)
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            if value.translation.width < 0 {
+                                offset = value.translation.width + (isSwiped ? -80 : 0)
+                            } else if isSwiped && value.translation.width > 0 {
+                                offset = value.translation.width - 80
+                            }
+                        }
+                        .onEnded { value in
+                            withAnimation(.spring()) {
+                                if value.translation.width < -40 {
+                                    offset = -80
+                                    isSwiped = true
+                                } else {
+                                    offset = 0
+                                    isSwiped = false
+                                }
+                            }
+                        }
+                )
+        }
+        .clipped()
     }
 }
 

@@ -76,27 +76,31 @@ func seedDefaultPlans(modelContext: ModelContext) {
     // Step 1: Cleanup old/invalid plans (one-time migration)
     cleanupInvalidPlans(modelContext: modelContext)
 
-    // Step 2: Fetch all exercise definitions for lookup
-    let definitionDescriptor = FetchDescriptor<ExerciseDefinition>()
-    guard let definitions = try? modelContext.fetch(definitionDescriptor), !definitions.isEmpty else {
-        print("No exercise definitions found - skipping plan seeding")
-        return
-    }
-    var definitionsByName = Dictionary(uniqueKeysWithValues: definitions.map { ($0.name, $0) })
-
-    // Step 3: Check and create each PPL plan individually
-    for planSeed in defaultPPLPlans {
-        if !planExists(named: planSeed.name, in: modelContext) {
-            createPlan(from: planSeed, definitions: &definitionsByName, modelContext: modelContext)
+    let hasSeeded = UserDefaults.standard.bool(forKey: "hasSeededDefaultPlans")
+    if !hasSeeded {
+        // Step 2: Fetch all exercise definitions for lookup
+        let definitionDescriptor = FetchDescriptor<ExerciseDefinition>()
+        guard let definitions = try? modelContext.fetch(definitionDescriptor), !definitions.isEmpty else {
+            print("No exercise definitions found - skipping plan seeding")
+            return
         }
-    }
+        var definitionsByName = Dictionary(uniqueKeysWithValues: definitions.map { ($0.name, $0) })
 
-    // Step 4: Save all changes
-    do {
-        try modelContext.save()
-        print("PPL plan seeding completed")
-    } catch {
-        print("Failed to save PPL plans: \(error)")
+        // Step 3: Check and create each PPL plan individually
+        for planSeed in defaultPPLPlans {
+            if !planExists(named: planSeed.name, in: modelContext) {
+                createPlan(from: planSeed, definitions: &definitionsByName, modelContext: modelContext)
+            }
+        }
+
+        // Step 4: Save all changes
+        do {
+            try modelContext.save()
+            UserDefaults.standard.set(true, forKey: "hasSeededDefaultPlans")
+            print("PPL plan seeding completed")
+        } catch {
+            print("Failed to save PPL plans: \(error)")
+        }
     }
 }
 

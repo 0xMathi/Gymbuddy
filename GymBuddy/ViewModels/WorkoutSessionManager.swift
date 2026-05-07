@@ -1,6 +1,7 @@
 import SwiftUI
 import Observation
 import AVFoundation
+import UserNotifications
 
 @Observable
 class WorkoutSessionManager {
@@ -12,6 +13,8 @@ class WorkoutSessionManager {
     private let audio = AudioService.shared
     private let haptics = HapticService.shared
     private let nowPlaying = NowPlayingService()
+    
+    private var targetRestEndTime: Date?
 
     // MARK: - Initialization
 
@@ -195,9 +198,12 @@ class WorkoutSessionManager {
             // Pause the timer
             stopTimer()
             audio.announcePaused()
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
         } else {
             // Resume if we were resting
             if let currentSession = session, currentSession.state == .resting {
+                targetRestEndTime = Date().addingTimeInterval(TimeInterval(currentSession.restTimeRemaining))
+                scheduleRestEndNotification(in: currentSession.restTimeRemaining)
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
                     self?.tick()
                 }
@@ -210,6 +216,7 @@ class WorkoutSessionManager {
 
     func cancelWorkout() {
         stopTimer()
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
         nowPlaying.deactivate()
         session = nil
         isPaused = false
@@ -269,6 +276,9 @@ class WorkoutSessionManager {
         session.restTimeRemaining = duration
         session.originalRestDuration = duration
 
+        targetRestEndTime = Date().addingTimeInterval(TimeInterval(duration))
+        scheduleRestEndNotification(in: duration)
+
         stopTimer()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             self?.tick()
@@ -288,6 +298,9 @@ class WorkoutSessionManager {
         if currentSession.restTimeRemaining > currentSession.originalRestDuration {
             currentSession.originalRestDuration = currentSession.restTimeRemaining
         }
+        
+        targetRestEndTime = Date().addingTimeInterval(TimeInterval(currentSession.restTimeRemaining))
+        scheduleRestEndNotification(in: currentSession.restTimeRemaining)
 
         self.session = currentSession
         haptics.light()
@@ -297,7 +310,14 @@ class WorkoutSessionManager {
     private func tick() {
         guard var currentSession = session, currentSession.state == .resting, !isPaused else { return }
 
-        currentSession.restTimeRemaining -= 1
+        if let target = targetRestEndTime {
+            let remaining = Int(ceil(target.timeIntervalSinceNow))
+            if remaining < currentSession.restTimeRemaining {
+                currentSession.restTimeRemaining = max(0, remaining)
+            }
+        } else {
+            currentSession.restTimeRemaining -= 1
+        }
 
         // Update lockscreen
         session = currentSession
@@ -327,6 +347,7 @@ class WorkoutSessionManager {
 
     private func endRest() {
         stopTimer()
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
         guard var currentSession = session else { return }
 
         currentSession.state = .active
@@ -345,6 +366,7 @@ class WorkoutSessionManager {
 
     private func finishWorkout() {
         stopTimer()
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
         guard var currentSession = session else { return }
 
         currentSession.plan.lastUsedAt = Date()
@@ -361,5 +383,20 @@ class WorkoutSessionManager {
     func dismissSummary() {
         session = nil
         isPaused = false
+    }
+
+    private func scheduleRestEndNotification(in seconds: Int) {
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
+        guard seconds > 0 else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Pause vorbei!"
+        content.body = "Mach dich bereit für den nächsten Satz."
+        content.sound = .default
+
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(seconds), repeats: false)
+        let request = UNNotificationRequest(identifier: "RestEnd", content: content, trigger: trigger)
+
+        UNUserNotificationCenter.current().add(request)
     }
 }

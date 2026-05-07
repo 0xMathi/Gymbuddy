@@ -9,6 +9,7 @@ struct ActiveWorkoutView: View {
     @State private var selectedExerciseIndex: Int? = nil
     @State private var editSetPayload: EditSetPayload? = nil
     @State private var draggedExercise: Exercise?
+    @State private var showSettings = false
 
     var body: some View {
         ZStack {
@@ -175,6 +176,9 @@ struct ActiveWorkoutView: View {
             .presentationDetents([.height(380)])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
 
         if manager.isPaused {
             pauseOverlay
@@ -221,6 +225,18 @@ struct ActiveWorkoutView: View {
                 .lineLimit(1)
 
             Spacer()
+
+            Button {
+                showSettings = true
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .frame(width: 40, height: 40)
+                    .background(Theme.Colors.surface)
+                    .cornerRadius(Theme.Layout.cornerRadiusSmall)
+            }
+            .buttonStyle(.plain)
 
             Button {
                 manager.togglePause()
@@ -749,13 +765,8 @@ private struct ExerciseQuickActionSheet: View {
                 // Actions
                 VStack(spacing: Theme.Spacing.medium) {
                     if isCompleted {
-                        HStack(spacing: Theme.Spacing.small) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(Theme.Colors.success)
-                            Text("ALREADY COMPLETED")
-                                .font(Theme.Fonts.label)
-                                .tracking(2)
-                                .foregroundStyle(Theme.Colors.success)
+                        PrimaryButton(title: "RESTART EXERCISE", icon: "arrow.uturn.left") {
+                            onJump()
                         }
                     } else {
                         PrimaryButton(title: "JUMP TO THIS EXERCISE", icon: "arrow.right") {
