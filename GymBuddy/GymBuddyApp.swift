@@ -14,7 +14,9 @@ struct GymBuddyApp: App {
             let schema = Schema([
                 WorkoutPlan.self,
                 Exercise.self,
-                ExerciseDefinition.self
+                ExerciseDefinition.self,
+                WorkoutHistoryEntry.self,
+                AppSettings.self
             ])
             let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])

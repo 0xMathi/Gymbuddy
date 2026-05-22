@@ -372,11 +372,48 @@ class WorkoutSessionManager {
         currentSession.plan.lastUsedAt = Date()
         currentSession.state = .completed
         currentSession.endTime = Date()
+        
+        // Save to workout history
+        saveToHistory(session: currentSession)
+        
         session = currentSession
 
         haptics.success()
         audio.announceWorkoutComplete()
         nowPlaying.deactivate()
+    }
+    
+    /// Persistiert das Workout in der Historie
+    @MainActor
+    private func saveToHistory(session: WorkoutSession) {
+        let context = ModelContext(try! ModelContainer(for: WorkoutHistoryEntry.self))
+        
+        let exerciseSnapshots = session.sortedExercises.map { exercise in
+            ExerciseSnapshot(
+                name: exercise.name,
+                sets: exercise.sets,
+                reps: exercise.reps,
+                weight: exercise.weight,
+                muscleGroup: exercise.muscleGroup
+            )
+        }
+        
+        let encodedSnapshots = try? JSONEncoder().encode(exerciseSnapshots)
+        
+        let entry = WorkoutHistoryEntry(
+            planName: session.plan.name,
+            planId: session.plan.id,
+            startTime: session.startTime,
+            endTime: session.endTime ?? Date(),
+            duration: session.duration,
+            totalSets: session.totalSetsCompleted,
+            totalVolume: session.totalVolume,
+            exercisesCompleted: session.currentExerciseIndex + 1,
+            exerciseSnapshots: encodedSnapshots
+        )
+        
+        context.insert(entry)
+        try? context.save()
     }
 
     /// Called from WorkoutSummaryView to dismiss and reset
