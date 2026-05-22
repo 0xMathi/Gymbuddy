@@ -1,52 +1,42 @@
+```
+# Build artifacts
+*.o
+*.obj
+*.out
+
 # Dependencies
-node_modules/
-.pnp
-.pnp.js
-
-# Testing
-coverage/
-
-# Next.js
-.next/
-out/
-
-# Production
+Pods/
+Carthage/
 build/
-dist/
+DerivedData/
 
-# Misc
-.DS_Store
-*.pem
+# Logs
+*.log
 
-# Debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Env
+# Environment
 .env
 .env.local
-.env.development.local
-.env.test.local
-.env.production.local
+*.env.*
 
-# IDEs
+# Editor files
 .vscode/
 .idea/
 *.swp
 *.swo
+*.tmp
 
-# Xcode
-xcuserdata/
-*.xcuserstate
-DerivedData/
-*.xccheckout
-*.moved-aside
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
+# macOS
+.DS_Store
+*.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Swift
+*.swiftmodule
+*.swiftdoc
+*.swiftsourceinfo
+```

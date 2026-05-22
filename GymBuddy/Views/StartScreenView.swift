@@ -89,6 +89,16 @@ struct StartScreenView: View {
 
                 Spacer()
 
+                // History button
+                NavigationLink(destination: HistoryView()) {
+                    Image(systemName: "clock.fill")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(Theme.Colors.textSecondary)
+                        .frame(width: 36, height: 36)
+                        .background(Theme.Colors.surface)
+                        .cornerRadius(8)
+                }
+
                 // Settings button
                 Button(action: { showSettings = true }) {
                     Image(systemName: "gearshape.fill")
