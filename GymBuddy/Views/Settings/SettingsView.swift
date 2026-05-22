@@ -8,7 +8,6 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 appearanceSection
-                voiceCoachSection
                 workoutDefaultsSection
             }
             .scrollContentBackground(.hidden)
@@ -50,71 +49,6 @@ struct SettingsView: View {
         .listRowBackground(Theme.Colors.surface)
     }
 
-    // MARK: - Voice Coach Section
-
-    private var voiceCoachSection: some View {
-        Section {
-            // Master Toggle
-            Toggle(isOn: $settings.isVoiceEnabled) {
-                Label("Voice Coach", systemImage: "speaker.wave.3.fill")
-            }
-            .tint(Theme.Colors.accent)
-
-            if settings.isVoiceEnabled {
-                // Language Picker
-                Picker(selection: $settings.appLanguage) {
-                    ForEach(AppLanguage.allCases) { language in
-                        Text("\(language.flagEmoji) \(language.displayName)")
-                            .tag(language)
-                    }
-                } label: {
-                    Label("Language", systemImage: "globe")
-                }
-                .pickerStyle(.menu)
-
-                // Verbosity Picker
-                Picker(selection: $settings.coachVerbosity) {
-                    ForEach(CoachVerbosity.allCases) { verbosity in
-                        Text(verbosity.displayName)
-                            .tag(verbosity)
-                    }
-                } label: {
-                    Label("Verbosity", systemImage: "text.bubble.fill")
-                }
-                .pickerStyle(.menu)
-
-                // Countdown Toggle
-                Toggle(isOn: $settings.isVoiceCountdownEnabled) {
-                    Label("Voice Countdown", systemImage: "timer")
-                }
-                .tint(Theme.Colors.accent)
-
-                // Voice Selection (ElevenLabs)
-                NavigationLink {
-                    ElevenLabsVoicePickerView()
-                } label: {
-                    HStack {
-                        Label("Voice", systemImage: "waveform.circle.fill")
-                        Spacer()
-                        Text(selectedVoiceName)
-                            .foregroundStyle(Theme.Colors.textSecondary)
-                    }
-                }
-            }
-        } header: {
-            Text("VOICE COACH")
-                .font(Theme.Fonts.label)
-                .foregroundStyle(Theme.Colors.textSecondary)
-        } footer: {
-            if settings.isVoiceEnabled {
-                Text(settings.coachVerbosity.description)
-                    .font(Theme.Fonts.caption)
-                    .foregroundStyle(Theme.Colors.textSecondary)
-            }
-        }
-        .listRowBackground(Theme.Colors.surface)
-    }
-
     // MARK: - Workout Defaults Section
 
     private var workoutDefaultsSection: some View {
@@ -140,9 +74,6 @@ struct SettingsView: View {
 
     // MARK: - Helpers
 
-    private var selectedVoiceName: String {
-        ElevenLabsVoice.allCases.first { $0.id == settings.elevenLabsVoiceId }?.name ?? "Rachel"
-    }
 
     private func colorSchemeFor(_ mode: AppearanceMode) -> ColorScheme? {
         switch mode {

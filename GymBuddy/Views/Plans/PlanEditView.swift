@@ -298,6 +298,8 @@ struct ExerciseDetailSheet: View {
     let onSave: () -> Void
 
     @State private var editSetPayload: EditSetPayload? = nil
+    @State private var weightString: String = ""
+    @State private var showWeightPicker = false
 
     // Picker ranges
     private let setsRange = Array(1...10)
@@ -376,30 +378,96 @@ struct ExerciseDetailSheet: View {
                                 }
                             }
 
-                            // Weight Card
-                            settingCardFull(
-                                title: "WEIGHT",
-                                value: exercise.weight == 0 ? "—" : String(format: exercise.weight.truncatingRemainder(dividingBy: 1) == 0 ? "%.0f KG" : "%.1f KG", exercise.weight),
-                                icon: "scalemass"
-                            ) {
-                                Picker("Weight", selection: Binding(
-                                    get: { exercise.weight },
-                                    set: { newVal in
-                                        exercise.weight = newVal
-                                        if var specific = exercise.specificSets {
-                                            for i in 0..<specific.count { specific[i].weight = newVal }
-                                            exercise.specificSets = specific
+                            // Weight Card (Dual Input)
+                            VStack(spacing: Theme.Spacing.medium) {
+                                HStack {
+                                    Image(systemName: "scalemass")
+                                        .font(.system(size: 14, weight: .medium))
+                                    Text("WEIGHT")
+                                        .font(Theme.Fonts.label)
+                                        .tracking(1)
+                                    Spacer()
+                                    Button {
+                                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                            showWeightPicker.toggle()
+                                        }
+                                    } label: {
+                                        Text(showWeightPicker ? "USE KEYBOARD" : "USE PICKER")
+                                            .font(Theme.Fonts.caption)
+                                            .tracking(0.5)
+                                            .foregroundStyle(Theme.Colors.textSecondary)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                .foregroundStyle(Theme.Colors.textSecondary)
+
+                                if !showWeightPicker {
+                                    VStack(spacing: Theme.Spacing.medium) {
+                                        HStack(spacing: Theme.Spacing.small) {
+                                            TextField("0", text: $weightString)
+                                                .font(.system(size: 40, weight: .black, design: .default))
+                                                .foregroundStyle(Theme.Colors.accent)
+                                                .multilineTextAlignment(.center)
+                                                .keyboardType(.decimalPad)
+                                                .padding(.vertical, Theme.Spacing.small)
+                                                .background(Theme.Colors.surfaceElevated.opacity(0.5))
+                                                .cornerRadius(Theme.Layout.cornerRadiusSmall)
+                                                .frame(maxWidth: 160)
+                                            
+                                            Text("KG")
+                                                .font(Theme.Fonts.h2)
+                                                .foregroundStyle(Theme.Colors.textSecondary)
+                                        }
+
+                                        // Quick selection adjustment buttons
+                                        HStack(spacing: Theme.Spacing.medium) {
+                                            ForEach([-5.0, -2.5, 2.5, 5.0], id: \.self) { diff in
+                                                Button {
+                                                    let current = Double(weightString.replacingOccurrences(of: ",", with: ".")) ?? exercise.weight
+                                                    let newWeight = max(0, min(300, current + diff))
+                                                    exercise.weight = newWeight
+                                                    weightString = newWeight == 0 ? "" : (newWeight.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", newWeight) : String(format: "%.1f", newWeight))
+                                                    if var specific = exercise.specificSets {
+                                                        for i in 0..<specific.count { specific[i].weight = newWeight }
+                                                        exercise.specificSets = specific
+                                                    }
+                                                    HapticService.shared.light()
+                                                } label: {
+                                                    Text(diff > 0 ? "+\(formatDiff(diff)) kg" : "\(formatDiff(diff)) kg")
+                                                        .font(Theme.Fonts.label)
+                                                        .foregroundStyle(Theme.Colors.textPrimary)
+                                                        .frame(maxWidth: .infinity)
+                                                        .padding(.vertical, 8)
+                                                        .background(Theme.Colors.surfaceElevated)
+                                                        .cornerRadius(Theme.Layout.cornerRadiusSmall)
+                                                }
+                                                .buttonStyle(.plain)
+                                            }
                                         }
                                     }
-                                )) {
-                                    Text("—").tag(Double(0))
-                                    ForEach(weightRange.dropFirst(), id: \.self) { weight in
-                                        Text(weight.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(weight)) kg" : String(format: "%.1f kg", weight)).tag(weight)
+                                } else {
+                                    Picker("Weight", selection: Binding(
+                                        get: { exercise.weight },
+                                        set: { newVal in
+                                            exercise.weight = newVal
+                                            if var specific = exercise.specificSets {
+                                                for i in 0..<specific.count { specific[i].weight = newVal }
+                                                exercise.specificSets = specific
+                                            }
+                                        }
+                                    )) {
+                                        Text("—").tag(Double(0))
+                                        ForEach(weightRange.dropFirst(), id: \.self) { weight in
+                                            Text(weight.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(weight)) kg" : String(format: "%.1f kg", weight)).tag(weight)
+                                        }
                                     }
+                                    .pickerStyle(.wheel)
+                                    .frame(height: 120)
                                 }
-                                .pickerStyle(.wheel)
-                                .frame(height: 120)
                             }
+                            .padding(Theme.Spacing.large)
+                            .background(Theme.Colors.surface)
+                            .cornerRadius(Theme.Layout.cornerRadius)
 
                             // Rest Time Card
                             settingCardFull(
@@ -501,6 +569,45 @@ struct ExerciseDetailSheet: View {
                         .padding(.horizontal, Theme.Spacing.large)
                     }
                     .padding(.vertical, Theme.Spacing.large)
+                }
+                .onAppear {
+                    if exercise.weight > 0 {
+                        weightString = exercise.weight.truncatingRemainder(dividingBy: 1) == 0 
+                            ? String(format: "%.0f", exercise.weight) 
+                            : String(format: "%.1f", exercise.weight)
+                    } else {
+                        weightString = ""
+                    }
+                }
+                .onChange(of: weightString) { _, newValue in
+                    let cleaned = newValue.replacingOccurrences(of: ",", with: ".")
+                    if let doubleVal = Double(cleaned) {
+                        if doubleVal >= 0 && doubleVal <= 300 {
+                            exercise.weight = doubleVal
+                            if var specific = exercise.specificSets {
+                                for i in 0..<specific.count { specific[i].weight = doubleVal }
+                                exercise.specificSets = specific
+                            }
+                        }
+                    } else if newValue.isEmpty {
+                        exercise.weight = 0
+                        if var specific = exercise.specificSets {
+                            for i in 0..<specific.count { specific[i].weight = 0 }
+                            exercise.specificSets = specific
+                        }
+                    }
+                }
+                .onChange(of: exercise.weight) { _, newValue in
+                    let currentParsed = Double(weightString.replacingOccurrences(of: ",", with: ".")) ?? -1.0
+                    if newValue != currentParsed {
+                        if newValue > 0 {
+                            weightString = newValue.truncatingRemainder(dividingBy: 1) == 0 
+                                ? String(format: "%.0f", newValue) 
+                                : String(format: "%.1f", newValue)
+                        } else {
+                            weightString = ""
+                        }
+                    }
                 }
             }
             .navigationTitle("EXERCISE DETAILS")
@@ -626,6 +733,10 @@ struct ExerciseDetailSheet: View {
             }
         }
         return "\(seconds) SEC"
+    }
+
+    private func formatDiff(_ val: Double) -> String {
+        val.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", val) : String(format: "%.1f", val)
     }
 }
 

@@ -377,6 +377,12 @@ private struct StartPlanCard: View {
             onTap()
         }) {
             HStack(spacing: Theme.Spacing.medium) {
+                // Left accent bar
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(isPressed ? Theme.Colors.accent : Theme.Colors.surfaceElevated)
+                    .frame(width: 4, height: 48)
+                    .padding(.leading, 8)
+
                 // Drag handle (visible in edit mode)
                 if isEditMode {
                     Image(systemName: "line.3.horizontal")
@@ -396,16 +402,30 @@ private struct StartPlanCard: View {
                 }
                 .frame(width: 64, height: 64)
                 .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusSmall))
-                .padding(.leading, isEditMode ? 0 : Theme.Spacing.medium)
+                .padding(.leading, isEditMode ? 0 : Theme.Spacing.small)
 
                 // Text content
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(plan.name.uppercased())
                         .font(.system(size: 24, weight: .black))
                         .tracking(1)
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.8)
+
+                    if !muscles.isEmpty {
+                        Text(muscles.uppercased())
+                            .font(.system(size: 11, weight: .bold))
+                            .tracking(1.5)
+                            .foregroundStyle(Theme.Colors.accent)
+                    }
+
+                    if let lastUsed = plan.lastUsedAt {
+                        Text(relativeLabel(for: lastUsed))
+                            .font(.system(size: 10, weight: .medium))
+                            .tracking(1.5)
+                            .foregroundStyle(Theme.Colors.textSecondary.opacity(0.7))
+                    }
                 }
 
                 Spacer()
@@ -427,16 +447,27 @@ private struct StartPlanCard: View {
             .padding(.vertical, Theme.Spacing.medium)
             .background(Theme.Colors.surface)
             .cornerRadius(Theme.Layout.cornerRadius)
-            .scaleEffect(isPressed ? 0.98 : 1.0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isPressed)
+            .scaleEffect(isPressed ? 0.97 : 1.0)
+            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPressed)
         }
         .buttonStyle(SquishableButtonStyle(isPressed: $isPressed))
     }
     
-    private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd.MM.yyyy"
-        return formatter.string(from: date)
+    private func relativeLabel(for date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) {
+            return "LAST USED · TODAY"
+        } else if calendar.isDateInYesterday(date) {
+            return "LAST USED · YESTERDAY"
+        } else {
+            let components = calendar.dateComponents([.day], from: date, to: Date())
+            if let days = components.day, days > 0 {
+                return "LAST USED · \(days) DAYS AGO"
+            }
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy"
+            return "LAST USED · \(formatter.string(from: date))"
+        }
     }
 }
 

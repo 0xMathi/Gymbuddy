@@ -58,6 +58,34 @@ struct WorkoutSession {
         return completed
     }
 
+    /// Total reps completed
+    var totalRepsCompleted: Int {
+        let sorted = sortedExercises
+        var completed = 0
+
+        for (index, exercise) in sorted.enumerated() {
+            if index < currentExerciseIndex {
+                completed += exercise.resolvedSets.reduce(0) { $0 + $1.reps }
+            } else if index == currentExerciseIndex {
+                let setsArray = exercise.resolvedSets
+                let completedCount = currentSetNumber - 1
+                for i in 0..<min(completedCount, setsArray.count) {
+                    completed += setsArray[i].reps
+                }
+            }
+        }
+
+        // If completed, add the final set's reps
+        if state == .completed, let exercise = currentExercise {
+            let setsArray = exercise.resolvedSets
+            if let lastSet = setsArray.last {
+                completed += lastSet.reps
+            }
+        }
+
+        return completed
+    }
+
     /// Total Volume calculated based on completed exercises
     var totalVolume: Double {
         plan.exercises

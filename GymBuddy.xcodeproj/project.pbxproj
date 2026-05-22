@@ -13,11 +13,9 @@
 		A0000007280A00010001 /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000008280A00010001 /* Exercise.swift */; };
 		A0000009280A00010001 /* WorkoutPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000A280A00010001 /* WorkoutPlan.swift */; };
 		A000000B280A00010001 /* WorkoutSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000C280A00010001 /* WorkoutSession.swift */; };
-		A000000D280A00010001 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000E280A00010001 /* AudioService.swift */; };
 		A000000F280A00010001 /* HapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000010280A00010001 /* HapticService.swift */; };
 		A0000011280A00010001 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000012280A00010001 /* PrimaryButton.swift */; };
 		A0000015280A00010001 /* ActiveWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000016280A00010001 /* ActiveWorkoutView.swift */; };
-		A0000017280A00010001 /* PlanListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000018280A00010001 /* PlanListView.swift */; };
 		A0000019280A00010001 /* WorkoutSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000001A280A00010001 /* WorkoutSessionManager.swift */; };
 		A000001B280A00010001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A000001C280A00010001 /* Assets.xcassets */; };
 		A0000032280A00010001 /* ExerciseDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000033280A00010001 /* ExerciseDefinition.swift */; };
@@ -35,13 +33,8 @@
 		A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004B280A00010001 /* Variant5_MinimalPower.swift */; };
 		A000004C280A00010001 /* FinalStartScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004D280A00010001 /* FinalStartScreen.swift */; };
 		A000004E280A00010001 /* StartScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004F280A00010001 /* StartScreenView.swift */; };
-		C7660E042F278286007D9059 /* VoiceSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E022F278286007D9059 /* VoiceSelectionView.swift */; };
 		C7660E052F278286007D9059 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E012F278286007D9059 /* SettingsView.swift */; };
 		C7660E072F2782AA007D9059 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E062F2782AA007D9059 /* AppSettings.swift */; };
-		C7660E0A2F27AD5C007D9059 /* ElevenLabsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E092F27AD5C007D9059 /* ElevenLabsService.swift */; };
-		C7660E0B2F27AD5C007D9059 /* AudioCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E082F27AD5C007D9059 /* AudioCacheService.swift */; };
-		C7660E0D2F27B3D9007D9059 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E0C2F27B3D9007D9059 /* KeychainService.swift */; };
-		C7660E0F2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E0E2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift */; };
 		C7660E112F27C000007D9059 /* WorkoutPlanSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E102F27C000007D9059 /* WorkoutPlanSeed.swift */; };
 		C7660E122F27C100007D9059 /* WorkoutSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E132F27C100007D9059 /* WorkoutSummaryView.swift */; };
 		3C68A54482AD4B48A283ADDE /* RestTimerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DC43A47F1D41D79E4D323B /* RestTimerBar.swift */; };
@@ -55,11 +48,9 @@
 		A0000008280A00010001 /* Exercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exercise.swift; sourceTree = "<group>"; };
 		A000000A280A00010001 /* WorkoutPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlan.swift; sourceTree = "<group>"; };
 		A000000C280A00010001 /* WorkoutSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSession.swift; sourceTree = "<group>"; };
-		A000000E280A00010001 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		A0000010280A00010001 /* HapticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticService.swift; sourceTree = "<group>"; };
 		A0000012280A00010001 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		A0000016280A00010001 /* ActiveWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveWorkoutView.swift; sourceTree = "<group>"; };
-		A0000018280A00010001 /* PlanListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanListView.swift; sourceTree = "<group>"; };
 		A000001A280A00010001 /* WorkoutSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionManager.swift; sourceTree = "<group>"; };
 		A000001C280A00010001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A0000033280A00010001 /* ExerciseDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDefinition.swift; sourceTree = "<group>"; };
@@ -79,12 +70,7 @@
 		A000004D280A00010001 /* FinalStartScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalStartScreen.swift; sourceTree = "<group>"; };
 		A000004F280A00010001 /* StartScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartScreenView.swift; sourceTree = "<group>"; };
 		C7660E012F278286007D9059 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		C7660E022F278286007D9059 /* VoiceSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSelectionView.swift; sourceTree = "<group>"; };
 		C7660E062F2782AA007D9059 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
-		C7660E082F27AD5C007D9059 /* AudioCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCacheService.swift; sourceTree = "<group>"; };
-		C7660E092F27AD5C007D9059 /* ElevenLabsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsService.swift; sourceTree = "<group>"; };
-		C7660E0C2F27B3D9007D9059 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
-		C7660E0E2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevenLabsVoicePickerView.swift; sourceTree = "<group>"; };
 		C7660E102F27C000007D9059 /* WorkoutPlanSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlanSeed.swift; sourceTree = "<group>"; };
 		C7660E132F27C100007D9059 /* WorkoutSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSummaryView.swift; sourceTree = "<group>"; };
 		36DC43A47F1D41D79E4D323B /* RestTimerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerBar.swift; sourceTree = "<group>"; };
@@ -152,10 +138,6 @@
 		A0000022280A00010001 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				C7660E0C2F27B3D9007D9059 /* KeychainService.swift */,
-				C7660E082F27AD5C007D9059 /* AudioCacheService.swift */,
-				C7660E092F27AD5C007D9059 /* ElevenLabsService.swift */,
-				A000000E280A00010001 /* AudioService.swift */,
 				A0000010280A00010001 /* HapticService.swift */,
 				A0000037280A00010001 /* ExerciseManager.swift */,
 					A0000051280A00010001 /* ExerciseImageService.swift */,
@@ -198,7 +180,6 @@
 			children = (
 				A0000039280A00010001 /* ExercisePickerView.swift */,
 				A000003B280A00010001 /* PlanEditView.swift */,
-				A0000018280A00010001 /* PlanListView.swift */,
 			);
 			path = Plans;
 			sourceTree = "<group>";
@@ -228,9 +209,7 @@
 		C7660E032F278286007D9059 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				C7660E0E2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift */,
 				C7660E012F278286007D9059 /* SettingsView.swift */,
-				C7660E022F278286007D9059 /* VoiceSelectionView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -310,7 +289,6 @@
 				A0000007280A00010001 /* Exercise.swift in Sources */,
 				A0000009280A00010001 /* WorkoutPlan.swift in Sources */,
 				A000000B280A00010001 /* WorkoutSession.swift in Sources */,
-				A000000D280A00010001 /* AudioService.swift in Sources */,
 				A0000036280A00010001 /* ExerciseManager.swift in Sources */,
 					A0000050280A00010001 /* ExerciseImageService.swift in Sources */,
 				C7660E072F2782AA007D9059 /* AppSettings.swift in Sources */,
@@ -319,7 +297,6 @@
 				A0000015280A00010001 /* ActiveWorkoutView.swift in Sources */,
 				C7660E122F27C100007D9059 /* WorkoutSummaryView.swift in Sources */,
 				3C68A54482AD4B48A283ADDE /* RestTimerBar.swift in Sources */,
-				A0000017280A00010001 /* PlanListView.swift in Sources */,
 				A0000038280A00010001 /* ExercisePickerView.swift in Sources */,
 				A000003A280A00010001 /* PlanEditView.swift in Sources */,
 				A0000019280A00010001 /* WorkoutSessionManager.swift in Sources */,
@@ -331,13 +308,8 @@
 				A0000042280A00010001 /* Variant1_JustDoIt.swift in Sources */,
 				A0000044280A00010001 /* Variant2_SplitCards.swift in Sources */,
 				A0000046280A00010001 /* Variant3_StatsHero.swift in Sources */,
-				C7660E0F2F27B3EB007D9059 /* ElevenLabsVoicePickerView.swift in Sources */,
-				C7660E042F278286007D9059 /* VoiceSelectionView.swift in Sources */,
 				C7660E052F278286007D9059 /* SettingsView.swift in Sources */,
-				C7660E0D2F27B3D9007D9059 /* KeychainService.swift in Sources */,
 				A0000048280A00010001 /* Variant4_Editorial.swift in Sources */,
-				C7660E0A2F27AD5C007D9059 /* ElevenLabsService.swift in Sources */,
-				C7660E0B2F27AD5C007D9059 /* AudioCacheService.swift in Sources */,
 				A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */,
 				A000004C280A00010001 /* FinalStartScreen.swift in Sources */,
 				A000004E280A00010001 /* StartScreenView.swift in Sources */,

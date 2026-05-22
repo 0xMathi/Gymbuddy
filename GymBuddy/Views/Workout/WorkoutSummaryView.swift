@@ -71,7 +71,7 @@ struct WorkoutSummaryView: View {
                     Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
                     statRow(icon: "checkmark", label: "Sätze", value: "\(session.totalSetsCompleted)")
                     Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
-                    statRow(icon: "arrow.triangle.2.circlepath", label: "Wiederholungen", value: "\(session.totalExercises * 10 /* rough estimate for now, we dont track per rep */)")
+                    statRow(icon: "arrow.triangle.2.circlepath", label: "Wiederholungen", value: "\(session.totalRepsCompleted)")
                 }
                 .padding(.horizontal, Theme.Spacing.xl)
                 .opacity(isAnimating ? 1 : 0)

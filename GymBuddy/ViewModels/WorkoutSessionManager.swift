@@ -1,6 +1,5 @@
 import SwiftUI
 import Observation
-import AVFoundation
 import UserNotifications
 
 @Observable
@@ -10,7 +9,6 @@ class WorkoutSessionManager {
     var isPaused: Bool = false
 
     private var timer: Timer?
-    private let audio = AudioService.shared
     private let haptics = HapticService.shared
     private let nowPlaying = NowPlayingService()
     
@@ -47,13 +45,13 @@ class WorkoutSessionManager {
             restTimeRemaining: 0
         )
 
+        plan.lastUsedAt = Date()
         isPaused = false
 
         // Activate Now Playing
         nowPlaying.activate()
 
-        if let exercise = sortedExercises.first {
-            audio.announceWorkoutStart(planName: plan.name, firstExercise: exercise.name)
+        if sortedExercises.first != nil {
             updateNowPlayingInfo()
         }
     }
@@ -87,7 +85,6 @@ class WorkoutSessionManager {
         if hasNextInSuperset {
             // Jump to next exercise in superset, SAME set number, NO REST
             currentSession.currentExerciseIndex += 1
-            audio.announceExercise(sortedExercises[currentSession.currentExerciseIndex].name)
             self.session = currentSession
             updateNowPlayingInfo()
             return
@@ -104,14 +101,12 @@ class WorkoutSessionManager {
                 }
                 currentSession.currentExerciseIndex = firstIndex
                 
-                audio.announceSetCompleted()
                 startRest(session: &currentSession, duration: currentExercise.restSeconds)
             } else {
                 // Superset completely done. Move to next block.
                 if currentSession.currentExerciseIndex < sortedExercises.count - 1 {
                     currentSession.currentExerciseIndex += 1
                     currentSession.currentSetNumber = 1
-                    audio.announceExercise(sortedExercises[currentSession.currentExerciseIndex].name)
                     startRest(session: &currentSession, duration: currentExercise.restSeconds)
                 } else {
                     finishWorkout()
@@ -123,12 +118,10 @@ class WorkoutSessionManager {
             // Normal (Non-Superset) logic
             if currentSession.currentSetNumber < currentExercise.sets {
                 currentSession.currentSetNumber += 1
-                audio.announceSetCompleted()
                 startRest(session: &currentSession, duration: currentExercise.restSeconds)
             } else if currentSession.currentExerciseIndex < sortedExercises.count - 1 {
                 currentSession.currentExerciseIndex += 1
                 currentSession.currentSetNumber = 1
-                audio.announceExercise(sortedExercises[currentSession.currentExerciseIndex].name)
                 startRest(session: &currentSession, duration: currentExercise.restSeconds)
             } else {
                 finishWorkout()
@@ -160,8 +153,6 @@ class WorkoutSessionManager {
         isPaused = false
         haptics.medium()
 
-        let exercise = exercises[index]
-        audio.announceExercise(exercise.name)
         updateNowPlayingInfo()
     }
 
@@ -179,8 +170,6 @@ class WorkoutSessionManager {
             currentSession.restTimeRemaining = 0
             self.session = currentSession
             haptics.success()
-            let next = exercises[index + 1]
-            audio.announceExercise(next.name)
             updateNowPlayingInfo()
         } else {
             // Last exercise — finish the workout
@@ -197,7 +186,6 @@ class WorkoutSessionManager {
         if isPaused {
             // Pause the timer
             stopTimer()
-            audio.announcePaused()
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
         } else {
             // Resume if we were resting
@@ -208,7 +196,6 @@ class WorkoutSessionManager {
                     self?.tick()
                 }
             }
-            audio.announceResumed()
         }
 
         updateNowPlayingInfo()
@@ -328,16 +315,13 @@ class WorkoutSessionManager {
             haptics.warning()
         }
 
-        // 3 second countdown - always haptic, audio respects isVoiceCountdownEnabled
+        // 3 second countdown - haptic only
         if currentSession.restTimeRemaining == 3 {
             haptics.light()
-            audio.announceCountdown(3)
         } else if currentSession.restTimeRemaining == 2 {
             haptics.light()
-            audio.announceCountdown(2)
         } else if currentSession.restTimeRemaining == 1 {
             haptics.medium()
-            audio.announceCountdown(1)
         }
 
         if currentSession.restTimeRemaining <= 0 {
@@ -355,7 +339,6 @@ class WorkoutSessionManager {
 
         // Strong haptic feedback - must be noticeable even in pocket/armband
         haptics.heavy()
-        audio.announceRestEnd()
         updateNowPlayingInfo()
     }
 
@@ -375,7 +358,6 @@ class WorkoutSessionManager {
         session = currentSession
 
         haptics.success()
-        audio.announceWorkoutComplete()
         nowPlaying.deactivate()
     }
 

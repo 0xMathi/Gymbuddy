@@ -10,6 +10,7 @@ struct ActiveWorkoutView: View {
     @State private var editSetPayload: EditSetPayload? = nil
     @State private var draggedExercise: Exercise?
     @State private var showSettings = false
+    @State private var isTimerPulsating = false
 
     var body: some View {
         ZStack {
@@ -30,6 +31,14 @@ struct ActiveWorkoutView: View {
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: manager.session?.state)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: manager.isPaused)
+        .confirmationDialog("End Workout?", isPresented: $showCancelConfirmation, titleVisibility: .visible) {
+            Button("End Workout", role: .destructive) {
+                manager.cancelWorkout()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Your progress will be lost.")
+        }
     }
 
     // MARK: - Main Content
@@ -43,13 +52,6 @@ struct ActiveWorkoutView: View {
                 .padding(.horizontal, Theme.Spacing.xl)
                 .padding(.top, Theme.Spacing.medium)
                 .padding(.bottom, Theme.Spacing.small)
-
-            exerciseProgressBar(
-                current: session.currentExerciseIndex + 1,
-                total: max(exercises.count, 1)
-            )
-            .padding(.horizontal, Theme.Spacing.xl)
-            .padding(.bottom, Theme.Spacing.medium)
 
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: Theme.Spacing.medium) {
@@ -207,14 +209,6 @@ struct ActiveWorkoutView: View {
                 .cornerRadius(Theme.Layout.cornerRadiusSmall)
             }
             .buttonStyle(.plain)
-            .confirmationDialog("End Workout?", isPresented: $showCancelConfirmation, titleVisibility: .visible) {
-                Button("End Workout", role: .destructive) {
-                    manager.cancelWorkout()
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Your progress will be lost.")
-            }
 
             Spacer()
 
@@ -254,30 +248,7 @@ struct ActiveWorkoutView: View {
 
     // MARK: - Exercise Progress Bar
 
-    private func exerciseProgressBar(current: Int, total: Int) -> some View {
-        VStack(spacing: Theme.Spacing.xs) {
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Theme.Colors.surfaceElevated)
-                        .frame(height: 3)
 
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Theme.Colors.accent)
-                        .frame(width: geo.size.width * (Double(current) / Double(total)), height: 3)
-                        .animation(.spring(response: 0.5, dampingFraction: 0.8), value: current)
-                }
-            }
-            .frame(height: 3)
-
-            HStack {
-                Spacer()
-                Text("\(current) / \(total) EX")
-                    .font(Theme.Fonts.caption)
-                    .foregroundStyle(Theme.Colors.textSecondary)
-            }
-        }
-    }
 
     // MARK: - STATE A: Active Section
 
@@ -287,6 +258,26 @@ struct ActiveWorkoutView: View {
             VStack(alignment: .leading, spacing: Theme.Spacing.large) {
                 // EXERCISE HERO HEADER (Image Removed for cleaner look)
                 VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                    VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+                        Text("EXERCISE \(session.currentExerciseIndex + 1) / \(exercises.count)")
+                            .font(Theme.Fonts.label)
+                            .tracking(3)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                        
+                        GeometryReader { geo in
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 1)
+                                    .fill(Theme.Colors.surfaceElevated)
+                                    .frame(height: 2)
+                                RoundedRectangle(cornerRadius: 1)
+                                    .fill(Theme.Colors.accent)
+                                    .frame(width: geo.size.width * (Double(session.currentExerciseIndex + 1) / Double(max(exercises.count, 1))), height: 2)
+                            }
+                        }
+                        .frame(height: 2)
+                    }
+                    .padding(.bottom, Theme.Spacing.small)
+
                     if let ssid = exercise.supersetId {
                         Text("SUPERSET • \(ssid)")
                             .font(.system(size: 14, weight: .black))
@@ -506,22 +497,27 @@ struct ActiveWorkoutView: View {
             .padding(.top, Theme.Spacing.medium)
 
             // Circular Timer
-            ZStack {
-                Circle()
-                    .stroke(Theme.Colors.surfaceElevated, lineWidth: 16)
-                
-                Circle()
-                    .trim(from: 0, to: CGFloat(session.restTimeRemaining) / CGFloat(max(session.originalRestDuration, 1)))
-                    .stroke(Theme.Colors.accent, style: StrokeStyle(lineWidth: 16, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 1.0), value: session.restTimeRemaining)
-                
-                Text(formatRestTimeDigital(session.restTimeRemaining))
-                    .font(.system(size: 72, weight: .bold, design: .default))
-                    .foregroundStyle(Theme.Colors.accent)
-                    .monospacedDigit()
+            Button {
+                manager.skipRest()
+            } label: {
+                ZStack {
+                    Circle()
+                        .stroke(Theme.Colors.surfaceElevated, lineWidth: 16)
+                    
+                    Circle()
+                        .trim(from: 0, to: CGFloat(session.restTimeRemaining) / CGFloat(max(session.originalRestDuration, 1)))
+                        .stroke(Theme.Colors.accent, style: StrokeStyle(lineWidth: 16, lineCap: .round))
+                        .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 1.0), value: session.restTimeRemaining)
+                    
+                    Text(formatRestTimeDigital(session.restTimeRemaining))
+                        .font(.system(size: 72, weight: .bold, design: .default))
+                        .foregroundStyle(Theme.Colors.accent)
+                        .monospacedDigit()
+                }
+                .frame(width: 260, height: 260)
             }
-            .frame(width: 260, height: 260)
+            .buttonStyle(.plain)
             
             VStack(spacing: Theme.Spacing.large) {
                 HStack(spacing: Theme.Spacing.xl) {
@@ -554,6 +550,17 @@ struct ActiveWorkoutView: View {
                     }
                     .buttonStyle(.plain)
                 }
+
+                Text("TAP TIMER TO SKIP")
+                    .font(Theme.Fonts.label)
+                    .tracking(3)
+                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .opacity(isTimerPulsating ? 1.0 : 0.4)
+                    .onAppear {
+                        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                            isTimerPulsating = true
+                        }
+                    }
 
                 Button {
                     manager.skipRest()
