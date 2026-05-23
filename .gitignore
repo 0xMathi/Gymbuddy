@@ -36,6 +36,18 @@ yarn-error.log*
 *.swp
 *.swo
 
+# AI Tools
+.agent/
+.agents/
+.claude/
+.codex/
+.cursor/
+.factory/
+.gemini/
+
+# Local assets & scratch
+moods/
+
 # Xcode
 xcuserdata/
 *.xcuserstate
