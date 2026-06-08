@@ -45,6 +45,7 @@ private let defaultExercisesRaw: [ExerciseSeedData] = [
     ExerciseSeedData(name: "Bankdrücken", muscleGroup: "Brust", equipment: "Langhantel"),
     ExerciseSeedData(name: "Schrägbankdrücken", muscleGroup: "Brust", equipment: "Langhantel"),
     ExerciseSeedData(name: "Kurzhantel-Bankdrücken", muscleGroup: "Brust", equipment: "Kurzhantel"),
+    ExerciseSeedData(name: "KH-Bankdrücken flach", muscleGroup: "Brust", equipment: "Kurzhantel"),
     ExerciseSeedData(name: "Kurzhantel-Flys", muscleGroup: "Brust", equipment: "Kurzhantel"),
     ExerciseSeedData(name: "Cable-Crossover", muscleGroup: "Brust", equipment: "Kabelzug"),
     ExerciseSeedData(name: "Liegestütze", muscleGroup: "Brust", equipment: "Körpergewicht"),
@@ -53,12 +54,14 @@ private let defaultExercisesRaw: [ExerciseSeedData] = [
 
     // MARK: Rücken (Back)
     ExerciseSeedData(name: "Kreuzheben", muscleGroup: "Rücken", equipment: "Langhantel"),
+    ExerciseSeedData(name: "KH-Kreuzheben oder RDL", muscleGroup: "Rücken", equipment: "Kurzhantel"),
     ExerciseSeedData(name: "Klimmzüge", muscleGroup: "Rücken", equipment: "Körpergewicht"),
     ExerciseSeedData(name: "Langhantel-Rudern", muscleGroup: "Rücken", equipment: "Langhantel"),
     ExerciseSeedData(name: "Kurzhantel-Rudern", muscleGroup: "Rücken", equipment: "Kurzhantel"),
     ExerciseSeedData(name: "Latzug", muscleGroup: "Rücken", equipment: "Kabelzug"),
     ExerciseSeedData(name: "Kabelrudern", muscleGroup: "Rücken", equipment: "Kabelzug"),
     ExerciseSeedData(name: "T-Bar Rudern", muscleGroup: "Rücken", equipment: "Langhantel"),
+    ExerciseSeedData(name: "T-Bar Rudern / KH-Rudern", muscleGroup: "Rücken", equipment: "Kurzhantel"),
     ExerciseSeedData(name: "Face Pulls", muscleGroup: "Rücken", equipment: "Kabelzug"),
 
     // MARK: Schultern (Shoulders)

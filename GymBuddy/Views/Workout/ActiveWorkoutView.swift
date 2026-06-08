@@ -593,49 +593,53 @@ struct ActiveWorkoutView: View {
         Button {
             selectedExerciseIndex = index
         } label: {
-            HStack(spacing: Theme.Spacing.medium) {
-                Circle()
-                    .fill(isCompleted ? Theme.Colors.success : Theme.Colors.surfaceElevated)
-                    .frame(width: 10, height: 10)
+            VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                HStack(alignment: .center, spacing: Theme.Spacing.medium) {
+                    Circle()
+                        .fill(isCompleted ? Theme.Colors.success : Theme.Colors.surfaceElevated)
+                        .frame(width: 12, height: 12)
 
-                HStack(spacing: 6) {
                     if let ssid = exercise.supersetId {
                         Text(ssid.uppercased())
-                            .font(.system(size: 9, weight: .bold))
+                            .font(.system(size: 10, weight: .black))
                             .foregroundStyle(Theme.Colors.accent)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
                             .background(Theme.Colors.accent.opacity(0.15))
-                            .cornerRadius(3)
+                            .cornerRadius(4)
                     }
-                    Text(exercise.name.uppercased())
-                        .font(Theme.Fonts.bodyBold)
-                        .tracking(0.5)
-                        .foregroundStyle(isCompleted ? Theme.Colors.textSecondary : Theme.Colors.textPrimary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+
+                    Spacer()
+
+                    Image(systemName: "line.3.horizontal")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundStyle(Theme.Colors.surfaceElevated)
                 }
 
-                Spacer(minLength: Theme.Spacing.medium)
+                Text(exercise.name.uppercased())
+                    .font(.system(size: 20, weight: .black))
+                    .tracking(0.5)
+                    .foregroundStyle(isCompleted ? Theme.Colors.textSecondary : Theme.Colors.textPrimary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .padding(.top, 2)
 
-                Text("\(exercise.sets)×\(exercise.reps)")
-                    .font(Theme.Fonts.body)
-                    .foregroundStyle(Theme.Colors.textSecondary)
+                HStack(spacing: Theme.Spacing.small) {
+                    Text("\(exercise.sets) SÄTZE × \(exercise.reps) WDH")
+                        .font(Theme.Fonts.caption)
+                        .foregroundStyle(Theme.Colors.textSecondary)
 
-                if exercise.weight > 0 {
-                    Text("·")
-                        .foregroundStyle(Theme.Colors.textSecondary)
-                    Text(exercise.weightFormatted)
-                        .font(Theme.Fonts.body)
-                        .foregroundStyle(Theme.Colors.textSecondary)
+                    if exercise.weight > 0 {
+                        Text("•")
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                        Text(exercise.weightFormatted)
+                            .font(Theme.Fonts.caption)
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                    }
                 }
-
-                Image(systemName: "line.3.horizontal")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Theme.Colors.surfaceElevated)
             }
-            .padding(.horizontal, Theme.Spacing.large)
-            .padding(.vertical, Theme.Spacing.medium)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.all, Theme.Spacing.large)
             .background(Theme.Colors.surface)
             .cornerRadius(Theme.Layout.cornerRadius)
             .opacity(isCompleted ? 0.5 : 1.0)

@@ -51,15 +51,14 @@ private let defaultPPLPlans: [PlanSeed] = [
     // MARK: Freitag (Power)
     PlanSeed(name: "FREITAG — Power-Tag", orderIndex: 2, exercises: [
         PlanExerciseSeed(exerciseName: "Kniebeuge Langhantel", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS1"),
-        PlanExerciseSeed(exerciseName: "T-Bar Rudern", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS1"),
-        PlanExerciseSeed(exerciseName: "KH-Bankdrücken", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS2"),
-        PlanExerciseSeed(exerciseName: "Kreuzheben", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS2"),
-        PlanExerciseSeed(exerciseName: "Schulterdrücken KH", sets: 3, reps: 10, restSeconds: 90, supersetId: "SS3"),
-        PlanExerciseSeed(exerciseName: "Face Pulls", sets: 3, reps: 10, restSeconds: 90, supersetId: "SS3"),
+        PlanExerciseSeed(exerciseName: "T-Bar Rudern / KH-Rudern", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS1"),
+        PlanExerciseSeed(exerciseName: "KH-Bankdrücken flach", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS2"),
+        PlanExerciseSeed(exerciseName: "Face Pulls", sets: 4, reps: 12, restSeconds: 90, supersetId: "SS2"),
+        PlanExerciseSeed(exerciseName: "KH-Kreuzheben oder RDL", sets: 3, reps: 8, restSeconds: 90, supersetId: "SS3"),
+        PlanExerciseSeed(exerciseName: "Hanging Leg Raises", sets: 3, reps: 12, restSeconds: 90, supersetId: "SS3"),
         PlanExerciseSeed(exerciseName: "Ausfallschritte KH", sets: 3, reps: 8, restSeconds: 60, supersetId: "SS4"),
         PlanExerciseSeed(exerciseName: "Wadenheben stehend", sets: 3, reps: 15, restSeconds: 60, supersetId: "SS4"),
-        PlanExerciseSeed(exerciseName: "Dips", sets: 2, reps: 8, restSeconds: 60, supersetId: "FINISHER"),
-        PlanExerciseSeed(exerciseName: "Hanging Leg Raises", sets: 2, reps: 12, restSeconds: 60, supersetId: "FINISHER")
+        PlanExerciseSeed(exerciseName: "Dips", sets: 2, reps: 8, restSeconds: 60, supersetId: "FINISHER")
     ]),
 ]
 
@@ -70,6 +69,23 @@ private let pplPlanNames = Set(defaultPPLPlans.map { $0.name })
 // MARK: - Seeder Function
 
 func seedDefaultPlans(modelContext: ModelContext) {
+    // Step -1: Force migration of Friday Power-Tag plan
+    let hasMigratedFridayV2 = UserDefaults.standard.bool(forKey: "hasMigratedFridayV2")
+    if !hasMigratedFridayV2 {
+        let descriptor = FetchDescriptor<WorkoutPlan>()
+        if let plans = try? modelContext.fetch(descriptor) {
+            for plan in plans {
+                if plan.name == "FREITAG — Power-Tag" {
+                    modelContext.delete(plan)
+                    print("Deleted old FREITAG — Power-Tag to trigger recreation")
+                }
+            }
+        }
+        UserDefaults.standard.set(false, forKey: "hasSeededDefaultPlans")
+        UserDefaults.standard.set(true, forKey: "hasMigratedFridayV2")
+        try? modelContext.save()
+    }
+
     // Step 0: Migrate old exercise names to exact screenshot names
     migrateExerciseNames(modelContext: modelContext)
 
@@ -134,9 +150,33 @@ private func createPlan(
         var definition = definitions[exerciseSeed.exerciseName]
         if definition == nil {
             print("Auto-creating missing exercise: '\(exerciseSeed.exerciseName)'")
-            let newDef = ExerciseDefinition(name: exerciseSeed.exerciseName, muscleGroup: "Sonstiges", equipment: "Sonstiges", isCustom: false)
+            var muscleGroup = "Sonstiges"
+            var equipment = "Sonstiges"
+            let name = exerciseSeed.exerciseName
+            
+            if name == "T-Bar Rudern / KH-Rudern" {
+                muscleGroup = "Rücken"
+                equipment = "Kurzhantel"
+            } else if name == "KH-Bankdrücken flach" {
+                muscleGroup = "Brust"
+                equipment = "Kurzhantel"
+            } else if name == "KH-Kreuzheben oder RDL" {
+                muscleGroup = "Rücken"
+                equipment = "Kurzhantel"
+            } else if name.contains("Rudern") {
+                muscleGroup = "Rücken"
+                equipment = "Kurzhantel"
+            } else if name.contains("Bankdrücken") {
+                muscleGroup = "Brust"
+                equipment = "Kurzhantel"
+            } else if name.contains("Kreuzheben") || name.contains("RDL") {
+                muscleGroup = "Rücken"
+                equipment = "Kurzhantel"
+            }
+            
+            let newDef = ExerciseDefinition(name: name, muscleGroup: muscleGroup, equipment: equipment, isCustom: false)
             modelContext.insert(newDef)
-            definitions[exerciseSeed.exerciseName] = newDef
+            definitions[name] = newDef
             definition = newDef
         }
 
