@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GymBuddy — Finaler Entwurf: V1 Compact Editorial</title>
+<style>
+  :root{
+    --bg:#0A0A0B; --surface:#161618; --elev:#1E1E21; --accent:#FF4F00;
+    --accent-dim:#331405; --txt:#FAFAFA; --txt2:#A1A1A6; --ok:#32D74B; --bad:#FF453A;
+    --page:#101013; --line:#26262a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--page);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1280px;margin:0 auto;padding:48px 32px 120px}
+  .head{margin-bottom:44px;border-bottom:1px solid var(--line);padding-bottom:36px}
+  .head h1{font-size:38px;font-weight:900;letter-spacing:-1px}
+  .head h1 em{color:var(--accent);font-style:normal}
+  .head p{color:var(--txt2);font-size:15px;line-height:1.6;max-width:780px;margin-top:12px}
+  .delta{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px;max-width:1100px}
+  .delta div{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:14px 16px;font-size:13px;color:var(--txt2);line-height:1.55}
+  .delta b{color:var(--txt);display:block;margin-bottom:3px;font-size:13px}
+  .delta span{color:var(--accent);font-weight:800}
+  .phones{display:flex;gap:28px;overflow-x:auto;padding:8px 4px 24px}
+  .phone-slot{flex-shrink:0}
+  .slot-label{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:10px;padding-left:6px}
+  .phone{position:relative;width:340px;height:728px;background:var(--bg);border-radius:46px;border:1px solid #2e2e33;outline:6px solid #1b1b1f;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.55)}
+  .sbar{display:flex;justify-content:space-between;align-items:center;padding:16px 26px 4px;font-size:12px;font-weight:700;flex-shrink:0;position:relative;z-index:5}
+  .sbar .dots{display:flex;gap:4px;align-items:center}
+  .sbar .dots i{display:block;width:14px;height:8px;border-radius:2px;background:#3a3a40}
+  .sbar .dots i.b{width:20px;background:#4a4a52;border-radius:3px}
+  .scr{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+  .px{padding-left:22px;padding-right:22px}
+  .kick{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--txt2)}
+  .kick.acc{color:var(--accent)}
+  .logo{font-size:11px;font-weight:900;letter-spacing:4px}
+  .logo b{color:var(--accent)}
+  .icbtn{width:32px;height:32px;border-radius:9px;background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--txt2);font-size:14px;font-weight:800}
+  .icbtn.acc{color:var(--accent)}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:10px}
+  .endchip{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;letter-spacing:1px;color:var(--bad);background:rgba(255,69,58,.12);padding:7px 11px;border-radius:9px}
+  .mono{font-family:"SF Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+  .prog{height:2px;background:var(--elev);border-radius:1px;overflow:hidden}
+  .prog i{display:block;height:100%;background:var(--accent)}
+  .imgph{position:relative;background:linear-gradient(135deg,#1a1a1f 0%,#26262c 55%,#1c1c21 100%);overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .imgph::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 85% 15%,rgba(255,79,0,.22),transparent 55%)}
+  .imgph svg{position:relative;opacity:.55}
+  .imgph .tag{position:absolute;left:10px;bottom:8px;font-size:7px;font-weight:800;letter-spacing:1.5px;color:rgba(250,250,250,.4);text-transform:uppercase}
+  .check{width:30px;height:30px;border-radius:50%;border:3px solid var(--elev);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .check.on{border-color:var(--accent)}
+  .check.on i{display:block;width:15px;height:15px;border-radius:50%;background:var(--accent)}
+  .check.ring{border-color:var(--accent)}
+  .divider{display:flex;align-items:center;gap:10px}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--elev)}
+  .bigbtn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:#000;font-size:14px;font-weight:900;letter-spacing:2px;border-radius:99px;height:56px}
+  .ghostrnd{width:42px;height:42px;border-radius:50%;background:var(--elev);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--txt2)}
+  svg.dmb{width:46px;height:46px}
+  .v1-hero{padding-top:54px}
+  .v1-hero .l1{font-size:42px;font-weight:900;letter-spacing:-2px;color:rgba(250,250,250,.16);line-height:.95}
+  .v1-hero .l2{font-size:56px;font-weight:900;letter-spacing:-2.5px;color:var(--accent);line-height:1}
+  .v1-card{display:flex;align-items:center;gap:13px;background:var(--surface);border-radius:16px;padding:12px;margin-top:10px}
+  .v1-card .imgph{width:60px;height:60px;border-radius:12px;flex-shrink:0}
+  .v1-card .imgph svg{width:26px;height:26px}
+  .v1-card h4{font-size:21px;font-weight:900;letter-spacing:.5px}
+  .v1-card .mus{font-size:9px;font-weight:800;letter-spacing:1.5px;color:var(--accent);margin-top:2px}
+  .v1-card .last{font-size:9px;font-weight:600;letter-spacing:1px;color:rgba(161,161,166,.7);margin-top:3px}
+  .v1-card .chev{margin-left:auto;color:var(--txt2);font-size:18px;font-weight:700;padding-right:6px}
+  .v1-add{display:flex;align-items:center;justify-content:center;height:54px;border:2px dashed var(--elev);border-radius:16px;color:var(--accent);font-size:20px;font-weight:700;margin-top:10px}
+  .v1-xname{font-size:30px;font-weight:900;letter-spacing:-.5px;line-height:1.02;margin-top:6px}
+  .v1-banner{height:104px;border-radius:16px;margin-top:12px}
+  .v1-sets{background:rgba(30,30,33,.32);border:1px solid var(--surface);border-radius:20px;margin-top:14px;overflow:hidden}
+  .v1-set{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--surface)}
+  .v1-set:last-child{border-bottom:none}
+  .v1-set .n{font-size:13px;font-weight:900;color:var(--txt2);width:62px;white-space:nowrap;flex-shrink:0}
+  .v1-set .val{font-size:17px;font-weight:700;color:var(--txt2)}
+  .v1-set.active{background:rgba(30,30,33,.7);box-shadow:inset 3px 0 0 var(--accent);padding-top:14px;padding-bottom:14px}
+  .v1-set.active .n{color:var(--accent);font-size:14px}
+  .v1-set.active .val{font-size:23px;color:var(--txt);font-weight:800}
+  .v1-set.done .val{opacity:.55}
+  .v1-ghost{font-size:8.5px;font-weight:700;letter-spacing:.8px;color:rgba(161,161,166,.65);margin-top:3px;white-space:nowrap}
+  .v1-addset{text-align:center;color:var(--accent);font-size:12px;font-weight:800;padding:13px}
+  .v1-next{display:flex;align-items:center;gap:11px;background:var(--surface);border-radius:14px;padding:11px 13px;margin-top:10px}
+  .v1-next .imgph{width:38px;height:38px;border-radius:9px}
+  .v1-next h5{font-size:14px;font-weight:900}
+  .v1-next p{font-size:10px;font-weight:700;color:var(--txt2);letter-spacing:.5px;margin-top:1px}
+  .v1-ring{position:relative;width:188px;height:188px;margin:18px auto 0}
+  .v1-ring .t{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:800;color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <h1>FINAL — <em>V1 COMPACT EDITORIAL</em></h1>
+    <p>Der gewählte Entwurf. Evolution des bestehenden Designs mit korrigierter Hierarchie — Identität bleibt, Ergonomie und Informationsgehalt steigen.</p>
+    <div class="delta">
+      <div><b>Startscreen</b>Hero von 70% → <span>~25% Höhe</span> („TIME TO WORK."), alle Pläne ohne Scrollen sichtbar, Cards mit KI-Bild-Thumbnail statt SF-Symbol.</div>
+      <div><b>Aktives Workout</b><span>Reps in jeder Satz-Zeile</span> („8 × 35 kg"), Übungsbild-Banner, „Letztes Mal"-Geisterwert unter dem aktiven Satz, Fortschrittsbalken oben.</div>
+      <div><b>Pause</b>Kreis-Timer bleibt, aber <span>eine</span> Skip-Affordance statt drei; „Danach"-Vorschau direkt im Screen.</div>
+      <div><b>Sprache & Daten</b>EN-Headlines + DE-UI konsequent; Sessions werden gespeichert → „Letztes Mal"-Werte; Volumen-Berechnung aus tatsächlich absolvierten Sätzen.</div>
+    </div>
+  </header>
+  <div class="phones">
+
+    <div class="phone-slot"><div class="slot-label">Start</div>
+    <div class="phone">
+      <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i class="b"></i></span></div>
+      <div class="scr px">
+        <div class="topbar">
+          <span class="logo"><b>GYM</b>BUDDY</span>
+          <span style="display:flex;gap:8px"><span class="icbtn">⚙</span><span class="icbtn acc">+</span></span>
+        </div>
+        <div class="v1-hero">
+          <div class="l1">TIME TO</div>
+          <div class="l2">WORK.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:46px">
+          <span style="width:34px;height:3px;background:var(--accent)"></span>
+          <span class="kick" style="color:var(--txt)">Deine Pläne</span>
+          <span class="kick acc" style="margin-left:auto;font-size:9px">Sortieren</span>
+        </div>
+        <div class="v1-card">
+          <div class="imgph"><svg class="dmb" viewBox="0 0 24 24" fill="none" stroke="#FAFAFA" stroke-width="1.6"><path d="M6.5 6.5v11M4 8.5v7M17.5 6.5v11M20 8.5v7M6.5 12h11"/></svg><span class="tag">KI-Bild</span></div>
+          <div><h4>PUSH</h4><div class="mus">BRUST · SCHULTER · TRIZEPS</div><div class="last">ZULETZT · VOR 2 TAGEN</div></div>
+          <span class="chev">›</span>
+        </div>
+        <div class="v1-card">
+          <div class="imgph"><svg class="dmb" viewBox="0 0 24 24" fill="none" stroke="#FAFAFA" stroke-width="1.6"><path d="M6.5 6.5v11M4 8.5v7M17.5 6.5v11M20 8.5v7M6.5 12h11"/></svg><span class="tag">KI-Bild</span></div>
+          <div><h4>PULL</h4><div class="mus">RÜCKEN · BIZEPS</div><div class="last">ZULETZT · VOR 4 TAGEN</div></div>
+          <span class="chev">›</span>
+        </div>
+        <div class="v1-card">
+          <div class="imgph"><svg class="dmb" viewBox="0 0 24 24" fill="none" stroke="#FAFAFA" stroke-width="1.6"><path d="M6.5 6.5v11M4 8.5v7M17.5 6.5v11M20 8.5v7M6.5 12h11"/></svg><span class="tag">KI-Bild</span></div>
+          <div><h4>LEGS</h4><div class="mus">QUADS · BEINBIZEPS · GLUTES</div><div class="last">ZULETZT · VOR 6 TAGEN</div></div>
+          <span class="chev">›</span>
+        </div>
+        <div class="v1-add">+</div>
+      </div>
+    </div></div>
+
+    <div class="phone-slot"><div class="slot-label">Aktives Workout</div>
+    <div class="phone">
+      <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i class="b"></i></span></div>
+      <div class="scr px">
+        <div class="topbar">
+          <span class="endchip">✕ ENDE</span>
+          <span class="kick">PUSH</span>
+          <span class="icbtn">❙❙</span>
+        </div>
+        <div style="margin-top:16px">
+          <span class="kick">ÜBUNG 2 / 6</span>
+          <div class="prog" style="margin-top:8px"><i style="width:33%"></i></div>
+        </div>
+        <div class="v1-xname">SCHRÄGBANK­DRÜCKEN</div>
+        <div class="v1-banner imgph"><svg class="dmb" viewBox="0 0 24 24" fill="none" stroke="#FAFAFA" stroke-width="1.6"><path d="M6.5 6.5v11M4 8.5v7M17.5 6.5v11M20 8.5v7M6.5 12h11"/></svg><span class="tag">KI-Bild · Schrägbankdrücken</span></div>
+        <div class="v1-sets">
+          <div class="v1-set done"><span class="n">SATZ 1</span><span class="val mono">8 × 30 kg</span><span class="check on" style="margin-left:auto"><i></i></span></div>
+          <div class="v1-set active">
+            <span class="n">SATZ 2</span>
+            <div><div class="val mono">8 × 35 kg</div><div class="v1-ghost">LETZTES MAL · 32,5 KG × 8</div></div>
+            <span class="check ring" style="margin-left:auto"></span>
+          </div>
+          <div class="v1-set"><span class="n">SATZ 3</span><span class="val mono">8 × 35 kg</span><span class="check" style="margin-left:auto"></span></div>
+          <div class="v1-set"><span class="n">SATZ 4</span><span class="val mono">6 × 37,5 kg</span><span class="check" style="margin-left:auto"></span></div>
+          <div class="v1-addset">+ Satz hinzufügen</div>
+        </div>
+        <div class="divider" style="margin-top:16px"><span class="kick" style="font-size:9px">NEXT UP</span></div>
+        <div class="v1-next">
+          <div class="imgph"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#FAFAFA" stroke-width="1.6"><path d="M6.5 6.5v11M4 8.5v7M17.5 6.5v11M20 8.5v7M6.5 12h11"/></svg></div>
+          <div><h5>SCHULTERDRÜCKEN</h5><p>3 SÄTZE × 12 WDH · 20 KG</p></div>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="phone-slot"><div class="slot-label">Pause</div>
+    <div class="phone">
+      <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i class="b"></i></span></div>
+      <div class="scr px">
+        <div class="topbar">
+          <span class="endchip">✕ ENDE</span>
+          <span class="kick">PUSH</span>
+          <span class="icbtn">❙❙</span>
+        </div>
+        <div style="text-align:center;margin-top:26px">
+          <span class="kick acc">PAUSE · NACH SATZ 2</span>
+          <div style="font-size:24px;font-weight:900;margin-top:8px">SCHRÄGBANKDRÜCKEN</div>
+          <div class="kick" style="margin-top:8px;font-size:9px">DANN · SATZ 3 VON 4 · 8 × 35 KG</div>
+        </div>
+        <div class="v1-ring">
+          <svg width="188" height="188" viewBox="0 0 188 188" style="transform:rotate(-90deg)">
+            <circle cx="94" cy="94" r="84" stroke="#1E1E21" stroke-width="13" fill="none"/>
+            <circle cx="94" cy="94" r="84" stroke="#FF4F00" stroke-width="13" fill="none" stroke-linecap="round" stroke-dasharray="528" stroke-dashoffset="180"/>
+          </svg>
+          <div class="t mono">1:24</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-top:24px">
+          <span class="ghostrnd">−15</span>
+          <span class="kick">PAUSE LÄUFT</span>
+          <span class="ghostrnd">+15</span>
+        </div>
+        <div class="bigbtn" style="margin-top:24px">ÜBERSPRINGEN</div>
+      </div>
+    </div></div>
+
+  </div>
+</div>
+</body>
+</html>
