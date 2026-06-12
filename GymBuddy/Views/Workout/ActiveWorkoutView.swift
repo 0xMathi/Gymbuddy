@@ -10,14 +10,15 @@ struct ActiveWorkoutView: View {
     @State private var editSetPayload: EditSetPayload? = nil
     @State private var draggedExercise: Exercise?
     @State private var showSettings = false
-    @State private var isTimerPulsating = false
+    /// Browsing preview via horizontal swipe — nil means the active exercise is shown
+    @State private var previewIndex: Int? = nil
 
     var body: some View {
         ZStack {
             Theme.Colors.bg.ignoresSafeArea()
 
             if let session = manager.session, session.state == .completed {
-                WorkoutSummaryView(session: session) {
+                WorkoutSummaryView(session: session, previousStats: manager.previousSessionStats) {
                     manager.dismissSummary()
                 }
                 .transition(.opacity.combined(with: .scale(scale: 0.95)))
@@ -31,13 +32,13 @@ struct ActiveWorkoutView: View {
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: manager.session?.state)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: manager.isPaused)
-        .confirmationDialog("End Workout?", isPresented: $showCancelConfirmation, titleVisibility: .visible) {
-            Button("End Workout", role: .destructive) {
+        .confirmationDialog("Workout beenden?", isPresented: $showCancelConfirmation, titleVisibility: .visible) {
+            Button("Beenden", role: .destructive) {
                 manager.cancelWorkout()
             }
-            Button("Cancel", role: .cancel) {}
+            Button("Abbrechen", role: .cancel) {}
         } message: {
-            Text("Your progress will be lost.")
+            Text("Dein Fortschritt geht verloren.")
         }
     }
 
@@ -53,9 +54,24 @@ struct ActiveWorkoutView: View {
                 .padding(.top, Theme.Spacing.medium)
                 .padding(.bottom, Theme.Spacing.small)
 
+            ScrollViewReader { scrollProxy in
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: Theme.Spacing.medium) {
-                    if session.state == .resting {
+                    Color.clear
+                        .frame(height: 0)
+                        .id("top")
+
+                    if let preview = previewIndex,
+                       preview != session.currentExerciseIndex,
+                       exercises.indices.contains(preview) {
+                        previewSection(session: session, exercises: exercises, index: preview)
+                            .id("preview-\(preview)")
+                            .padding(.horizontal, Theme.Spacing.xl)
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .trailing).combined(with: .opacity),
+                                removal: .opacity
+                            ))
+                    } else if session.state == .resting {
                         restSection(session: session, exercises: exercises)
                             .padding(.horizontal, Theme.Spacing.xl)
                             .transition(.asymmetric(
@@ -87,7 +103,7 @@ struct ActiveWorkoutView: View {
                         if hasOthers {
                             let nextEx = session.currentExerciseIndex + 1 < exercises.count ? exercises[session.currentExerciseIndex + 1] : nil
                             let isSupersetNext = session.state != .resting && nextEx?.supersetId != nil && nextEx?.supersetId == exercises[session.currentExerciseIndex].supersetId
-                            let titleStr = session.state == .resting ? "COMING UP" : (isSupersetNext ? "NEXT IN SUPERSET (NO REST)" : "NEXT UP")
+                            let titleStr = session.state == .resting ? "COMING UP" : (isSupersetNext ? "SUPERSET · KEINE PAUSE" : "NEXT UP")
 
                             sectionDivider(title: titleStr)
                                 .padding(.horizontal, Theme.Spacing.xl)
@@ -125,7 +141,7 @@ struct ActiveWorkoutView: View {
                         HStack(spacing: Theme.Spacing.small) {
                             Image(systemName: "xmark.circle")
                                 .font(.system(size: 15, weight: .medium))
-                            Text("END WORKOUT")
+                            Text("WORKOUT BEENDEN")
                                 .font(Theme.Fonts.label)
                                 .tracking(1)
                         }
@@ -141,6 +157,42 @@ struct ActiveWorkoutView: View {
                 }
                 .padding(.top, Theme.Spacing.small)
                 .padding(.bottom, Theme.Spacing.xxxl)
+            }
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 30)
+                    .onEnded { value in
+                        handleSwipe(value, session: session, count: exercises.count)
+                    }
+            )
+            .overlay(alignment: .bottom) {
+                if let preview = previewIndex, preview != session.currentExerciseIndex {
+                    returnPill(session: session)
+                        .padding(.bottom, Theme.Spacing.medium)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .onChange(of: session.currentExerciseIndex) { _, _ in
+                previewIndex = nil
+                withAnimation(.easeOut(duration: 0.3)) {
+                    scrollProxy.scrollTo("top", anchor: .top)
+                }
+            }
+            .onChange(of: session.state) { _, newState in
+                if newState == .resting || newState == .active {
+                    // Rest ended or new set started → snap back to the active exercise
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                        previewIndex = nil
+                    }
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        scrollProxy.scrollTo("top", anchor: .top)
+                    }
+                }
+            }
+            .onChange(of: previewIndex) { _, _ in
+                withAnimation(.easeOut(duration: 0.25)) {
+                    scrollProxy.scrollTo("top", anchor: .top)
+                }
+            }
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: session.currentExerciseIndex)
@@ -198,7 +250,7 @@ struct ActiveWorkoutView: View {
                 HStack(spacing: 5) {
                     Image(systemName: "xmark")
                         .font(.system(size: 12, weight: .bold))
-                    Text("END")
+                    Text("ENDE")
                         .font(Theme.Fonts.label)
                         .tracking(1)
                 }
@@ -259,7 +311,7 @@ struct ActiveWorkoutView: View {
                 // EXERCISE HERO HEADER (Image Removed for cleaner look)
                 VStack(alignment: .leading, spacing: Theme.Spacing.small) {
                     VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                        Text("EXERCISE \(session.currentExerciseIndex + 1) / \(exercises.count)")
+                        Text("ÜBUNG \(session.currentExerciseIndex + 1) / \(exercises.count)")
                             .font(Theme.Fonts.label)
                             .tracking(3)
                             .foregroundStyle(Theme.Colors.textSecondary)
@@ -286,16 +338,36 @@ struct ActiveWorkoutView: View {
                     }
 
                     Text(exercise.name.uppercased())
-                        .font(.system(size: 40, weight: .black, design: .default))
+                        .font(.system(size: 30, weight: .black, design: .default))
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .lineLimit(3)
                         .minimumScaleFactor(0.5)
                         .fixedSize(horizontal: false, vertical: true)
-                    
-                    Text("\(exercise.sets) SÄTZE • \(exercise.reps) WDH")
+
+                    Text("\(exercise.sets) SÄTZE · PAUSE \(formatRestTime(exercise.restSeconds))")
                         .font(Theme.Fonts.bodyBold)
                         .tracking(1)
                         .foregroundStyle(Theme.Colors.textSecondary)
+
+                    // Exercise image banner (gpt-image-1 asset, SF Symbol fallback)
+                    ZStack {
+                        Rectangle()
+                            .fill(Theme.Colors.surfaceElevated)
+
+                        if let image = UIImage(named: exercise.imageName) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            Image(systemName: exercise.fallbackIcon)
+                                .font(.system(size: 36, weight: .thin))
+                                .foregroundStyle(Theme.Colors.textSecondary.opacity(0.4))
+                        }
+                    }
+                    .frame(height: 168)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius))
+                    .padding(.top, Theme.Spacing.small)
                 }
                 .padding(.top, Theme.Spacing.medium)
                 .padding(.horizontal, 4)
@@ -319,36 +391,31 @@ struct ActiveWorkoutView: View {
                                 )
                             } label: {
                                 HStack(spacing: 0) {
-                                    // "SET 1"
-                                    Text("SET \(setNum)")
-                                        .font(.system(size: isActive ? 20 : 16, weight: .black))
+                                    // "SATZ 1"
+                                    Text("SATZ \(setNum)")
+                                        .font(.system(size: isActive ? 15 : 13, weight: .black))
                                         .foregroundStyle(isActive ? Theme.Colors.accent : Theme.Colors.textSecondary)
-                                        .frame(width: 65, alignment: .leading)
-                                    
+                                        .frame(width: 76, alignment: .leading)
+
+                                    VStack(alignment: .leading, spacing: 3) {
+                                        // "8 × 35 kg"
+                                        Text("\(exerciseSet.reps) × \(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")")
+                                            .font(.system(size: isActive ? 23 : 17, weight: isActive ? .bold : .semibold, design: .monospaced))
+                                            .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.6)
+
+                                        // "LETZTES MAL · 32,5 KG × 8" (only when a weight was logged)
+                                        if isActive, let last = lastSet(for: exercise, index: index), last.weight > 0 {
+                                            Text("LETZTES MAL · \(formatWeight(last.weight)) × \(last.reps)")
+                                                .font(Theme.Fonts.ghostLabel)
+                                                .tracking(0.8)
+                                                .foregroundStyle(Theme.Colors.textSecondary.opacity(0.65))
+                                                .lineLimit(1)
+                                        }
+                                    }
+
                                     Spacer(minLength: 4)
-                                    
-                                    // "35 kg"
-                                    Text(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")
-                                        .font(.system(size: isActive ? 34 : 26, weight: .bold))
-                                        .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.5)
-                                    
-                                    Spacer(minLength: 4)
-                                    
-                                    Text("•")
-                                        .font(.system(size: 16))
-                                        .foregroundStyle(Theme.Colors.surfaceElevated)
-                                    
-                                    Spacer(minLength: 4)
-                                    
-                                    // "1:30 min"
-                                    Text(formatRestTime(exerciseSet.restSeconds ?? exercise.restSeconds))
-                                        .font(.system(size: isActive ? 18 : 14, weight: .semibold))
-                                        .foregroundStyle(Theme.Colors.textSecondary)
-                                        .lineLimit(1)
-                                        .minimumScaleFactor(0.8)
-                                        .frame(width: 60, alignment: .trailing)
                                 }
                             }
                             .buttonStyle(.plain)
@@ -377,9 +444,16 @@ struct ActiveWorkoutView: View {
                             .buttonStyle(.plain)
                             .disabled(!isActive || manager.isPaused)
                         }
-                        .padding(.vertical, 20)
+                        .padding(.vertical, 18)
                         .padding(.horizontal, Theme.Spacing.large)
-                        .background(isActive ? Theme.Colors.surfaceElevated.opacity(0.3) : Color.clear)
+                        .background(isActive ? Theme.Colors.surfaceElevated.opacity(0.45) : Color.clear)
+                        .overlay(alignment: .leading) {
+                            if isActive {
+                                Rectangle()
+                                    .fill(Theme.Colors.accent)
+                                    .frame(width: 3)
+                            }
+                        }
                         
                         // Separator between rows
                         if setNum < exercise.sets {
@@ -433,6 +507,190 @@ struct ActiveWorkoutView: View {
         return "\(secs) s"
     }
 
+    /// "Letztes Mal" set for the given set index — same-numbered set, falls back to the last one
+    private func lastSet(for exercise: Exercise, index: Int) -> CompletedSetData? {
+        guard let sets = manager.lastResults[exercise.name], !sets.isEmpty else { return nil }
+        return sets.indices.contains(index) ? sets[index] : sets.last
+    }
+
+    private func formatWeight(_ weight: Double) -> String {
+        guard weight > 0 else { return "—" }
+        let formatted = weight.truncatingRemainder(dividingBy: 1) == 0
+            ? String(format: "%.0f", weight)
+            : String(format: "%.1f", weight).replacingOccurrences(of: ".", with: ",")
+        return "\(formatted) KG"
+    }
+
+    // MARK: - Swipe Browsing (Preview)
+
+    /// Horizontal swipe browses exercises as a preview; the active exercise stays anchored.
+    private func handleSwipe(_ value: DragGesture.Value, session: WorkoutSession, count: Int) {
+        let dx = value.translation.width
+        let dy = value.translation.height
+        guard abs(dx) > 60, abs(dx) > abs(dy) * 1.5 else { return }
+
+        let base = previewIndex ?? session.currentExerciseIndex
+        let target = dx < 0 ? base + 1 : base - 1
+        guard (0..<count).contains(target) else { return }
+
+        HapticService.shared.light()
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+            previewIndex = target == session.currentExerciseIndex ? nil : target
+        }
+    }
+
+    @ViewBuilder
+    private func previewSection(session: WorkoutSession, exercises: [Exercise], index: Int) -> some View {
+        let exercise = exercises[index]
+        let isCompleted = index < session.currentExerciseIndex
+
+        VStack(alignment: .leading, spacing: Theme.Spacing.large) {
+            VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                Text(isCompleted ? "VORSCHAU · ERLEDIGT ✓" : "VORSCHAU · ÜBUNG \(index + 1) / \(exercises.count)")
+                    .font(Theme.Fonts.label)
+                    .tracking(3)
+                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .padding(.bottom, Theme.Spacing.small)
+
+                if let ssid = exercise.supersetId {
+                    Text("SUPERSET • \(ssid)")
+                        .font(.system(size: 14, weight: .black))
+                        .tracking(2)
+                        .foregroundStyle(Theme.Colors.accent)
+                }
+
+                Text(exercise.name.uppercased())
+                    .font(.system(size: 30, weight: .black, design: .default))
+                    .foregroundStyle(isCompleted ? Theme.Colors.textSecondary : Theme.Colors.textPrimary)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.5)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("\(exercise.sets) SÄTZE · PAUSE \(formatRestTime(exercise.restSeconds))")
+                    .font(Theme.Fonts.bodyBold)
+                    .tracking(1)
+                    .foregroundStyle(Theme.Colors.textSecondary)
+
+                ZStack {
+                    Rectangle()
+                        .fill(Theme.Colors.surfaceElevated)
+
+                    if let image = UIImage(named: exercise.imageName) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } else {
+                        Image(systemName: exercise.fallbackIcon)
+                            .font(.system(size: 36, weight: .thin))
+                            .foregroundStyle(Theme.Colors.textSecondary.opacity(0.4))
+                    }
+                }
+                .frame(height: 168)
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius))
+                .padding(.top, Theme.Spacing.small)
+                .opacity(isCompleted ? 0.6 : 1)
+            }
+            .padding(.top, Theme.Spacing.medium)
+            .padding(.horizontal, 4)
+
+            // Read-only set list
+            VStack(spacing: 0) {
+                let setsArray = exercise.resolvedSets
+                ForEach(Array(setsArray.enumerated()), id: \.offset) { idx, exerciseSet in
+                    HStack(spacing: Theme.Spacing.medium) {
+                        Text("SATZ \(idx + 1)")
+                            .font(.system(size: 13, weight: .black))
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                            .frame(width: 76, alignment: .leading)
+
+                        Text("\(exerciseSet.reps) × \(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")")
+                            .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(Theme.Colors.textSecondary)
+
+                        Spacer()
+
+                        if isCompleted {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundStyle(Theme.Colors.accent.opacity(0.7))
+                        }
+                    }
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, Theme.Spacing.large)
+
+                    if idx < setsArray.count - 1 {
+                        Rectangle()
+                            .fill(Theme.Colors.surface)
+                            .frame(height: 1)
+                            .padding(.horizontal, Theme.Spacing.large)
+                    }
+                }
+            }
+            .background(Theme.Colors.surfaceElevated.opacity(0.1))
+            .cornerRadius(Theme.Layout.cornerRadiusLarge)
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusLarge)
+                    .stroke(Theme.Colors.surface, lineWidth: 1)
+            )
+
+            // Deliberate jump — browsing alone never changes the active exercise
+            Button {
+                HapticService.shared.medium()
+                manager.jumpToExercise(index: index)
+                previewIndex = nil
+            } label: {
+                Text(isCompleted ? "ÜBUNG NEU STARTEN" : "HIER WEITERMACHEN")
+                    .font(Theme.Fonts.label)
+                    .tracking(2)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 26)
+                            .stroke(Theme.Colors.accent, lineWidth: 1.5)
+                    )
+                    .foregroundStyle(Theme.Colors.accent)
+            }
+            .buttonStyle(.plain)
+            .padding(.bottom, Theme.Spacing.xxl)
+        }
+    }
+
+    private func returnPill(session: WorkoutSession) -> some View {
+        Button {
+            HapticService.shared.light()
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                previewIndex = nil
+            }
+        } label: {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(Theme.Colors.accent)
+                    .frame(width: 8, height: 8)
+
+                Text("ZURÜCK ZU ÜBUNG \(session.currentExerciseIndex + 1)")
+                    .font(Theme.Fonts.kicker)
+                    .tracking(1.2)
+                    .foregroundStyle(Theme.Colors.textPrimary)
+
+                if session.state == .resting {
+                    Text(formatRestTimeDigital(session.restTimeRemaining))
+                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                        .foregroundStyle(Theme.Colors.accent)
+                }
+            }
+            .padding(.horizontal, 18)
+            .padding(.vertical, 12)
+            .background(Theme.Colors.surfaceElevated)
+            .overlay(
+                Capsule().stroke(Theme.Colors.accent.opacity(0.4), lineWidth: 1)
+            )
+            .clipShape(Capsule())
+            .shadow(color: .black.opacity(0.5), radius: 16, y: 6)
+        }
+        .buttonStyle(.plain)
+    }
+
     // MARK: - STATE B: Rest Section
 
     @ViewBuilder
@@ -442,19 +700,19 @@ struct ActiveWorkoutView: View {
 
         let topLabel: String = {
             if let ex = exercise, session.currentSetNumber <= ex.sets {
-                return "RESTING: SET \(session.currentSetNumber)"
+                return "PAUSE · SATZ \(session.currentSetNumber)"
             }
-            return "RESTING"
+            return "PAUSE"
         }()
         
         let mainLabel: String = {
-            guard let ex = exercise else { return "FINISH" }
+            guard let ex = exercise else { return "FERTIG" }
             if session.currentSetNumber <= ex.sets {
                 return ex.name.uppercased()
             } else if session.currentExerciseIndex + 1 < exercises.count {
                 return exercises[session.currentExerciseIndex + 1].name.uppercased()
             } else {
-                return "LAST SET"
+                return "LETZTER SATZ"
             }
         }()
 
@@ -462,25 +720,24 @@ struct ActiveWorkoutView: View {
             guard let ex = exercise else { return nil }
             if session.currentSetNumber <= ex.sets {
                 if session.currentExerciseIndex + 1 < exercises.count {
-                    return "NEXT: \(exercises[session.currentExerciseIndex + 1].name.uppercased())"
+                    return "DANN: \(exercises[session.currentExerciseIndex + 1].name.uppercased())"
                 }
             } else if session.currentExerciseIndex + 2 < exercises.count {
-                return "NEXT: \(exercises[session.currentExerciseIndex + 2].name.uppercased())"
+                return "DANN: \(exercises[session.currentExerciseIndex + 2].name.uppercased())"
             }
             return nil
         }()
 
-        VStack(spacing: Theme.Spacing.xxl) {
+        VStack(spacing: Theme.Spacing.xl) {
             // Header
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Text(topLabel)
-                    .font(.system(size: 34, weight: .bold, design: .default))
-                    .foregroundStyle(Theme.Colors.textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                    .font(Theme.Fonts.label)
+                    .tracking(2)
+                    .foregroundStyle(Theme.Colors.accent)
 
                 Text(mainLabel)
-                    .font(.system(size: 34, weight: .bold, design: .default))
+                    .font(.system(size: 24, weight: .black, design: .default))
                     .foregroundStyle(Theme.Colors.textPrimary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
@@ -488,43 +745,38 @@ struct ActiveWorkoutView: View {
 
                 if let next = nextLabel {
                     Text(next)
-                        .font(Theme.Fonts.label)
+                        .font(Theme.Fonts.kicker)
                         .tracking(2)
                         .foregroundStyle(Theme.Colors.textSecondary)
-                        .padding(.top, Theme.Spacing.small)
                 }
             }
-            .padding(.top, Theme.Spacing.medium)
+            .padding(.top, Theme.Spacing.large)
 
-            // Circular Timer
-            Button {
-                manager.skipRest()
-            } label: {
-                ZStack {
-                    Circle()
-                        .stroke(Theme.Colors.surfaceElevated, lineWidth: 16)
-                    
-                    Circle()
-                        .trim(from: 0, to: CGFloat(session.restTimeRemaining) / CGFloat(max(session.originalRestDuration, 1)))
-                        .stroke(Theme.Colors.accent, style: StrokeStyle(lineWidth: 16, lineCap: .round))
-                        .rotationEffect(.degrees(-90))
-                        .animation(.linear(duration: 1.0), value: session.restTimeRemaining)
-                    
-                    Text(formatRestTimeDigital(session.restTimeRemaining))
-                        .font(.system(size: 72, weight: .bold, design: .default))
-                        .foregroundStyle(Theme.Colors.accent)
-                        .monospacedDigit()
-                }
-                .frame(width: 260, height: 260)
+            // Circular Timer (display only — skipping happens via the button below)
+            ZStack {
+                Circle()
+                    .stroke(Theme.Colors.surfaceElevated, lineWidth: 14)
+
+                Circle()
+                    .trim(from: 0, to: CGFloat(session.restTimeRemaining) / CGFloat(max(session.originalRestDuration, 1)))
+                    .stroke(Theme.Colors.accent, style: StrokeStyle(lineWidth: 14, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(.linear(duration: 1.0), value: session.restTimeRemaining)
+
+                Text(formatRestTimeDigital(session.restTimeRemaining))
+                    .font(.system(size: 60, weight: .bold, design: .default))
+                    .foregroundStyle(Theme.Colors.accent)
+                    .monospacedDigit()
             }
-            .buttonStyle(.plain)
-            
+            .frame(width: 224, height: 224)
+            .padding(.vertical, Theme.Spacing.small)
+
             VStack(spacing: Theme.Spacing.large) {
                 HStack(spacing: Theme.Spacing.xl) {
                     Button {
                         manager.adjustRest(by: -15)
                     } label: {
-                        Text("-15")
+                        Text("−15")
                             .font(Theme.Fonts.label)
                             .foregroundStyle(Theme.Colors.textSecondary)
                             .frame(width: 44, height: 44)
@@ -533,7 +785,7 @@ struct ActiveWorkoutView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Text("REMAINING REST")
+                    Text("PAUSE LÄUFT")
                         .font(Theme.Fonts.label)
                         .tracking(2)
                         .foregroundStyle(Theme.Colors.textSecondary)
@@ -551,21 +803,10 @@ struct ActiveWorkoutView: View {
                     .buttonStyle(.plain)
                 }
 
-                Text("TAP TIMER TO SKIP")
-                    .font(Theme.Fonts.label)
-                    .tracking(3)
-                    .foregroundStyle(Theme.Colors.textSecondary)
-                    .opacity(isTimerPulsating ? 1.0 : 0.4)
-                    .onAppear {
-                        withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
-                            isTimerPulsating = true
-                        }
-                    }
-
                 Button {
                     manager.skipRest()
                 } label: {
-                    Text("SKIP REST")
+                    Text("ÜBERSPRINGEN")
                         .font(Theme.Fonts.bodyBold)
                         .tracking(1)
                         .frame(maxWidth: .infinity)
@@ -691,12 +932,12 @@ struct ActiveWorkoutView: View {
                 .font(.system(size: 80))
                 .foregroundStyle(Theme.Colors.accent)
 
-            Text("WORKOUT PAUSED")
+            Text("PAUSIERT")
                 .font(Theme.Fonts.h2)
                 .foregroundStyle(Theme.Colors.textPrimary)
                 .tracking(2)
 
-            Text("TAP ANYWHERE TO RESUME")
+            Text("TIPPEN ZUM FORTSETZEN")
                 .font(Theme.Fonts.body)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }
@@ -715,7 +956,7 @@ struct ActiveWorkoutView: View {
             ProgressView()
                 .scaleEffect(1.5)
                 .tint(Theme.Colors.accent)
-            Text("LOADING...")
+            Text("LADE …")
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .tracking(2)
@@ -762,12 +1003,12 @@ private struct ExerciseQuickActionSheet: View {
 
                 // Stats row
                 HStack(spacing: Theme.Spacing.xl) {
-                    statItem(value: "\(exercise.sets)", label: "SETS")
-                    statItem(value: "\(exercise.reps)", label: "REPS")
+                    statItem(value: "\(exercise.sets)", label: "SÄTZE")
+                    statItem(value: "\(exercise.reps)", label: "WDH")
                     if exercise.weight > 0 {
-                        statItem(value: exercise.weightFormatted, label: "WEIGHT")
+                        statItem(value: exercise.weightFormatted, label: "GEWICHT")
                     }
-                    statItem(value: "\(exercise.restSeconds)s", label: "REST")
+                    statItem(value: "\(exercise.restSeconds)s", label: "PAUSE")
                 }
                 .padding(.horizontal, Theme.Spacing.xl)
 
@@ -776,15 +1017,15 @@ private struct ExerciseQuickActionSheet: View {
                 // Actions
                 VStack(spacing: Theme.Spacing.medium) {
                     if isCompleted {
-                        PrimaryButton(title: "RESTART EXERCISE", icon: "arrow.uturn.left") {
+                        PrimaryButton(title: "ÜBUNG NEU STARTEN", icon: "arrow.uturn.left") {
                             onJump()
                         }
                     } else {
-                        PrimaryButton(title: "JUMP TO THIS EXERCISE", icon: "arrow.right") {
+                        PrimaryButton(title: "ZU DIESER ÜBUNG", icon: "arrow.right") {
                             onJump()
                         }
 
-                        SecondaryButton(title: "MARK AS COMPLETE", icon: "checkmark.circle") {
+                        SecondaryButton(title: "ALS ERLEDIGT MARKIEREN", icon: "checkmark.circle") {
                             onMarkComplete()
                         }
                     }
@@ -859,7 +1100,7 @@ struct EditSetSheet: View {
                     HStack(spacing: Theme.Spacing.medium) {
                         // Reps Picker
                         VStack {
-                            Text("REPS")
+                            Text("WDH")
                                 .font(Theme.Fonts.caption)
                                 .tracking(1)
                                 .foregroundStyle(Theme.Colors.textSecondary)
@@ -878,7 +1119,7 @@ struct EditSetSheet: View {
 
                         // Weight Picker
                         VStack {
-                            Text("WEIGHT")
+                            Text("GEWICHT")
                                 .font(Theme.Fonts.caption)
                                 .tracking(1)
                                 .foregroundStyle(Theme.Colors.textSecondary)
@@ -898,7 +1139,7 @@ struct EditSetSheet: View {
 
                         // Rest Picker
                         VStack {
-                            Text("REST")
+                            Text("PAUSE")
                                 .font(Theme.Fonts.caption)
                                 .tracking(1)
                                 .foregroundStyle(Theme.Colors.textSecondary)
@@ -925,14 +1166,14 @@ struct EditSetSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("CANCEL") {
+                    Button("ABBRECHEN") {
                         dismiss()
                     }
                     .font(Theme.Fonts.label)
                     .foregroundStyle(Theme.Colors.textSecondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("SAVE") {
+                    Button("SPEICHERN") {
                         onSave(reps, weight, restSeconds)
                         dismiss()
                     }

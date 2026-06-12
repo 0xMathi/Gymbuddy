@@ -12,11 +12,11 @@ struct SettingsView: View {
             }
             .scrollContentBackground(.hidden)
             .background(Theme.Colors.bg)
-            .navigationTitle("Settings")
+            .navigationTitle("Einstellungen")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
+                    Button("Fertig") {
                         dismiss()
                     }
                     .foregroundStyle(Theme.Colors.accent)
@@ -38,11 +38,11 @@ struct SettingsView: View {
                         .tag(mode)
                 }
             } label: {
-                Label("Appearance", systemImage: "paintbrush.fill")
+                Label("Darstellung", systemImage: "paintbrush.fill")
             }
             .pickerStyle(.menu)
         } header: {
-            Text("APPEARANCE")
+            Text("DARSTELLUNG")
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }
@@ -54,18 +54,18 @@ struct SettingsView: View {
     private var workoutDefaultsSection: some View {
         Section {
             Picker(selection: $settings.defaultRestSeconds) {
-                Text("30 sec").tag(30)
-                Text("45 sec").tag(45)
-                Text("60 sec").tag(60)
-                Text("90 sec").tag(90)
-                Text("120 sec").tag(120)
-                Text("180 sec").tag(180)
+                Text("30 s").tag(30)
+                Text("45 s").tag(45)
+                Text("60 s").tag(60)
+                Text("90 s").tag(90)
+                Text("120 s").tag(120)
+                Text("180 s").tag(180)
             } label: {
-                Label("Default Rest", systemImage: "clock.fill")
+                Label("Standard-Pause", systemImage: "clock.fill")
             }
             .pickerStyle(.menu)
         } header: {
-            Text("WORKOUT DEFAULTS")
+            Text("WORKOUT-STANDARDS")
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }

@@ -86,11 +86,30 @@ struct WorkoutSession {
         return completed
     }
 
-    /// Total Volume calculated based on completed exercises
+    /// Total volume based on sets actually completed (not the full plan)
     var totalVolume: Double {
-        plan.exercises
-            .filter { $0.weight > 0 }
-            .reduce(0) { $0 + ($1.weight * Double($1.reps) * Double($1.sets)) }
+        let sorted = sortedExercises
+        var volume: Double = 0
+
+        for (index, exercise) in sorted.enumerated() {
+            let sets = exercise.resolvedSets
+            let completedCount: Int
+            if index < currentExerciseIndex {
+                completedCount = sets.count
+            } else if index == currentExerciseIndex {
+                // currentSetNumber points at the upcoming set; the final set
+                // only counts once the workout is completed
+                completedCount = min(currentSetNumber - 1 + (state == .completed ? 1 : 0), sets.count)
+            } else {
+                completedCount = 0
+            }
+
+            for i in 0..<completedCount {
+                volume += sets[i].weight * Double(sets[i].reps)
+            }
+        }
+
+        return volume
     }
 
     /// Formatted: "4.800 KG" or "—" if no weight tracked

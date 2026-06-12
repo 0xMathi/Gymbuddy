@@ -14,7 +14,9 @@ struct GymBuddyApp: App {
             let schema = Schema([
                 WorkoutPlan.self,
                 Exercise.self,
-                ExerciseDefinition.self
+                ExerciseDefinition.self,
+                CompletedWorkout.self,
+                CompletedExercise.self
             ])
             let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
@@ -36,6 +38,7 @@ struct GymBuddyApp: App {
                 .onAppear {
                     UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
                     exerciseManager.configure(with: modelContainer.mainContext)
+                    sessionManager.configure(with: modelContainer.mainContext)
                     seedDefaultPlans(modelContext: modelContainer.mainContext)
                 }
         }

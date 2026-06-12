@@ -120,6 +120,7 @@ final class Exercise {
             .replacingOccurrences(of: "(", with: "")
             .replacingOccurrences(of: ")", with: "")
             .replacingOccurrences(of: "&", with: "und")
+            .replacingOccurrences(of: "/", with: "_")
     }
 
     /// SF Symbol fallback when no image asset is available
