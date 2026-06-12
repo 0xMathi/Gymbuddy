@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 import Observation
 import UserNotifications
 
@@ -8,16 +9,27 @@ class WorkoutSessionManager {
     var isActive: Bool { session != nil }
     var isPaused: Bool = false
 
+    /// Per exercise name: the set results from the most recent completed workout
+    private(set) var lastResults: [String: [CompletedSetData]] = [:]
+    /// Duration + volume of the previous session of the same plan (for the summary comparison)
+    private(set) var previousSessionStats: (duration: TimeInterval, volume: Double)?
+
     private var timer: Timer?
     private let haptics = HapticService.shared
     private let nowPlaying = NowPlayingService()
-    
+    private var modelContext: ModelContext?
+
     private var targetRestEndTime: Date?
 
     // MARK: - Initialization
 
     init() {
         setupRemoteCommands()
+    }
+
+    /// Must be called once at app start — history features refuse to work silently without it
+    func configure(with context: ModelContext) {
+        modelContext = context
     }
 
     private func setupRemoteCommands() {
@@ -47,6 +59,8 @@ class WorkoutSessionManager {
 
         plan.lastUsedAt = Date()
         isPaused = false
+
+        loadHistory(for: plan)
 
         // Activate Now Playing
         nowPlaying.activate()
@@ -357,8 +371,96 @@ class WorkoutSessionManager {
         currentSession.endTime = Date()
         session = currentSession
 
+        saveCompletedWorkout(currentSession)
+
         haptics.success()
         nowPlaying.deactivate()
+    }
+
+    // MARK: - History (Letztes Mal)
+
+    /// Loads "Letztes Mal" values + previous session stats for the summary comparison
+    private func loadHistory(for plan: WorkoutPlan) {
+        lastResults = [:]
+        previousSessionStats = nil
+
+        guard let context = modelContext else {
+            assertionFailure("WorkoutSessionManager.configure(with:) was never called — history is unavailable")
+            return
+        }
+
+        let descriptor = FetchDescriptor<CompletedWorkout>(
+            sortBy: [SortDescriptor(\.endTime, order: .reverse)]
+        )
+
+        let workouts: [CompletedWorkout]
+        do {
+            workouts = try context.fetch(descriptor)
+        } catch {
+            assertionFailure("Failed to fetch workout history: \(error)")
+            return
+        }
+
+        for exercise in plan.exercises {
+            for workout in workouts {
+                if let match = workout.exercises.first(where: { $0.name == exercise.name }),
+                   !match.sets.isEmpty {
+                    lastResults[exercise.name] = match.sets
+                    break
+                }
+            }
+        }
+
+        if let previous = workouts.first(where: { $0.planName == plan.name }) {
+            previousSessionStats = (previous.duration, previous.totalVolume)
+        }
+    }
+
+    private func saveCompletedWorkout(_ session: WorkoutSession) {
+        guard let context = modelContext else {
+            assertionFailure("WorkoutSessionManager.configure(with:) was never called — workout was NOT saved")
+            return
+        }
+
+        let completed = CompletedWorkout(
+            planName: session.plan.name,
+            startTime: session.startTime,
+            endTime: session.endTime ?? Date(),
+            totalVolume: session.totalVolume
+        )
+
+        // Persist only sets that were actually completed (mirrors totalVolume logic)
+        let sorted = session.sortedExercises
+        for (index, exercise) in sorted.enumerated() {
+            let sets = exercise.resolvedSets
+            let completedCount: Int
+            if index < session.currentExerciseIndex {
+                completedCount = sets.count
+            } else if index == session.currentExerciseIndex {
+                completedCount = min(session.currentSetNumber - 1 + (session.state == .completed ? 1 : 0), sets.count)
+            } else {
+                completedCount = 0
+            }
+
+            guard completedCount > 0 else { continue }
+
+            let setData = sets.prefix(completedCount).map {
+                CompletedSetData(reps: $0.reps, weight: $0.weight)
+            }
+            let completedExercise = CompletedExercise(
+                name: exercise.name,
+                orderIndex: index,
+                sets: Array(setData)
+            )
+            completed.exercises.append(completedExercise)
+        }
+
+        context.insert(completed)
+        do {
+            try context.save()
+        } catch {
+            assertionFailure("Failed to save completed workout: \(error)")
+        }
     }
 
     /// Called from WorkoutSummaryView to dismiss and reset

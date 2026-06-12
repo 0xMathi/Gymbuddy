@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WorkoutSummaryView: View {
     let session: WorkoutSession
+    var previousStats: (duration: TimeInterval, volume: Double)? = nil
     let onDismiss: () -> Void
 
     @State private var isAnimating = false
@@ -72,6 +73,15 @@ struct WorkoutSummaryView: View {
                     statRow(icon: "checkmark", label: "Sätze", value: "\(session.totalSetsCompleted)")
                     Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
                     statRow(icon: "arrow.triangle.2.circlepath", label: "Wiederholungen", value: "\(session.totalRepsCompleted)")
+
+                    if let previous = previousStats {
+                        Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
+                        statRow(
+                            icon: "clock.arrow.circlepath",
+                            label: "Letzte Session",
+                            value: "\(formatDuration(previous.duration)) · \(formatVolume(previous.volume))"
+                        )
+                    }
                 }
                 .padding(.horizontal, Theme.Spacing.xl)
                 .opacity(isAnimating ? 1 : 0)
@@ -138,6 +148,17 @@ struct WorkoutSummaryView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd.MM.yyyy"
         return formatter.string(from: date)
+    }
+
+    private func formatDuration(_ duration: TimeInterval) -> String {
+        let totalSeconds = Int(duration)
+        return String(format: "%02d:%02d", totalSeconds / 60, totalSeconds % 60)
+    }
+
+    private func formatVolume(_ volume: Double) -> String {
+        guard volume > 0 else { return "—" }
+        let formatted = NumberFormatter.localizedString(from: NSNumber(value: volume), number: .decimal)
+        return "\(formatted) kg"
     }
 }
 
