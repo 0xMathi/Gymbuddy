@@ -72,12 +72,12 @@ struct ExercisePickerView: View {
                     }
                 }
             }
-            .navigationTitle("Add Exercises")
+            .navigationTitle("Übungen hinzufügen")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $searchText, prompt: "Search exercises...")
+            .searchable(text: $searchText, prompt: "Übung suchen …")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
+                    Button("Abbrechen") {
                         dismiss()
                     }
                     .foregroundStyle(Theme.Colors.textSecondary)
@@ -127,7 +127,7 @@ struct ExercisePickerView: View {
             HStack(spacing: Theme.Spacing.small) {
                 // "All" chip
                 FilterChip(
-                    title: "All",
+                    title: "Alle",
                     isSelected: selectedFilter == nil,
                     action: { selectedFilter = nil }
                 )
@@ -172,7 +172,7 @@ struct ExercisePickerView: View {
             HStack(spacing: Theme.Spacing.small) {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
-                Text("Add (\(selectedExercises.count)) Exercises")
+                Text("Hinzufügen (\(selectedExercises.count))")
                     .font(Theme.Fonts.h3)
             }
             .foregroundColor(Theme.Colors.textPrimary)

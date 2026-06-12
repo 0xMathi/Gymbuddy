@@ -33,6 +33,15 @@ struct Theme {
         static let label = Font.system(size: 14, weight: .bold, design: .default)
         static let caption = Font.system(size: 13, weight: .semibold, design: .default)
 
+        // Kicker: smallest readable functional label (11pt floor)
+        static let kicker = Font.system(size: 11, weight: .heavy, design: .default)
+        // Ghost: supplementary info only (e.g. "LETZTES MAL"), never the sole access to data
+        static let ghostLabel = Font.system(size: 9, weight: .bold, design: .default)
+
+        // Compact editorial hero (V1 redesign)
+        static let heroLine1 = Font.system(size: 48, weight: .black, design: .default)
+        static let heroLine2 = Font.system(size: 68, weight: .black, design: .default)
+
         // Monospace for numbers
         static let mono = Font.system(size: 18, weight: .medium, design: .monospaced)
         static let monoLarge = Font.system(size: 28, weight: .bold, design: .monospaced)
