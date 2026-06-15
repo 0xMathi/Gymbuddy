@@ -1162,7 +1162,7 @@ struct EditSetSheet: View {
                 }
                 .padding(.top, Theme.Spacing.xl)
             }
-            .navigationTitle(payload.exercise.name.uppercased())
+            .navigationTitle(payload.exercise.displayName.uppercased())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
