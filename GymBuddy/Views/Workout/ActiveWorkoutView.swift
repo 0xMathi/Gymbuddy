@@ -337,7 +337,7 @@ struct ActiveWorkoutView: View {
                             .foregroundStyle(Theme.Colors.accent)
                     }
 
-                    Text(exercise.name.uppercased())
+                    Text(exercise.displayName.uppercased())
                         .font(.system(size: 30, weight: .black, design: .default))
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .lineLimit(3)
@@ -555,7 +555,7 @@ struct ActiveWorkoutView: View {
                         .foregroundStyle(Theme.Colors.accent)
                 }
 
-                Text(exercise.name.uppercased())
+                Text(exercise.displayName.uppercased())
                     .font(.system(size: 30, weight: .black, design: .default))
                     .foregroundStyle(isCompleted ? Theme.Colors.textSecondary : Theme.Colors.textPrimary)
                     .lineLimit(3)
@@ -704,9 +704,9 @@ struct ActiveWorkoutView: View {
         let mainLabel: String = {
             guard let ex = exercise else { return "FERTIG" }
             if session.currentSetNumber <= ex.sets {
-                return ex.name.uppercased()
+                return ex.displayName.uppercased()
             } else if session.currentExerciseIndex + 1 < exercises.count {
-                return exercises[session.currentExerciseIndex + 1].name.uppercased()
+                return exercises[session.currentExerciseIndex + 1].displayName.uppercased()
             } else {
                 return "LETZTER SATZ"
             }
@@ -716,10 +716,10 @@ struct ActiveWorkoutView: View {
             guard let ex = exercise else { return nil }
             if session.currentSetNumber <= ex.sets {
                 if session.currentExerciseIndex + 1 < exercises.count {
-                    return "DANN: \(exercises[session.currentExerciseIndex + 1].name.uppercased())"
+                    return "DANN: \(exercises[session.currentExerciseIndex + 1].displayName.uppercased())"
                 }
             } else if session.currentExerciseIndex + 2 < exercises.count {
-                return "DANN: \(exercises[session.currentExerciseIndex + 2].name.uppercased())"
+                return "DANN: \(exercises[session.currentExerciseIndex + 2].displayName.uppercased())"
             }
             return nil
         }()
@@ -853,7 +853,7 @@ struct ActiveWorkoutView: View {
                         .foregroundStyle(Theme.Colors.surfaceElevated)
                 }
 
-                Text(exercise.name.uppercased())
+                Text(exercise.displayName.uppercased())
                     .font(.system(size: 20, weight: .black))
                     .tracking(0.5)
                     .foregroundStyle(isCompleted ? Theme.Colors.textSecondary : Theme.Colors.textPrimary)
@@ -983,12 +983,12 @@ private struct ExerciseQuickActionSheet: View {
                 // Header
                 VStack(spacing: Theme.Spacing.xs) {
                     if !exercise.muscleGroup.isEmpty {
-                        Text(exercise.muscleGroup.uppercased())
+                        Text(exercise.displayMuscleGroup.uppercased())
                             .font(Theme.Fonts.caption)
                             .tracking(2)
                             .foregroundStyle(Theme.Colors.accent)
                     }
-                    Text(exercise.name.uppercased())
+                    Text(exercise.displayName.uppercased())
                         .font(Theme.Fonts.h2)
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .tracking(0.5)

@@ -241,7 +241,7 @@ struct ExerciseRowView: View {
                 .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusSmall))
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(exercise.name)
+                    Text(exercise.displayName)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .lineLimit(1)
@@ -642,13 +642,13 @@ struct ExerciseDetailSheet: View {
 
     private var exerciseHeader: some View {
         VStack(spacing: Theme.Spacing.small) {
-            Text(exercise.name.uppercased())
+            Text(exercise.displayName.uppercased())
                 .font(Theme.Fonts.h2)
                 .foregroundStyle(Theme.Colors.textPrimary)
                 .tracking(1)
                 .multilineTextAlignment(.center)
 
-            Text(exercise.muscleGroup.uppercased())
+            Text(exercise.displayMuscleGroup.uppercased())
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.accent)
                 .tracking(1.5)

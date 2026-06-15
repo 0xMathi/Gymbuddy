@@ -132,10 +132,10 @@ struct ExercisePickerView: View {
                     action: { selectedFilter = nil }
                 )
 
-                // Muscle group chips
+                // Muscle group chips (localized label, raw value drives filtering)
                 ForEach(exerciseManager.muscleGroups, id: \.self) { group in
                     FilterChip(
-                        title: group,
+                        title: ExerciseLocalization.muscleGroup(group),
                         isSelected: selectedFilter == group,
                         action: { selectedFilter = group }
                     )
@@ -262,14 +262,14 @@ struct ExerciseListItem: View {
 
                 // Text
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(exercise.name)
+                    Text(exercise.displayName)
                         .font(Theme.Fonts.body)
                         .fontWeight(.medium)
                         .foregroundStyle(Theme.Colors.textPrimary)
 
                     // Show category only if not filtered
                     if showCategory {
-                        Text(exercise.muscleGroup.uppercased())
+                        Text(exercise.displayMuscleGroup.uppercased())
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                             .tracking(1)

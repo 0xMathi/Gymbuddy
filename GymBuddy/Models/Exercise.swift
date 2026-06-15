@@ -134,6 +134,14 @@ final class Exercise {
         }
     }
 
+    // MARK: - Localized Display
+
+    /// Localized name for display (storage `name` stays the German canonical key
+    /// used for image lookup and "Letztes Mal" history).
+    var displayName: String { ExerciseLocalization.exercise(name) }
+    /// Localized muscle group for display.
+    var displayMuscleGroup: String { ExerciseLocalization.muscleGroup(muscleGroup) }
+
     // MARK: - Formatted Display
 
     var weightFormatted: String {
