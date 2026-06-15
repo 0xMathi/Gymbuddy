@@ -42,13 +42,13 @@ struct StartScreenView: View {
     private func musclesFor(_ plan: WorkoutPlan) -> String {
         let lowercased = plan.name.lowercased()
         if lowercased.contains("push") {
-            return "Brust · Schultern · Trizeps"
+            return L.musclesPush
         } else if lowercased.contains("pull") {
-            return "Rücken · Bizeps · Hintere Schulter"
+            return L.musclesPull
         } else if lowercased.contains("leg") || lowercased.contains("bein") {
-            return "Quads · Beinbizeps · Gesäß"
+            return L.musclesLegs
         }
-        return "\(plan.exercises.count) Übungen"
+        return L.exercisesCount(plan.exercises.count)
     }
 
     var body: some View {
@@ -163,7 +163,7 @@ struct StartScreenView: View {
                 .fill(Theme.Colors.accent)
                 .frame(width: 34, height: 3)
 
-            Text("DEINE PLÄNE")
+            Text(L.yourPlans)
                 .font(Theme.Fonts.kicker)
                 .tracking(3)
                 .foregroundStyle(.white)
@@ -176,7 +176,7 @@ struct StartScreenView: View {
                 }
                 HapticService.shared.light()
             }) {
-                Text(isEditMode ? "FERTIG" : "SORTIEREN")
+                Text(isEditMode ? L.done : L.sort)
                     .font(Theme.Fonts.kicker)
                     .tracking(2)
                     .foregroundStyle(Theme.Colors.accent)
@@ -214,7 +214,7 @@ struct StartScreenView: View {
                 Button(role: .destructive) {
                     deletePlan(plan)
                 } label: {
-                    Label("Löschen", systemImage: "trash.fill")
+                    Label(L.delete, systemImage: "trash.fill")
                 }
             }
         }
@@ -222,7 +222,7 @@ struct StartScreenView: View {
             Button {
                 planToEdit = plan
             } label: {
-                Label("Bearbeiten", systemImage: "pencil")
+                Label(L.edit, systemImage: "pencil")
             }
             Button(role: .destructive) {
                 deletePlan(plan)
@@ -260,12 +260,12 @@ struct StartScreenView: View {
                 .foregroundStyle(Theme.Colors.surfaceElevated)
 
             VStack(spacing: Theme.Spacing.small) {
-                Text("NO PLANS YET")
+                Text(L.noPlansYet)
                     .font(.system(size: 24, weight: .black))
                     .tracking(2)
                     .foregroundStyle(.white)
 
-                Text("Erstelle deinen ersten Trainingsplan")
+                Text(L.createFirstPlan)
                     .font(Theme.Fonts.body)
                     .foregroundStyle(Theme.Colors.textSecondary)
             }
@@ -274,7 +274,7 @@ struct StartScreenView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "plus")
                         .font(.system(size: 18, weight: .bold))
-                    Text("PLAN ERSTELLEN")
+                    Text(L.createPlan)
                         .font(Theme.Fonts.label)
                         .tracking(2)
                 }
@@ -293,7 +293,7 @@ struct StartScreenView: View {
 
     private func createNewPlan() {
         let maxOrderIndex = plans.map { $0.orderIndex }.max() ?? -1
-        let newPlan = WorkoutPlan(name: "Neuer Plan", orderIndex: maxOrderIndex + 1)
+        let newPlan = WorkoutPlan(name: L.newPlanName, orderIndex: maxOrderIndex + 1)
         modelContext.insert(newPlan)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             planToEdit = newPlan
@@ -406,17 +406,17 @@ private struct StartPlanCard: View {
     private func relativeLabel(for date: Date) -> String {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) {
-            return "ZULETZT · HEUTE"
+            return L.lastUsedToday
         } else if calendar.isDateInYesterday(date) {
-            return "ZULETZT · GESTERN"
+            return L.lastUsedYesterday
         } else {
             let components = calendar.dateComponents([.day], from: date, to: Date())
             if let days = components.day, days > 0 {
-                return days == 1 ? "ZULETZT · VOR 1 TAG" : "ZULETZT · VOR \(days) TAGEN"
+                return L.lastUsedDaysAgo(days)
             }
             let formatter = DateFormatter()
             formatter.dateFormat = "dd.MM.yyyy"
-            return "ZULETZT · \(formatter.string(from: date))"
+            return L.lastUsedOn(formatter.string(from: date))
         }
     }
 }

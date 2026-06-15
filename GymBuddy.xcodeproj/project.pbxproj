@@ -40,6 +40,7 @@
 		C7AA10012F4D100000000001 /* CompletedWorkout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA10022F4D100000000002 /* CompletedWorkout.swift */; };
 		C7AA10052F4D100000000005 /* Units.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA10062F4D100000000006 /* Units.swift */; };
 		C7AA10092F4D100000000009 /* ExerciseLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA100A2F4D10000000000A /* ExerciseLocalization.swift */; };
+		C7AA100B2F4D10000000000B /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA100C2F4D10000000000C /* Strings.swift */; };
 		C7660E122F27C100007D9059 /* WorkoutSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E132F27C100007D9059 /* WorkoutSummaryView.swift */; };
 		3C68A54482AD4B48A283ADDE /* RestTimerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DC43A47F1D41D79E4D323B /* RestTimerBar.swift */; };
 /* End PBXBuildFile section */
@@ -80,6 +81,7 @@
 		C7AA10022F4D100000000002 /* CompletedWorkout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedWorkout.swift; sourceTree = "<group>"; };
 		C7AA10062F4D100000000006 /* Units.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Units.swift; sourceTree = "<group>"; };
 		C7AA100A2F4D10000000000A /* ExerciseLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLocalization.swift; sourceTree = "<group>"; };
+		C7AA100C2F4D10000000000C /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
 		C7660E132F27C100007D9059 /* WorkoutSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSummaryView.swift; sourceTree = "<group>"; };
 		36DC43A47F1D41D79E4D323B /* RestTimerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -142,6 +144,7 @@
 				C7AA10022F4D100000000002 /* CompletedWorkout.swift */,
 				C7AA10062F4D100000000006 /* Units.swift */,
 				C7AA100A2F4D10000000000A /* ExerciseLocalization.swift */,
+				C7AA100C2F4D10000000000C /* Strings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -267,6 +270,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				de,
 				Base,
 			);
 			mainGroup = A000001E280A00010001;
@@ -318,6 +322,7 @@
 				C7AA10012F4D100000000001 /* CompletedWorkout.swift in Sources */,
 				C7AA10052F4D100000000005 /* Units.swift in Sources */,
 				C7AA10092F4D100000000009 /* ExerciseLocalization.swift in Sources */,
+				C7AA100B2F4D10000000000B /* Strings.swift in Sources */,
 				A000003C280A00010001 /* NowPlayingService.swift in Sources */,
 				A0000040280A00010001 /* DesignLabView.swift in Sources */,
 				A0000042280A00010001 /* Variant1_JustDoIt.swift in Sources */,

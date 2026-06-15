@@ -11,9 +11,9 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .system: return "System"
-        case .light: return "Hell"
-        case .dark: return "Dunkel"
+        case .system: return L.appearanceSystem
+        case .light: return L.appearanceLight
+        case .dark: return L.appearanceDark
         }
     }
 

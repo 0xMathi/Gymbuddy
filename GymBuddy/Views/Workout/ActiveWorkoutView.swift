@@ -32,13 +32,13 @@ struct ActiveWorkoutView: View {
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: manager.session?.state)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: manager.isPaused)
-        .confirmationDialog("Workout beenden?", isPresented: $showCancelConfirmation, titleVisibility: .visible) {
-            Button("Beenden", role: .destructive) {
+        .confirmationDialog(L.endWorkoutQuestion, isPresented: $showCancelConfirmation, titleVisibility: .visible) {
+            Button(L.end, role: .destructive) {
                 manager.cancelWorkout()
             }
-            Button("Abbrechen", role: .cancel) {}
+            Button(L.cancel, role: .cancel) {}
         } message: {
-            Text("Dein Fortschritt geht verloren.")
+            Text(L.progressLost)
         }
     }
 
@@ -103,7 +103,7 @@ struct ActiveWorkoutView: View {
                         if hasOthers {
                             let nextEx = session.currentExerciseIndex + 1 < exercises.count ? exercises[session.currentExerciseIndex + 1] : nil
                             let isSupersetNext = session.state != .resting && nextEx?.supersetId != nil && nextEx?.supersetId == exercises[session.currentExerciseIndex].supersetId
-                            let titleStr = session.state == .resting ? "COMING UP" : (isSupersetNext ? "SUPERSET · KEINE PAUSE" : "NEXT UP")
+                            let titleStr = session.state == .resting ? "COMING UP" : (isSupersetNext ? L.supersetNoRest : "NEXT UP")
 
                             sectionDivider(title: titleStr)
                                 .padding(.horizontal, Theme.Spacing.xl)
@@ -141,7 +141,7 @@ struct ActiveWorkoutView: View {
                         HStack(spacing: Theme.Spacing.small) {
                             Image(systemName: "xmark.circle")
                                 .font(.system(size: 15, weight: .medium))
-                            Text("WORKOUT BEENDEN")
+                            Text(L.endWorkoutUpper)
                                 .font(Theme.Fonts.label)
                                 .tracking(1)
                         }
@@ -250,7 +250,7 @@ struct ActiveWorkoutView: View {
                 HStack(spacing: 5) {
                     Image(systemName: "xmark")
                         .font(.system(size: 12, weight: .bold))
-                    Text("ENDE")
+                    Text(L.endUpper)
                         .font(Theme.Fonts.label)
                         .tracking(1)
                 }
@@ -311,7 +311,7 @@ struct ActiveWorkoutView: View {
                 // EXERCISE HERO HEADER (Image Removed for cleaner look)
                 VStack(alignment: .leading, spacing: Theme.Spacing.small) {
                     VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                        Text("ÜBUNG \(session.currentExerciseIndex + 1) / \(exercises.count)")
+                        Text(L.exerciseProgress(session.currentExerciseIndex + 1, exercises.count))
                             .font(Theme.Fonts.label)
                             .tracking(3)
                             .foregroundStyle(Theme.Colors.textSecondary)
@@ -344,7 +344,7 @@ struct ActiveWorkoutView: View {
                         .minimumScaleFactor(0.5)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Text("\(exercise.sets) SÄTZE · PAUSE \(formatRestTime(exercise.restSeconds))")
+                    Text(L.setsRestMeta(exercise.sets, formatRestTime(exercise.restSeconds)))
                         .font(Theme.Fonts.bodyBold)
                         .tracking(1)
                         .foregroundStyle(Theme.Colors.textSecondary)
@@ -392,7 +392,7 @@ struct ActiveWorkoutView: View {
                             } label: {
                                 HStack(spacing: 0) {
                                     // "SATZ 1"
-                                    Text("SATZ \(setNum)")
+                                    Text(L.setN(setNum))
                                         .font(.system(size: isActive ? 15 : 13, weight: .black))
                                         .foregroundStyle(isActive ? Theme.Colors.accent : Theme.Colors.textSecondary)
                                         .frame(width: 76, alignment: .leading)
@@ -407,7 +407,7 @@ struct ActiveWorkoutView: View {
 
                                         // "LETZTES MAL · 32,5 KG × 8" (only when a weight was logged)
                                         if isActive, let last = lastSet(for: exercise, index: index), last.weight > 0 {
-                                            Text("LETZTES MAL · \(formatWeight(last.weight)) × \(last.reps)")
+                                            Text(L.lastTime(formatWeight(last.weight), last.reps))
                                                 .font(Theme.Fonts.ghostLabel)
                                                 .tracking(0.8)
                                                 .foregroundStyle(Theme.Colors.textSecondary.opacity(0.65))
@@ -476,7 +476,7 @@ struct ActiveWorkoutView: View {
                     } label: {
                         HStack {
                             Image(systemName: "plus")
-                            Text("Satz hinzufügen")
+                            Text(L.addSet)
                         }
                         .font(.system(size: 14, weight: .bold))
                         .foregroundStyle(Theme.Colors.accent)
@@ -542,7 +542,7 @@ struct ActiveWorkoutView: View {
 
         VStack(alignment: .leading, spacing: Theme.Spacing.large) {
             VStack(alignment: .leading, spacing: Theme.Spacing.small) {
-                Text(isCompleted ? "VORSCHAU · ERLEDIGT ✓" : "VORSCHAU · ÜBUNG \(index + 1) / \(exercises.count)")
+                Text(isCompleted ? L.previewDone : L.previewExercise(index + 1, exercises.count))
                     .font(Theme.Fonts.label)
                     .tracking(3)
                     .foregroundStyle(Theme.Colors.textSecondary)
@@ -562,7 +562,7 @@ struct ActiveWorkoutView: View {
                     .minimumScaleFactor(0.5)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("\(exercise.sets) SÄTZE · PAUSE \(formatRestTime(exercise.restSeconds))")
+                Text(L.setsRestMeta(exercise.sets, formatRestTime(exercise.restSeconds)))
                     .font(Theme.Fonts.bodyBold)
                     .tracking(1)
                     .foregroundStyle(Theme.Colors.textSecondary)
@@ -595,7 +595,7 @@ struct ActiveWorkoutView: View {
                 let setsArray = exercise.resolvedSets
                 ForEach(Array(setsArray.enumerated()), id: \.offset) { idx, exerciseSet in
                     HStack(spacing: Theme.Spacing.medium) {
-                        Text("SATZ \(idx + 1)")
+                        Text(L.setN(idx + 1))
                             .font(.system(size: 13, weight: .black))
                             .foregroundStyle(Theme.Colors.textSecondary)
                             .frame(width: 76, alignment: .leading)
@@ -636,7 +636,7 @@ struct ActiveWorkoutView: View {
                 manager.jumpToExercise(index: index)
                 previewIndex = nil
             } label: {
-                Text(isCompleted ? "ÜBUNG NEU STARTEN" : "HIER WEITERMACHEN")
+                Text(isCompleted ? L.restartExerciseUpper : L.continueHereUpper)
                     .font(Theme.Fonts.label)
                     .tracking(2)
                     .frame(maxWidth: .infinity)
@@ -664,7 +664,7 @@ struct ActiveWorkoutView: View {
                     .fill(Theme.Colors.accent)
                     .frame(width: 8, height: 8)
 
-                Text("ZURÜCK ZU ÜBUNG \(session.currentExerciseIndex + 1)")
+                Text(L.backToExercise(session.currentExerciseIndex + 1))
                     .font(Theme.Fonts.kicker)
                     .tracking(1.2)
                     .foregroundStyle(Theme.Colors.textPrimary)
@@ -696,19 +696,19 @@ struct ActiveWorkoutView: View {
 
         let topLabel: String = {
             if let ex = exercise, session.currentSetNumber <= ex.sets {
-                return "PAUSE · SATZ \(session.currentSetNumber)"
+                return L.restSetN(session.currentSetNumber)
             }
-            return "PAUSE"
+            return L.rest
         }()
-        
+
         let mainLabel: String = {
-            guard let ex = exercise else { return "FERTIG" }
+            guard let ex = exercise else { return L.finishUpper }
             if session.currentSetNumber <= ex.sets {
                 return ex.displayName.uppercased()
             } else if session.currentExerciseIndex + 1 < exercises.count {
                 return exercises[session.currentExerciseIndex + 1].displayName.uppercased()
             } else {
-                return "LETZTER SATZ"
+                return L.lastSetUpper
             }
         }()
 
@@ -716,10 +716,10 @@ struct ActiveWorkoutView: View {
             guard let ex = exercise else { return nil }
             if session.currentSetNumber <= ex.sets {
                 if session.currentExerciseIndex + 1 < exercises.count {
-                    return "DANN: \(exercises[session.currentExerciseIndex + 1].displayName.uppercased())"
+                    return L.then(exercises[session.currentExerciseIndex + 1].displayName.uppercased())
                 }
             } else if session.currentExerciseIndex + 2 < exercises.count {
-                return "DANN: \(exercises[session.currentExerciseIndex + 2].displayName.uppercased())"
+                return L.then(exercises[session.currentExerciseIndex + 2].displayName.uppercased())
             }
             return nil
         }()
@@ -781,7 +781,7 @@ struct ActiveWorkoutView: View {
                     }
                     .buttonStyle(.plain)
 
-                    Text("PAUSE LÄUFT")
+                    Text(L.restRunning)
                         .font(Theme.Fonts.label)
                         .tracking(2)
                         .foregroundStyle(Theme.Colors.textSecondary)
@@ -802,7 +802,7 @@ struct ActiveWorkoutView: View {
                 Button {
                     manager.skipRest()
                 } label: {
-                    Text("ÜBERSPRINGEN")
+                    Text(L.skip)
                         .font(Theme.Fonts.bodyBold)
                         .tracking(1)
                         .frame(maxWidth: .infinity)
@@ -862,7 +862,7 @@ struct ActiveWorkoutView: View {
                     .padding(.top, 2)
 
                 HStack(spacing: Theme.Spacing.small) {
-                    Text("\(exercise.sets) SÄTZE × \(exercise.reps) WDH")
+                    Text(L.setsRepsMeta(exercise.sets, exercise.reps))
                         .font(Theme.Fonts.caption)
                         .foregroundStyle(Theme.Colors.textSecondary)
 
@@ -928,12 +928,12 @@ struct ActiveWorkoutView: View {
                 .font(.system(size: 80))
                 .foregroundStyle(Theme.Colors.accent)
 
-            Text("PAUSIERT")
+            Text(L.paused)
                 .font(Theme.Fonts.h2)
                 .foregroundStyle(Theme.Colors.textPrimary)
                 .tracking(2)
 
-            Text("TIPPEN ZUM FORTSETZEN")
+            Text(L.tapToResume)
                 .font(Theme.Fonts.body)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }
@@ -952,7 +952,7 @@ struct ActiveWorkoutView: View {
             ProgressView()
                 .scaleEffect(1.5)
                 .tint(Theme.Colors.accent)
-            Text("LADE …")
+            Text(L.loading)
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .tracking(2)
@@ -999,12 +999,12 @@ private struct ExerciseQuickActionSheet: View {
 
                 // Stats row
                 HStack(spacing: Theme.Spacing.xl) {
-                    statItem(value: "\(exercise.sets)", label: "SÄTZE")
-                    statItem(value: "\(exercise.reps)", label: "WDH")
+                    statItem(value: "\(exercise.sets)", label: L.setsUpper)
+                    statItem(value: "\(exercise.reps)", label: L.repsUpper)
                     if exercise.weight > 0 {
-                        statItem(value: exercise.weightFormatted, label: "GEWICHT")
+                        statItem(value: exercise.weightFormatted, label: L.weightUpper)
                     }
-                    statItem(value: "\(exercise.restSeconds)s", label: "PAUSE")
+                    statItem(value: "\(exercise.restSeconds)s", label: L.restUpper)
                 }
                 .padding(.horizontal, Theme.Spacing.xl)
 
@@ -1013,15 +1013,15 @@ private struct ExerciseQuickActionSheet: View {
                 // Actions
                 VStack(spacing: Theme.Spacing.medium) {
                     if isCompleted {
-                        PrimaryButton(title: "ÜBUNG NEU STARTEN", icon: "arrow.uturn.left") {
+                        PrimaryButton(title: L.restartExerciseUpper, icon: "arrow.uturn.left") {
                             onJump()
                         }
                     } else {
-                        PrimaryButton(title: "ZU DIESER ÜBUNG", icon: "arrow.right") {
+                        PrimaryButton(title: L.jumpToExerciseUpper, icon: "arrow.right") {
                             onJump()
                         }
 
-                        SecondaryButton(title: "ALS ERLEDIGT MARKIEREN", icon: "checkmark.circle") {
+                        SecondaryButton(title: L.markAsDoneUpper, icon: "checkmark.circle") {
                             onMarkComplete()
                         }
                     }
@@ -1092,7 +1092,7 @@ struct EditSetSheet: View {
                 Theme.Colors.bg.ignoresSafeArea()
 
                 VStack(spacing: Theme.Spacing.large) {
-                    Text("\(payload.setIndex + 1). SATZ BEARBEITEN")
+                    Text(L.editSetN(payload.setIndex + 1))
                         .font(Theme.Fonts.label)
                         .foregroundStyle(Theme.Colors.textSecondary)
                         .tracking(1)
@@ -1100,7 +1100,7 @@ struct EditSetSheet: View {
                     HStack(spacing: Theme.Spacing.medium) {
                         // Reps Picker
                         VStack {
-                            Text("WDH")
+                            Text(L.repsUpper)
                                 .font(Theme.Fonts.caption)
                                 .tracking(1)
                                 .foregroundStyle(Theme.Colors.textSecondary)
@@ -1119,7 +1119,7 @@ struct EditSetSheet: View {
 
                         // Weight Picker
                         VStack {
-                            Text("GEWICHT")
+                            Text(L.weightUpper)
                                 .font(Theme.Fonts.caption)
                                 .tracking(1)
                                 .foregroundStyle(Theme.Colors.textSecondary)
@@ -1139,7 +1139,7 @@ struct EditSetSheet: View {
 
                         // Rest Picker
                         VStack {
-                            Text("PAUSE")
+                            Text(L.restUpper)
                                 .font(Theme.Fonts.caption)
                                 .tracking(1)
                                 .foregroundStyle(Theme.Colors.textSecondary)
@@ -1166,14 +1166,14 @@ struct EditSetSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("ABBRECHEN") {
+                    Button(L.cancelUpper) {
                         dismiss()
                     }
                     .font(Theme.Fonts.label)
                     .foregroundStyle(Theme.Colors.textSecondary)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("SPEICHERN") {
+                    Button(L.saveUpper) {
                         onSave(reps, weight, restSeconds)
                         dismiss()
                     }

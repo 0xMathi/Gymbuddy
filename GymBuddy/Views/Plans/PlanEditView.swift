@@ -41,11 +41,11 @@ struct PlanEditView: View {
                         .padding(Theme.Spacing.large)
                 }
             }
-            .navigationTitle("PLAN BEARBEITEN")
+            .navigationTitle(L.editPlanUpper)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("FERTIG") {
+                    Button(L.done) {
                         savePlan()
                         dismiss()
                     }
@@ -55,7 +55,7 @@ struct PlanEditView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     if !plan.exercises.isEmpty {
-                        Button(editMode == .active ? "FERTIG" : "SORTIEREN") {
+                        Button(editMode == .active ? L.done : L.sort) {
                             withAnimation {
                                 editMode = editMode == .active ? .inactive : .active
                             }
@@ -83,12 +83,12 @@ struct PlanEditView: View {
 
     private var planNameHeader: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.small) {
-            Text("PLAN-NAME")
+            Text(L.planNameUpper)
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .tracking(1.5)
 
-            TextField("MEIN WORKOUT", text: $plan.name)
+            TextField(L.myWorkoutPlaceholder, text: $plan.name)
                 .font(Theme.Fonts.h2)
                 .foregroundStyle(Theme.Colors.textPrimary)
                 .focused($isNameFocused)
@@ -109,12 +109,12 @@ struct PlanEditView: View {
                 .foregroundStyle(Theme.Colors.surfaceElevated)
 
             VStack(spacing: Theme.Spacing.small) {
-                Text("NO EXERCISES YET")
+                Text(L.noExercisesYet)
                     .font(Theme.Fonts.h3)
                     .foregroundStyle(Theme.Colors.textPrimary)
                     .tracking(1)
 
-                Text("Füge Übungen hinzu, um deinen Plan aufzubauen.")
+                Text(L.addExercisesToBuild)
                     .font(Theme.Fonts.body)
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -166,7 +166,7 @@ struct PlanEditView: View {
             HStack(spacing: Theme.Spacing.small) {
                 Image(systemName: "plus")
                     .font(.system(size: 20, weight: .bold))
-                Text("ÜBUNGEN HINZUFÜGEN")
+                Text(L.addExercisesUpper)
                     .font(Theme.Fonts.label)
                     .tracking(1.5)
             }
@@ -257,7 +257,7 @@ struct ExerciseRowView: View {
                                 .cornerRadius(4)
                         }
 
-                        Text("\(exercise.sets) Sätze")
+                        Text(L.setsCount(exercise.sets))
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                         
@@ -273,7 +273,7 @@ struct ExerciseRowView: View {
                         Text("•")
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.surfaceElevated)
-                        Text("\(exercise.reps) Wdh")
+                        Text(L.repsCount(exercise.reps))
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
@@ -328,7 +328,7 @@ struct ExerciseDetailSheet: View {
                             // Sets & Reps Row
                             HStack(spacing: Theme.Spacing.medium) {
                                 settingCard(
-                                    title: "SÄTZE",
+                                    title: L.setsUpper,
                                     value: "\(exercise.sets)",
                                     icon: "repeat"
                                 ) {
@@ -357,7 +357,7 @@ struct ExerciseDetailSheet: View {
                                 }
 
                                 settingCard(
-                                    title: "WDH",
+                                    title: L.repsUpper,
                                     value: "\(exercise.reps)",
                                     icon: "arrow.up.arrow.down"
                                 ) {
@@ -385,7 +385,7 @@ struct ExerciseDetailSheet: View {
                                 HStack {
                                     Image(systemName: "scalemass")
                                         .font(.system(size: 14, weight: .medium))
-                                    Text("GEWICHT")
+                                    Text(L.weightUpper)
                                         .font(Theme.Fonts.label)
                                         .tracking(1)
                                     Spacer()
@@ -394,7 +394,7 @@ struct ExerciseDetailSheet: View {
                                             showWeightPicker.toggle()
                                         }
                                     } label: {
-                                        Text(showWeightPicker ? "TASTATUR" : "PICKER")
+                                        Text(showWeightPicker ? L.keyboard : L.picker)
                                             .font(Theme.Fonts.caption)
                                             .tracking(0.5)
                                             .foregroundStyle(Theme.Colors.textSecondary)
@@ -475,7 +475,7 @@ struct ExerciseDetailSheet: View {
 
                             // Rest Time Card
                             settingCardFull(
-                                title: "PAUSE",
+                                title: L.restUpper,
                                 value: formatRestTime(exercise.restSeconds),
                                 icon: "timer"
                             ) {
@@ -490,7 +490,7 @@ struct ExerciseDetailSheet: View {
 
                             // Specific Sets Card
                             VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
-                                Text("EINZELNE SÄTZE")
+                                Text(L.individualSetsUpper)
                                     .font(Theme.Fonts.label)
                                     .tracking(1)
                                     .foregroundStyle(Theme.Colors.textSecondary)
@@ -519,7 +519,7 @@ struct ExerciseDetailSheet: View {
                                                 )
                                             } label: {
                                                 HStack {
-                                                    Text("\(index + 1). Satz")
+                                                    Text(L.setRowN(index + 1))
                                                         .font(Theme.Fonts.body)
                                                         .foregroundStyle(Theme.Colors.textPrimary)
                                                     Spacer()
@@ -557,7 +557,7 @@ struct ExerciseDetailSheet: View {
                                 } label: {
                                     HStack(spacing: Theme.Spacing.small) {
                                         Image(systemName: "plus")
-                                        Text("SATZ HINZUFÜGEN")
+                                        Text(L.addSetUpper)
                                             .tracking(1)
                                     }
                                     .font(Theme.Fonts.label)
@@ -604,11 +604,11 @@ struct ExerciseDetailSheet: View {
                     }
                 }
             }
-            .navigationTitle("ÜBUNGS-DETAILS")
+            .navigationTitle(L.exerciseDetailsUpper)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("ABBRECHEN") {
+                    Button(L.cancelUpper) {
                         dismiss()
                     }
                     .font(Theme.Fonts.label)
@@ -616,7 +616,7 @@ struct ExerciseDetailSheet: View {
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("SPEICHERN") {
+                    Button(L.saveUpper) {
                         onSave()
                         dismiss()
                     }

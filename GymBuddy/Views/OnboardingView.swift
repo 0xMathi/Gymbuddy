@@ -84,7 +84,7 @@ struct OnboardingView: View {
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("Ein schneller, fokussierter Workout-Tracker. Kein Abo, kein Lärm — nur du und das Eisen.")
+                Text(L.onbSub)
                     .font(Theme.Fonts.body)
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -95,7 +95,7 @@ struct OnboardingView: View {
 
             Spacer()
 
-            primaryButton("Los geht's") { advance(to: 1) }
+            primaryButton(L.onbGetStarted) { advance(to: 1) }
                 .padding(.bottom, 76)
         }
     }
@@ -106,30 +106,30 @@ struct OnboardingView: View {
         VStack(alignment: .leading, spacing: 0) {
             Spacer()
 
-            Text("Deine Einheit.")
+            Text(L.onbUnitTitle)
                 .font(.system(size: 40, weight: .black)).tracking(-1)
                 .foregroundStyle(.white)
 
-            Text("In welcher Einheit trainierst du?")
+            Text(L.onbUnitQuestion)
                 .font(Theme.Fonts.body)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .padding(.top, Theme.Spacing.small)
 
             // Big segmented choice
             HStack(spacing: Theme.Spacing.medium) {
-                unitCard(.kg, title: "Kilogramm", subtitle: "kg")
-                unitCard(.lb, title: "Pfund", subtitle: "lb")
+                unitCard(.kg, title: L.unitKilograms, subtitle: "kg")
+                unitCard(.lb, title: L.unitPounds, subtitle: "lb")
             }
             .padding(.top, Theme.Spacing.xl)
 
-            Text("Jederzeit in den Einstellungen änderbar.")
+            Text(L.onbUnitChangeable)
                 .font(Theme.Fonts.caption)
                 .foregroundStyle(Theme.Colors.textSecondary.opacity(0.7))
                 .padding(.top, Theme.Spacing.medium)
 
             Spacer()
 
-            primaryButton("Weiter") { advance(to: 2) }
+            primaryButton(L.onbContinue) { advance(to: 2) }
                 .padding(.bottom, 76)
         }
         .padding(.horizontal, Theme.Spacing.xl)
@@ -172,11 +172,11 @@ struct OnboardingView: View {
                 .foregroundStyle(Theme.Colors.accent)
                 .padding(.bottom, Theme.Spacing.large)
 
-            Text("Bereit.")
+            Text(L.onbReadyTitle)
                 .font(.system(size: 44, weight: .black)).tracking(-1)
                 .foregroundStyle(.white)
 
-            Text("Push, Pull & Leg Day sind schon eingerichtet — pass sie an oder bau eigene. Tipp einen Plan, und los.")
+            Text(L.onbReadyBody)
                 .font(Theme.Fonts.body)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -187,7 +187,7 @@ struct OnboardingView: View {
                 Image(systemName: "bell.badge.fill")
                     .font(.system(size: 20))
                     .foregroundStyle(Theme.Colors.accent)
-                Text("Der Pause-Timer piept dich an — auch aus der Tasche.")
+                Text(L.onbNotifPrime)
                     .font(Theme.Fonts.caption)
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -200,8 +200,8 @@ struct OnboardingView: View {
 
             Spacer()
 
-            primaryButton("Mitteilungen erlauben") { requestNotificationsThenFinish() }
-            Button("Vielleicht später") { finish() }
+            primaryButton(L.onbAllowNotifs) { requestNotificationsThenFinish() }
+            Button(L.onbMaybeLater) { finish() }
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .frame(maxWidth: .infinity)
