@@ -11,8 +11,6 @@
 	<array>
 		<string>audio</string>
 	</array>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>GymBuddy needs audio access for workout announcements.</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
