@@ -33,6 +33,7 @@
 		A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004B280A00010001 /* Variant5_MinimalPower.swift */; };
 		A000004C280A00010001 /* FinalStartScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004D280A00010001 /* FinalStartScreen.swift */; };
 		A000004E280A00010001 /* StartScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004F280A00010001 /* StartScreenView.swift */; };
+		C7AA10072F4D100000000007 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA10082F4D100000000008 /* OnboardingView.swift */; };
 		C7660E052F278286007D9059 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E012F278286007D9059 /* SettingsView.swift */; };
 		C7660E072F2782AA007D9059 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E062F2782AA007D9059 /* AppSettings.swift */; };
 		C7660E112F27C000007D9059 /* WorkoutPlanSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E102F27C000007D9059 /* WorkoutPlanSeed.swift */; };
@@ -71,6 +72,7 @@
 		A000004B280A00010001 /* Variant5_MinimalPower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant5_MinimalPower.swift; sourceTree = "<group>"; };
 		A000004D280A00010001 /* FinalStartScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalStartScreen.swift; sourceTree = "<group>"; };
 		A000004F280A00010001 /* StartScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartScreenView.swift; sourceTree = "<group>"; };
+		C7AA10082F4D100000000008 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		C7660E012F278286007D9059 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C7660E062F2782AA007D9059 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		C7660E102F27C000007D9059 /* WorkoutPlanSeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutPlanSeed.swift; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 			children = (
 				C7660E032F278286007D9059 /* Settings */,
 				A000004F280A00010001 /* StartScreenView.swift */,
+				C7AA10082F4D100000000008 /* OnboardingView.swift */,
 				A0000025280A00010001 /* Workout */,
 				A0000026280A00010001 /* Plans */,
 			);
@@ -321,6 +324,7 @@
 				A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */,
 				A000004C280A00010001 /* FinalStartScreen.swift in Sources */,
 				A000004E280A00010001 /* StartScreenView.swift in Sources */,
+				C7AA10072F4D100000000007 /* OnboardingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
