@@ -514,11 +514,7 @@ struct ActiveWorkoutView: View {
     }
 
     private func formatWeight(_ weight: Double) -> String {
-        guard weight > 0 else { return "—" }
-        let formatted = weight.truncatingRemainder(dividingBy: 1) == 0
-            ? String(format: "%.0f", weight)
-            : String(format: "%.1f", weight).replacingOccurrences(of: ".", with: ",")
-        return "\(formatted) KG"
+        WeightDisplay.string(kg: weight, uppercase: true)
     }
 
     // MARK: - Swipe Browsing (Preview)
@@ -1071,18 +1067,22 @@ struct EditSetSheet: View {
 
     // Picker ranges
     private let repsRange = Array(1...100)
-    private let weightRange: [Double] = {
-        var weights: [Double] = [0]
-        weights += stride(from: 2.5, through: 300, by: 2.5).map { $0 }
-        return weights
-    }()
     private let restRange = Array(stride(from: 0, through: 600, by: 15))
+
+    private var unit: WeightUnit { AppSettings.shared.weightUnit }
+    /// Selectable weight values in the active unit (kg: 2.5-steps, lb: 5-steps).
+    private var weightOptions: [Double] {
+        Array(stride(from: unit.step, through: unit.pickerMax, by: unit.step))
+    }
 
     init(payload: EditSetPayload, onSave: @escaping (Int, Double, Int) -> Void) {
         self.payload = payload
         self.onSave = onSave
         _reps = State(initialValue: payload.reps)
-        _weight = State(initialValue: payload.weight)
+        // Snap to a valid option in the active unit so the wheel preselects correctly.
+        let u = AppSettings.shared.weightUnit
+        let snapped = (u.value(fromKg: payload.weight) / u.step).rounded() * u.step
+        _weight = State(initialValue: payload.weight > 0 ? u.kg(fromValue: snapped) : 0)
         _restSeconds = State(initialValue: payload.restSeconds)
     }
 
@@ -1126,8 +1126,8 @@ struct EditSetSheet: View {
                             
                             Picker("Weight", selection: $weight) {
                                 Text("—").tag(Double(0))
-                                ForEach(weightRange.dropFirst(), id: \.self) { w in
-                                    Text(w.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(w)) kg" : String(format: "%.1f kg", w)).tag(w)
+                                ForEach(weightOptions, id: \.self) { v in
+                                    Text(v.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(v)) \(unit.label)" : String(format: "%.1f \(unit.label)", v)).tag(unit.kg(fromValue: v))
                                 }
                             }
                             .pickerStyle(.wheel)

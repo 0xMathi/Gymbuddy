@@ -304,12 +304,14 @@ struct ExerciseDetailSheet: View {
     // Picker ranges
     private let setsRange = Array(1...10)
     private let repsRange = Array(1...30)
-    private let weightRange: [Double] = {
-        var weights: [Double] = [0]
-        weights += stride(from: 2.5, through: 200, by: 2.5).map { $0 }
-        return weights
-    }()
     private let restRange = [30, 45, 60, 75, 90, 120, 150, 180, 240, 300]
+
+    private var unit: WeightUnit { AppSettings.shared.weightUnit }
+    /// Selectable weight values in the active unit (kg: 2.5-steps, lb: 5-steps).
+    private var weightOptions: [Double] {
+        Array(stride(from: unit.step, through: unit.pickerMax, by: unit.step))
+    }
+    private func displayNumber(_ kg: Double) -> String { WeightDisplay.number(kg: kg, unit: unit) }
 
     var body: some View {
         NavigationStack {
@@ -414,26 +416,27 @@ struct ExerciseDetailSheet: View {
                                                 .cornerRadius(Theme.Layout.cornerRadiusSmall)
                                                 .frame(maxWidth: 160)
                                             
-                                            Text("KG")
+                                            Text(unit.labelUpper)
                                                 .font(Theme.Fonts.h2)
                                                 .foregroundStyle(Theme.Colors.textSecondary)
                                         }
 
-                                        // Quick selection adjustment buttons
+                                        // Quick selection adjustment buttons (in the active unit)
                                         HStack(spacing: Theme.Spacing.medium) {
-                                            ForEach([-5.0, -2.5, 2.5, 5.0], id: \.self) { diff in
+                                            ForEach([-2 * unit.step, -unit.step, unit.step, 2 * unit.step], id: \.self) { diff in
                                                 Button {
-                                                    let current = Double(weightString.replacingOccurrences(of: ",", with: ".")) ?? exercise.weight
-                                                    let newWeight = max(0, min(300, current + diff))
-                                                    exercise.weight = newWeight
-                                                    weightString = newWeight == 0 ? "" : (newWeight.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", newWeight) : String(format: "%.1f", newWeight))
+                                                    let current = Double(weightString.replacingOccurrences(of: ",", with: ".")) ?? unit.value(fromKg: exercise.weight)
+                                                    let newDisplay = max(0, min(unit.pickerMax, current + diff))
+                                                    let newKg = unit.kg(fromValue: newDisplay)
+                                                    exercise.weight = newKg
+                                                    weightString = newDisplay == 0 ? "" : displayNumber(newKg)
                                                     if var specific = exercise.specificSets {
-                                                        for i in 0..<specific.count { specific[i].weight = newWeight }
+                                                        for i in 0..<specific.count { specific[i].weight = newKg }
                                                         exercise.specificSets = specific
                                                     }
                                                     HapticService.shared.light()
                                                 } label: {
-                                                    Text(diff > 0 ? "+\(formatDiff(diff)) kg" : "\(formatDiff(diff)) kg")
+                                                    Text(diff > 0 ? "+\(formatDiff(diff)) \(unit.label)" : "\(formatDiff(diff)) \(unit.label)")
                                                         .font(Theme.Fonts.label)
                                                         .foregroundStyle(Theme.Colors.textPrimary)
                                                         .frame(maxWidth: .infinity)
@@ -450,6 +453,7 @@ struct ExerciseDetailSheet: View {
                                         get: { exercise.weight },
                                         set: { newVal in
                                             exercise.weight = newVal
+                                            weightString = newVal > 0 ? displayNumber(newVal) : ""
                                             if var specific = exercise.specificSets {
                                                 for i in 0..<specific.count { specific[i].weight = newVal }
                                                 exercise.specificSets = specific
@@ -457,8 +461,8 @@ struct ExerciseDetailSheet: View {
                                         }
                                     )) {
                                         Text("—").tag(Double(0))
-                                        ForEach(weightRange.dropFirst(), id: \.self) { weight in
-                                            Text(weight.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(weight)) kg" : String(format: "%.1f kg", weight)).tag(weight)
+                                        ForEach(weightOptions, id: \.self) { v in
+                                            Text(v.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(v)) \(unit.label)" : String(format: "%.1f \(unit.label)", v)).tag(unit.kg(fromValue: v))
                                         }
                                     }
                                     .pickerStyle(.wheel)
@@ -571,21 +575,16 @@ struct ExerciseDetailSheet: View {
                     .padding(.vertical, Theme.Spacing.large)
                 }
                 .onAppear {
-                    if exercise.weight > 0 {
-                        weightString = exercise.weight.truncatingRemainder(dividingBy: 1) == 0 
-                            ? String(format: "%.0f", exercise.weight) 
-                            : String(format: "%.1f", exercise.weight)
-                    } else {
-                        weightString = ""
-                    }
+                    weightString = displayNumber(exercise.weight)
                 }
                 .onChange(of: weightString) { _, newValue in
                     let cleaned = newValue.replacingOccurrences(of: ",", with: ".")
-                    if let doubleVal = Double(cleaned) {
-                        if doubleVal >= 0 && doubleVal <= 300 {
-                            exercise.weight = doubleVal
+                    if let v = Double(cleaned) {
+                        if v >= 0 && v <= unit.pickerMax {
+                            let kg = unit.kg(fromValue: v)
+                            exercise.weight = kg
                             if var specific = exercise.specificSets {
-                                for i in 0..<specific.count { specific[i].weight = doubleVal }
+                                for i in 0..<specific.count { specific[i].weight = kg }
                                 exercise.specificSets = specific
                             }
                         }
@@ -598,15 +597,10 @@ struct ExerciseDetailSheet: View {
                     }
                 }
                 .onChange(of: exercise.weight) { _, newValue in
-                    let currentParsed = Double(weightString.replacingOccurrences(of: ",", with: ".")) ?? -1.0
-                    if newValue != currentParsed {
-                        if newValue > 0 {
-                            weightString = newValue.truncatingRemainder(dividingBy: 1) == 0 
-                                ? String(format: "%.0f", newValue) 
-                                : String(format: "%.1f", newValue)
-                        } else {
-                            weightString = ""
-                        }
+                    // Sync the text field when weight changes elsewhere, without fighting the user's typing.
+                    let currentKg = Double(weightString.replacingOccurrences(of: ",", with: ".")).map { unit.kg(fromValue: $0) } ?? -1
+                    if abs(currentKg - newValue) > 0.01 {
+                        weightString = displayNumber(newValue)
                     }
                 }
             }

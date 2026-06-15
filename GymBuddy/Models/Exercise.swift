@@ -9,13 +9,7 @@ struct ExerciseSet: Codable, Identifiable, Hashable {
     var restSeconds: Int? = nil
 
     var weightFormatted: String {
-        if weight == 0 {
-            return "—"
-        } else if weight.truncatingRemainder(dividingBy: 1) == 0 {
-            return "\(Int(weight)) KG"
-        } else {
-            return String(format: "%.1f KG", weight)
-        }
+        WeightDisplay.string(kg: weight, uppercase: true)
     }
 }
 
@@ -143,13 +137,7 @@ final class Exercise {
     // MARK: - Formatted Display
 
     var weightFormatted: String {
-        if weight == 0 {
-            return "—"
-        } else if weight.truncatingRemainder(dividingBy: 1) == 0 {
-            return "\(Int(weight)) KG"
-        } else {
-            return String(format: "%.1f KG", weight)
-        }
+        WeightDisplay.string(kg: weight, uppercase: true)
     }
 
     var repsFormatted: String {

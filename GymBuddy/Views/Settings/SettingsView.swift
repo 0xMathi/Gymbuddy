@@ -53,6 +53,14 @@ struct SettingsView: View {
 
     private var workoutDefaultsSection: some View {
         Section {
+            Picker(selection: $settings.weightUnit) {
+                Text("Kilogramm (kg)").tag(WeightUnit.kg)
+                Text("Pfund (lb)").tag(WeightUnit.lb)
+            } label: {
+                Label("Einheit", systemImage: "scalemass.fill")
+            }
+            .pickerStyle(.menu)
+
             Picker(selection: $settings.defaultRestSeconds) {
                 Text("30 s").tag(30)
                 Text("45 s").tag(45)

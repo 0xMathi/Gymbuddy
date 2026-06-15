@@ -157,8 +157,10 @@ struct WorkoutSummaryView: View {
 
     private func formatVolume(_ volume: Double) -> String {
         guard volume > 0 else { return "—" }
-        let formatted = NumberFormatter.localizedString(from: NSNumber(value: volume), number: .decimal)
-        return "\(formatted) kg"
+        let unit = AppSettings.shared.weightUnit
+        let value = unit.value(fromKg: volume).rounded()
+        let formatted = NumberFormatter.localizedString(from: NSNumber(value: value), number: .decimal)
+        return "\(formatted) \(unit.label)"
     }
 }
 
