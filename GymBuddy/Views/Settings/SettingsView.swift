@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var settings = AppSettings.shared
+    @State private var showTipJar = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -9,9 +10,11 @@ struct SettingsView: View {
             Form {
                 appearanceSection
                 workoutDefaultsSection
+                supportSection
             }
             .scrollContentBackground(.hidden)
             .background(Theme.Colors.bg)
+            .sheet(isPresented: $showTipJar) { TipJarView() }
             .navigationTitle(L.settings)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -76,6 +79,28 @@ struct SettingsView: View {
             Text(L.workoutDefaultsUpper)
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
+        }
+        .listRowBackground(Theme.Colors.surface)
+    }
+
+    // MARK: - Support Section
+
+    private var supportSection: some View {
+        Section {
+            Button {
+                showTipJar = true
+            } label: {
+                HStack(spacing: Theme.Spacing.medium) {
+                    Image(systemName: "heart.fill")
+                        .foregroundStyle(Theme.Colors.accent)
+                    Text(L.supportGymBuddy)
+                        .foregroundStyle(Theme.Colors.textPrimary)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.Colors.textSecondary)
+                }
+            }
         }
         .listRowBackground(Theme.Colors.surface)
     }

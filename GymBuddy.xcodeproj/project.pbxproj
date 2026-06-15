@@ -33,6 +33,8 @@
 		C7AA10052F4D100000000005 /* Units.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA10062F4D100000000006 /* Units.swift */; };
 		C7AA10092F4D100000000009 /* ExerciseLocalization.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA100A2F4D10000000000A /* ExerciseLocalization.swift */; };
 		C7AA100B2F4D10000000000B /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA100C2F4D10000000000C /* Strings.swift */; };
+		C7AA10112F4D100000000011 /* TipJarStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA10122F4D100000000012 /* TipJarStore.swift */; };
+		C7AA10132F4D100000000013 /* TipJarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA10142F4D100000000014 /* TipJarView.swift */; };
 		C7660E122F27C100007D9059 /* WorkoutSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E132F27C100007D9059 /* WorkoutSummaryView.swift */; };
 		3C68A54482AD4B48A283ADDE /* RestTimerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36DC43A47F1D41D79E4D323B /* RestTimerBar.swift */; };
 /* End PBXBuildFile section */
@@ -66,6 +68,9 @@
 		C7AA10062F4D100000000006 /* Units.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Units.swift; sourceTree = "<group>"; };
 		C7AA100A2F4D10000000000A /* ExerciseLocalization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLocalization.swift; sourceTree = "<group>"; };
 		C7AA100C2F4D10000000000C /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
+		C7AA10122F4D100000000012 /* TipJarStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipJarStore.swift; sourceTree = "<group>"; };
+		C7AA10142F4D100000000014 /* TipJarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipJarView.swift; sourceTree = "<group>"; };
+		C7AA10152F4D100000000015 /* GymBuddy.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = GymBuddy.storekit; sourceTree = "<group>"; };
 		C7660E132F27C100007D9059 /* WorkoutSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSummaryView.swift; sourceTree = "<group>"; };
 		36DC43A47F1D41D79E4D323B /* RestTimerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestTimerBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -128,6 +133,8 @@
 				C7AA10062F4D100000000006 /* Units.swift */,
 				C7AA100A2F4D10000000000A /* ExerciseLocalization.swift */,
 				C7AA100C2F4D10000000000C /* Strings.swift */,
+				C7AA10122F4D100000000012 /* TipJarStore.swift */,
+				C7AA10152F4D100000000015 /* GymBuddy.storekit */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -155,6 +162,7 @@
 			children = (
 				C7660E032F278286007D9059 /* Settings */,
 				A000004F280A00010001 /* StartScreenView.swift */,
+				C7AA10142F4D100000000014 /* TipJarView.swift */,
 				C7AA10082F4D100000000008 /* OnboardingView.swift */,
 				A0000025280A00010001 /* Workout */,
 				A0000026280A00010001 /* Plans */,
@@ -290,6 +298,8 @@
 				C7AA10052F4D100000000005 /* Units.swift in Sources */,
 				C7AA10092F4D100000000009 /* ExerciseLocalization.swift in Sources */,
 				C7AA100B2F4D10000000000B /* Strings.swift in Sources */,
+				C7AA10112F4D100000000011 /* TipJarStore.swift in Sources */,
+				C7AA10132F4D100000000013 /* TipJarView.swift in Sources */,
 				A000003C280A00010001 /* NowPlayingService.swift in Sources */,
 				C7660E052F278286007D9059 /* SettingsView.swift in Sources */,
 				A000004E280A00010001 /* StartScreenView.swift in Sources */,

@@ -35,6 +35,22 @@ Status as of launch-prep. ✅ = done in the repo · ⬜ = you do it (needs your 
 - **External testing:** create a group → add friends by email → submit the build for a quick
   TestFlight beta review (usually <1 day) → share the public link
 
+## 4b. In-App Purchases — Tip Jar — ⬜ (App Store Connect)
+The app has a voluntary tip jar (Settings → "Support GymBuddy"). Create 3 **Consumable** IAPs
+with these exact product IDs (must match the code), set prices, and submit them **with the build**:
+
+| Product ID | Type | Price | Reference name |
+|-----------|------|-------|----------------|
+| `com.mathis.GymBuddy.tip.preworkout` | Consumable | ~€1.99 | Pre-Workout Tip |
+| `com.mathis.GymBuddy.tip.proteinshake` | Consumable | ~€4.99 | Protein Shake Tip |
+| `com.mathis.GymBuddy.tip.cheatmeal` | Consumable | ~€9.99 | Cheat Meal Tip |
+
+- Each needs a display name + description + a review screenshot (a shot of the tip jar screen works;
+  see `docs/app-store/` style).
+- **Test locally first:** Xcode → Edit Scheme → Run → Options → **StoreKit Configuration** →
+  `GymBuddy/Models/GymBuddy.storekit`, then run — the tip sheet and purchase flow work in the simulator.
+- Sandbox: also testable via a Sandbox Apple ID once the IAPs exist in ASC.
+
 ## 5. App Store listing — ⬜ (paste from `docs/app-store-listing.md`)
 - **Name:** GymBuddy: Workout Tracker · **Subtitle:** Lifting log, sets & rest timer
 - **Keywords:** the 99-byte string (EN), plus the German set under the German localization

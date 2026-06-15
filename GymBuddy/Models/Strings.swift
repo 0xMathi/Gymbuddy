@@ -127,6 +127,20 @@ enum L {
     static var addSetUpper: String { t("ADD SET", "SATZ HINZUFÜGEN") }
     static var exerciseDetailsUpper: String { t("EXERCISE DETAILS", "ÜBUNGS-DETAILS") }
 
+    // MARK: - Tip Jar
+    static var supportGymBuddy: String { t("Support GymBuddy", "GymBuddy unterstützen") }
+    static var tipTitle: String { t("Support GymBuddy", "GymBuddy unterstützen") }
+    static var tipIntro: String { t("GymBuddy is free — no ads, no account. If it earned a spot in your gym bag, you can leave a tip. Completely optional, hugely appreciated.",
+                                    "GymBuddy ist gratis — keine Werbung, kein Account. Wenn die App einen Platz in deiner Gym-Bag verdient hat, kannst du was dalassen. Komplett freiwillig, riesig wertgeschätzt.") }
+    static var tipSubSmall: String { t("Spot me a set.", "Gib mir 'nen Satz aus.") }
+    static var tipSubMedium: String { t("Fuel the gains.", "Treibstoff für die Gains.") }
+    static var tipSubLarge: String { t("Absolute legend.", "Absolute Legende.") }
+    static var tipUnavailable: String { t("Tips aren't available right now.", "Tips sind gerade nicht verfügbar.") }
+    static var tipNoUnlock: String { t("Nothing gets unlocked — it's pure goodwill.", "Es wird nichts freigeschaltet — reine Wertschätzung.") }
+    static var tipThanksTitle: String { t("Thank you. Seriously.", "Danke. Wirklich.") }
+    static var tipThanksBody: String { t("That means a lot. Now go hit a PR.", "Das bedeutet mir viel. Jetzt geh und reiß 'nen PR.") }
+    static var tipClose: String { t("You're welcome", "Gern geschehen") }
+
     // MARK: - Notifications
     static var notifRestOverTitle: String { t("Rest's over!", "Pause vorbei!") }
     static var notifRestOverBody: String { t("Get ready for your next set.", "Mach dich bereit für den nächsten Satz.") }

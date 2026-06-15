@@ -1,0 +1,62 @@
+{
+  "identifier" : "B7E1F2A0-TIPJAR-CONFIG",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "1.99",
+      "familyShareable" : false,
+      "internalID" : "TIP0000001",
+      "localizations" : [
+        {
+          "description" : "A small tip to support GymBuddy.",
+          "displayName" : "Pre-Workout",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.mathis.GymBuddy.tip.preworkout",
+      "referenceName" : "Pre-Workout Tip",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "TIP0000002",
+      "localizations" : [
+        {
+          "description" : "A generous tip to support GymBuddy.",
+          "displayName" : "Protein Shake",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.mathis.GymBuddy.tip.proteinshake",
+      "referenceName" : "Protein Shake Tip",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "TIP0000003",
+      "localizations" : [
+        {
+          "description" : "A big tip to support GymBuddy.",
+          "displayName" : "Cheat Meal",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.mathis.GymBuddy.tip.cheatmeal",
+      "referenceName" : "Cheat Meal Tip",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "de_DE",
+    "_storefront" : "DEU",
+    "_storeKitErrors" : []
+  },
+  "subscriptionGroups" : [],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}
