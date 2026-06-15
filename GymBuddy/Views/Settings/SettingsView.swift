@@ -12,11 +12,11 @@ struct SettingsView: View {
             }
             .scrollContentBackground(.hidden)
             .background(Theme.Colors.bg)
-            .navigationTitle("Einstellungen")
+            .navigationTitle(L.settings)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Fertig") {
+                    Button(L.done) {
                         dismiss()
                     }
                     .foregroundStyle(Theme.Colors.accent)
@@ -38,11 +38,11 @@ struct SettingsView: View {
                         .tag(mode)
                 }
             } label: {
-                Label("Darstellung", systemImage: "paintbrush.fill")
+                Label(L.appearance, systemImage: "paintbrush.fill")
             }
             .pickerStyle(.menu)
         } header: {
-            Text("DARSTELLUNG")
+            Text(L.appearanceUpper)
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }
@@ -53,6 +53,14 @@ struct SettingsView: View {
 
     private var workoutDefaultsSection: some View {
         Section {
+            Picker(selection: $settings.weightUnit) {
+                Text(L.unitKgLong).tag(WeightUnit.kg)
+                Text(L.unitLbLong).tag(WeightUnit.lb)
+            } label: {
+                Label(L.unit, systemImage: "scalemass.fill")
+            }
+            .pickerStyle(.menu)
+
             Picker(selection: $settings.defaultRestSeconds) {
                 Text("30 s").tag(30)
                 Text("45 s").tag(45)
@@ -61,11 +69,11 @@ struct SettingsView: View {
                 Text("120 s").tag(120)
                 Text("180 s").tag(180)
             } label: {
-                Label("Standard-Pause", systemImage: "clock.fill")
+                Label(L.defaultRest, systemImage: "clock.fill")
             }
             .pickerStyle(.menu)
         } header: {
-            Text("WORKOUT-STANDARDS")
+            Text(L.workoutDefaultsUpper)
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }

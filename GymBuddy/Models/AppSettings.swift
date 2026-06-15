@@ -11,9 +11,9 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .system: return "System"
-        case .light: return "Hell"
-        case .dark: return "Dunkel"
+        case .system: return L.appearanceSystem
+        case .light: return L.appearanceLight
+        case .dark: return L.appearanceDark
         }
     }
 
@@ -37,6 +37,7 @@ final class AppSettings {
     private enum Keys {
         static let appearanceMode = "appearanceMode"
         static let defaultRestSeconds = "defaultRestSeconds"
+        static let weightUnit = "weightUnit"
     }
 
     // MARK: - Properties
@@ -47,6 +48,10 @@ final class AppSettings {
 
     var defaultRestSeconds: Int {
         didSet { save(defaultRestSeconds, forKey: Keys.defaultRestSeconds) }
+    }
+
+    var weightUnit: WeightUnit {
+        didSet { save(weightUnit.rawValue, forKey: Keys.weightUnit) }
     }
 
     // MARK: - Init
@@ -65,6 +70,14 @@ final class AppSettings {
         // Load default rest seconds (default: 90)
         let storedRest = defaults.integer(forKey: Keys.defaultRestSeconds)
         self.defaultRestSeconds = storedRest > 0 ? storedRest : 90
+
+        // Load weight unit (default: region-based — set explicitly during onboarding)
+        if let rawUnit = defaults.string(forKey: Keys.weightUnit),
+           let unit = WeightUnit(rawValue: rawUnit) {
+            self.weightUnit = unit
+        } else {
+            self.weightUnit = WeightUnit.regionDefault
+        }
     }
 
     // MARK: - Persistence Helpers

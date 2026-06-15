@@ -18,7 +18,7 @@ struct WorkoutSummaryView: View {
                         .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(Theme.Colors.textPrimary)
                     
-                    Text("abgeschlossen am \(formattedDate(session.endTime ?? Date()))")
+                    Text(L.completedOn(formattedDate(session.endTime ?? Date())))
                         .font(.system(size: 14))
                         .foregroundStyle(Theme.Colors.textSecondary)
                 }
@@ -64,21 +64,21 @@ struct WorkoutSummaryView: View {
 
                 // Stats List (Tabular)
                 VStack(spacing: 0) {
-                    statRow(icon: "timer", label: "Trainingsdauer", value: session.durationFormatted)
+                    statRow(icon: "timer", label: L.duration, value: session.durationFormatted)
                     Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
-                    statRow(icon: "scalemass", label: "Bewegtes Gewicht", value: session.totalVolumeFormatted)
+                    statRow(icon: "scalemass", label: L.volume, value: session.totalVolumeFormatted)
                     Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
-                    statRow(icon: "figure.arms.open", label: "Übungen", value: "\(session.totalExercises)")
+                    statRow(icon: "figure.arms.open", label: L.exercises, value: "\(session.totalExercises)")
                     Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
-                    statRow(icon: "checkmark", label: "Sätze", value: "\(session.totalSetsCompleted)")
+                    statRow(icon: "checkmark", label: L.setsLabel, value: "\(session.totalSetsCompleted)")
                     Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
-                    statRow(icon: "arrow.triangle.2.circlepath", label: "Wiederholungen", value: "\(session.totalRepsCompleted)")
+                    statRow(icon: "arrow.triangle.2.circlepath", label: L.repsLabel, value: "\(session.totalRepsCompleted)")
 
                     if let previous = previousStats {
                         Divider().background(Theme.Colors.surfaceElevated).padding(.vertical, 8)
                         statRow(
                             icon: "clock.arrow.circlepath",
-                            label: "Letzte Session",
+                            label: L.lastSession,
                             value: "\(formatDuration(previous.duration)) · \(formatVolume(previous.volume))"
                         )
                     }
@@ -94,7 +94,7 @@ struct WorkoutSummaryView: View {
                     HapticService.shared.medium()
                     onDismiss()
                 }) {
-                    Text("Training abschließen")
+                    Text(L.finishWorkout)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(Theme.Colors.bg) // Dark text roughly matches the styling
                         .frame(maxWidth: .infinity)
@@ -157,8 +157,10 @@ struct WorkoutSummaryView: View {
 
     private func formatVolume(_ volume: Double) -> String {
         guard volume > 0 else { return "—" }
-        let formatted = NumberFormatter.localizedString(from: NSNumber(value: volume), number: .decimal)
-        return "\(formatted) kg"
+        let unit = AppSettings.shared.weightUnit
+        let value = unit.value(fromKg: volume).rounded()
+        let formatted = NumberFormatter.localizedString(from: NSNumber(value: value), number: .decimal)
+        return "\(formatted) \(unit.label)"
     }
 }
 

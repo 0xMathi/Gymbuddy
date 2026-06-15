@@ -23,6 +23,14 @@ final class ExerciseDefinition {
     }
 }
 
+// MARK: - Localized Display
+extension ExerciseDefinition {
+    /// Localized name for display (storage `name` stays the German canonical key).
+    var displayName: String { ExerciseLocalization.exercise(name) }
+    /// Localized muscle group for display.
+    var displayMuscleGroup: String { ExerciseLocalization.muscleGroup(muscleGroup) }
+}
+
 // MARK: - Media
 extension ExerciseDefinition {
     /// Asset catalog name derived from the exercise name (e.g. "exercise_bankdruecken")

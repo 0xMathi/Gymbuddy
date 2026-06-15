@@ -1,0 +1,53 @@
+{
+  "_comment": "Mathis' persönliche Trainingspläne — verlustfreies Backup vor dem App-Store-Launch (Seed auf generische Starter-Pläne umgestellt). Wiederherstellbar: diese Pläne lassen sich jederzeit wieder einseeden. Übungsnamen entsprechen den internen Definition-Keys (post-migration).",
+  "savedAt": "2026-06-15",
+  "plans": [
+    {
+      "name": "MONTAG — Schwerer Tag (Push-Pull)",
+      "orderIndex": 0,
+      "exercises": [
+        { "name": "KH-Bankdrücken", "sets": 4, "reps": 10, "restSeconds": 90, "supersetId": "SS1" },
+        { "name": "Einarmiges KH-Rudern", "sets": 4, "reps": 10, "restSeconds": 90, "supersetId": "SS1" },
+        { "name": "Schrägbankdrücken KH", "sets": 4, "reps": 10, "restSeconds": 90, "supersetId": "SS2" },
+        { "name": "Klimmzüge", "sets": 4, "reps": 10, "restSeconds": 90, "supersetId": "SS2" },
+        { "name": "Rumänisches Kreuzheben", "sets": 4, "reps": 10, "restSeconds": 90, "supersetId": "SS3" },
+        { "name": "Langhantel-Rudern stehend", "sets": 4, "reps": 10, "restSeconds": 90, "supersetId": "SS3" },
+        { "name": "Kabelzug-Seitenheben", "sets": 3, "reps": 15, "restSeconds": 60, "supersetId": "SS4" },
+        { "name": "Face Pulls", "sets": 3, "reps": 15, "restSeconds": 60, "supersetId": "SS4" },
+        { "name": "Kabel-Bizeps-Curls", "sets": 3, "reps": 15, "restSeconds": 60, "supersetId": "FINISHER" },
+        { "name": "Kabel-Overhead-Trizeps", "sets": 3, "reps": 15, "restSeconds": 60, "supersetId": "FINISHER" }
+      ]
+    },
+    {
+      "name": "MITTWOCH — Hypertrophie-Tag",
+      "orderIndex": 1,
+      "exercises": [
+        { "name": "Kniebeuge Langhantel", "sets": 4, "reps": 10, "restSeconds": 90, "supersetId": "SS1" },
+        { "name": "Ausfallschritte KH", "sets": 4, "reps": 10, "restSeconds": 90, "supersetId": "SS1" },
+        { "name": "Beinstrecker", "sets": 4, "reps": 12, "restSeconds": 75, "supersetId": "SS2" },
+        { "name": "Beinbeuger", "sets": 4, "reps": 12, "restSeconds": 75, "supersetId": "SS2" },
+        { "name": "Hip Thrusts", "sets": 3, "reps": 12, "restSeconds": 60, "supersetId": "SS3" },
+        { "name": "Wadenheben stehend", "sets": 3, "reps": 15, "restSeconds": 60, "supersetId": "SS3" },
+        { "name": "KH-Bankdrücken", "sets": 3, "reps": 12, "restSeconds": 75, "supersetId": "SS4" },
+        { "name": "Einarmiges KH-Rudern", "sets": 3, "reps": 12, "restSeconds": 75, "supersetId": "SS4" },
+        { "name": "Bizeps-Curls KH", "sets": 3, "reps": 15, "restSeconds": 60, "supersetId": "FINISHER" },
+        { "name": "Trizeps-Drücken Seil", "sets": 3, "reps": 15, "restSeconds": 60, "supersetId": "FINISHER" }
+      ]
+    },
+    {
+      "name": "FREITAG — Power-Tag",
+      "orderIndex": 2,
+      "exercises": [
+        { "name": "Kniebeuge Langhantel", "sets": 4, "reps": 8, "restSeconds": 90, "supersetId": "SS1" },
+        { "name": "T-Bar Rudern / KH-Rudern", "sets": 4, "reps": 8, "restSeconds": 90, "supersetId": "SS1" },
+        { "name": "KH-Bankdrücken flach", "sets": 4, "reps": 8, "restSeconds": 90, "supersetId": "SS2" },
+        { "name": "Face Pulls", "sets": 4, "reps": 12, "restSeconds": 90, "supersetId": "SS2" },
+        { "name": "KH-Kreuzheben oder RDL", "sets": 3, "reps": 8, "restSeconds": 90, "supersetId": "SS3" },
+        { "name": "Hanging Leg Raises", "sets": 3, "reps": 12, "restSeconds": 90, "supersetId": "SS3" },
+        { "name": "Ausfallschritte KH", "sets": 3, "reps": 8, "restSeconds": 60, "supersetId": "SS4" },
+        { "name": "Wadenheben stehend", "sets": 3, "reps": 15, "restSeconds": 60, "supersetId": "SS4" },
+        { "name": "Dips", "sets": 2, "reps": 8, "restSeconds": 60, "supersetId": "FINISHER" }
+      ]
+    }
+  ]
+}

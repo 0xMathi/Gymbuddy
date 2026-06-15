@@ -41,11 +41,11 @@ struct PlanEditView: View {
                         .padding(Theme.Spacing.large)
                 }
             }
-            .navigationTitle("PLAN BEARBEITEN")
+            .navigationTitle(L.editPlanUpper)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("FERTIG") {
+                    Button(L.done) {
                         savePlan()
                         dismiss()
                     }
@@ -55,7 +55,7 @@ struct PlanEditView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     if !plan.exercises.isEmpty {
-                        Button(editMode == .active ? "FERTIG" : "SORTIEREN") {
+                        Button(editMode == .active ? L.done : L.sort) {
                             withAnimation {
                                 editMode = editMode == .active ? .inactive : .active
                             }
@@ -83,12 +83,12 @@ struct PlanEditView: View {
 
     private var planNameHeader: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.small) {
-            Text("PLAN-NAME")
+            Text(L.planNameUpper)
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
                 .tracking(1.5)
 
-            TextField("MEIN WORKOUT", text: $plan.name)
+            TextField(L.myWorkoutPlaceholder, text: $plan.name)
                 .font(Theme.Fonts.h2)
                 .foregroundStyle(Theme.Colors.textPrimary)
                 .focused($isNameFocused)
@@ -109,12 +109,12 @@ struct PlanEditView: View {
                 .foregroundStyle(Theme.Colors.surfaceElevated)
 
             VStack(spacing: Theme.Spacing.small) {
-                Text("NO EXERCISES YET")
+                Text(L.noExercisesYet)
                     .font(Theme.Fonts.h3)
                     .foregroundStyle(Theme.Colors.textPrimary)
                     .tracking(1)
 
-                Text("Füge Übungen hinzu, um deinen Plan aufzubauen.")
+                Text(L.addExercisesToBuild)
                     .font(Theme.Fonts.body)
                     .foregroundStyle(Theme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -166,7 +166,7 @@ struct PlanEditView: View {
             HStack(spacing: Theme.Spacing.small) {
                 Image(systemName: "plus")
                     .font(.system(size: 20, weight: .bold))
-                Text("ÜBUNGEN HINZUFÜGEN")
+                Text(L.addExercisesUpper)
                     .font(Theme.Fonts.label)
                     .tracking(1.5)
             }
@@ -241,7 +241,7 @@ struct ExerciseRowView: View {
                 .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusSmall))
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(exercise.name)
+                    Text(exercise.displayName)
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .lineLimit(1)
@@ -257,7 +257,7 @@ struct ExerciseRowView: View {
                                 .cornerRadius(4)
                         }
 
-                        Text("\(exercise.sets) Sätze")
+                        Text(L.setsCount(exercise.sets))
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                         
@@ -273,7 +273,7 @@ struct ExerciseRowView: View {
                         Text("•")
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.surfaceElevated)
-                        Text("\(exercise.reps) Wdh")
+                        Text(L.repsCount(exercise.reps))
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                     }
@@ -304,12 +304,14 @@ struct ExerciseDetailSheet: View {
     // Picker ranges
     private let setsRange = Array(1...10)
     private let repsRange = Array(1...30)
-    private let weightRange: [Double] = {
-        var weights: [Double] = [0]
-        weights += stride(from: 2.5, through: 200, by: 2.5).map { $0 }
-        return weights
-    }()
     private let restRange = [30, 45, 60, 75, 90, 120, 150, 180, 240, 300]
+
+    private var unit: WeightUnit { AppSettings.shared.weightUnit }
+    /// Selectable weight values in the active unit (kg: 2.5-steps, lb: 5-steps).
+    private var weightOptions: [Double] {
+        Array(stride(from: unit.step, through: unit.pickerMax, by: unit.step))
+    }
+    private func displayNumber(_ kg: Double) -> String { WeightDisplay.number(kg: kg, unit: unit) }
 
     var body: some View {
         NavigationStack {
@@ -326,7 +328,7 @@ struct ExerciseDetailSheet: View {
                             // Sets & Reps Row
                             HStack(spacing: Theme.Spacing.medium) {
                                 settingCard(
-                                    title: "SÄTZE",
+                                    title: L.setsUpper,
                                     value: "\(exercise.sets)",
                                     icon: "repeat"
                                 ) {
@@ -355,7 +357,7 @@ struct ExerciseDetailSheet: View {
                                 }
 
                                 settingCard(
-                                    title: "WDH",
+                                    title: L.repsUpper,
                                     value: "\(exercise.reps)",
                                     icon: "arrow.up.arrow.down"
                                 ) {
@@ -383,7 +385,7 @@ struct ExerciseDetailSheet: View {
                                 HStack {
                                     Image(systemName: "scalemass")
                                         .font(.system(size: 14, weight: .medium))
-                                    Text("GEWICHT")
+                                    Text(L.weightUpper)
                                         .font(Theme.Fonts.label)
                                         .tracking(1)
                                     Spacer()
@@ -392,7 +394,7 @@ struct ExerciseDetailSheet: View {
                                             showWeightPicker.toggle()
                                         }
                                     } label: {
-                                        Text(showWeightPicker ? "TASTATUR" : "PICKER")
+                                        Text(showWeightPicker ? L.keyboard : L.picker)
                                             .font(Theme.Fonts.caption)
                                             .tracking(0.5)
                                             .foregroundStyle(Theme.Colors.textSecondary)
@@ -414,26 +416,27 @@ struct ExerciseDetailSheet: View {
                                                 .cornerRadius(Theme.Layout.cornerRadiusSmall)
                                                 .frame(maxWidth: 160)
                                             
-                                            Text("KG")
+                                            Text(unit.labelUpper)
                                                 .font(Theme.Fonts.h2)
                                                 .foregroundStyle(Theme.Colors.textSecondary)
                                         }
 
-                                        // Quick selection adjustment buttons
+                                        // Quick selection adjustment buttons (in the active unit)
                                         HStack(spacing: Theme.Spacing.medium) {
-                                            ForEach([-5.0, -2.5, 2.5, 5.0], id: \.self) { diff in
+                                            ForEach([-2 * unit.step, -unit.step, unit.step, 2 * unit.step], id: \.self) { diff in
                                                 Button {
-                                                    let current = Double(weightString.replacingOccurrences(of: ",", with: ".")) ?? exercise.weight
-                                                    let newWeight = max(0, min(300, current + diff))
-                                                    exercise.weight = newWeight
-                                                    weightString = newWeight == 0 ? "" : (newWeight.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", newWeight) : String(format: "%.1f", newWeight))
+                                                    let current = Double(weightString.replacingOccurrences(of: ",", with: ".")) ?? unit.value(fromKg: exercise.weight)
+                                                    let newDisplay = max(0, min(unit.pickerMax, current + diff))
+                                                    let newKg = unit.kg(fromValue: newDisplay)
+                                                    exercise.weight = newKg
+                                                    weightString = newDisplay == 0 ? "" : displayNumber(newKg)
                                                     if var specific = exercise.specificSets {
-                                                        for i in 0..<specific.count { specific[i].weight = newWeight }
+                                                        for i in 0..<specific.count { specific[i].weight = newKg }
                                                         exercise.specificSets = specific
                                                     }
                                                     HapticService.shared.light()
                                                 } label: {
-                                                    Text(diff > 0 ? "+\(formatDiff(diff)) kg" : "\(formatDiff(diff)) kg")
+                                                    Text(diff > 0 ? "+\(formatDiff(diff)) \(unit.label)" : "\(formatDiff(diff)) \(unit.label)")
                                                         .font(Theme.Fonts.label)
                                                         .foregroundStyle(Theme.Colors.textPrimary)
                                                         .frame(maxWidth: .infinity)
@@ -450,6 +453,7 @@ struct ExerciseDetailSheet: View {
                                         get: { exercise.weight },
                                         set: { newVal in
                                             exercise.weight = newVal
+                                            weightString = newVal > 0 ? displayNumber(newVal) : ""
                                             if var specific = exercise.specificSets {
                                                 for i in 0..<specific.count { specific[i].weight = newVal }
                                                 exercise.specificSets = specific
@@ -457,8 +461,8 @@ struct ExerciseDetailSheet: View {
                                         }
                                     )) {
                                         Text("—").tag(Double(0))
-                                        ForEach(weightRange.dropFirst(), id: \.self) { weight in
-                                            Text(weight.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(weight)) kg" : String(format: "%.1f kg", weight)).tag(weight)
+                                        ForEach(weightOptions, id: \.self) { v in
+                                            Text(v.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(v)) \(unit.label)" : String(format: "%.1f \(unit.label)", v)).tag(unit.kg(fromValue: v))
                                         }
                                     }
                                     .pickerStyle(.wheel)
@@ -471,7 +475,7 @@ struct ExerciseDetailSheet: View {
 
                             // Rest Time Card
                             settingCardFull(
-                                title: "PAUSE",
+                                title: L.restUpper,
                                 value: formatRestTime(exercise.restSeconds),
                                 icon: "timer"
                             ) {
@@ -486,7 +490,7 @@ struct ExerciseDetailSheet: View {
 
                             // Specific Sets Card
                             VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
-                                Text("EINZELNE SÄTZE")
+                                Text(L.individualSetsUpper)
                                     .font(Theme.Fonts.label)
                                     .tracking(1)
                                     .foregroundStyle(Theme.Colors.textSecondary)
@@ -515,7 +519,7 @@ struct ExerciseDetailSheet: View {
                                                 )
                                             } label: {
                                                 HStack {
-                                                    Text("\(index + 1). Satz")
+                                                    Text(L.setRowN(index + 1))
                                                         .font(Theme.Fonts.body)
                                                         .foregroundStyle(Theme.Colors.textPrimary)
                                                     Spacer()
@@ -553,7 +557,7 @@ struct ExerciseDetailSheet: View {
                                 } label: {
                                     HStack(spacing: Theme.Spacing.small) {
                                         Image(systemName: "plus")
-                                        Text("SATZ HINZUFÜGEN")
+                                        Text(L.addSetUpper)
                                             .tracking(1)
                                     }
                                     .font(Theme.Fonts.label)
@@ -571,21 +575,16 @@ struct ExerciseDetailSheet: View {
                     .padding(.vertical, Theme.Spacing.large)
                 }
                 .onAppear {
-                    if exercise.weight > 0 {
-                        weightString = exercise.weight.truncatingRemainder(dividingBy: 1) == 0 
-                            ? String(format: "%.0f", exercise.weight) 
-                            : String(format: "%.1f", exercise.weight)
-                    } else {
-                        weightString = ""
-                    }
+                    weightString = displayNumber(exercise.weight)
                 }
                 .onChange(of: weightString) { _, newValue in
                     let cleaned = newValue.replacingOccurrences(of: ",", with: ".")
-                    if let doubleVal = Double(cleaned) {
-                        if doubleVal >= 0 && doubleVal <= 300 {
-                            exercise.weight = doubleVal
+                    if let v = Double(cleaned) {
+                        if v >= 0 && v <= unit.pickerMax {
+                            let kg = unit.kg(fromValue: v)
+                            exercise.weight = kg
                             if var specific = exercise.specificSets {
-                                for i in 0..<specific.count { specific[i].weight = doubleVal }
+                                for i in 0..<specific.count { specific[i].weight = kg }
                                 exercise.specificSets = specific
                             }
                         }
@@ -598,23 +597,18 @@ struct ExerciseDetailSheet: View {
                     }
                 }
                 .onChange(of: exercise.weight) { _, newValue in
-                    let currentParsed = Double(weightString.replacingOccurrences(of: ",", with: ".")) ?? -1.0
-                    if newValue != currentParsed {
-                        if newValue > 0 {
-                            weightString = newValue.truncatingRemainder(dividingBy: 1) == 0 
-                                ? String(format: "%.0f", newValue) 
-                                : String(format: "%.1f", newValue)
-                        } else {
-                            weightString = ""
-                        }
+                    // Sync the text field when weight changes elsewhere, without fighting the user's typing.
+                    let currentKg = Double(weightString.replacingOccurrences(of: ",", with: ".")).map { unit.kg(fromValue: $0) } ?? -1
+                    if abs(currentKg - newValue) > 0.01 {
+                        weightString = displayNumber(newValue)
                     }
                 }
             }
-            .navigationTitle("ÜBUNGS-DETAILS")
+            .navigationTitle(L.exerciseDetailsUpper)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("ABBRECHEN") {
+                    Button(L.cancelUpper) {
                         dismiss()
                     }
                     .font(Theme.Fonts.label)
@@ -622,7 +616,7 @@ struct ExerciseDetailSheet: View {
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("SPEICHERN") {
+                    Button(L.saveUpper) {
                         onSave()
                         dismiss()
                     }
@@ -648,13 +642,13 @@ struct ExerciseDetailSheet: View {
 
     private var exerciseHeader: some View {
         VStack(spacing: Theme.Spacing.small) {
-            Text(exercise.name.uppercased())
+            Text(exercise.displayName.uppercased())
                 .font(Theme.Fonts.h2)
                 .foregroundStyle(Theme.Colors.textPrimary)
                 .tracking(1)
                 .multilineTextAlignment(.center)
 
-            Text(exercise.muscleGroup.uppercased())
+            Text(exercise.displayMuscleGroup.uppercased())
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.accent)
                 .tracking(1.5)

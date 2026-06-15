@@ -9,13 +9,7 @@ struct ExerciseSet: Codable, Identifiable, Hashable {
     var restSeconds: Int? = nil
 
     var weightFormatted: String {
-        if weight == 0 {
-            return "—"
-        } else if weight.truncatingRemainder(dividingBy: 1) == 0 {
-            return "\(Int(weight)) KG"
-        } else {
-            return String(format: "%.1f KG", weight)
-        }
+        WeightDisplay.string(kg: weight, uppercase: true)
     }
 }
 
@@ -140,16 +134,18 @@ final class Exercise {
         }
     }
 
+    // MARK: - Localized Display
+
+    /// Localized name for display (storage `name` stays the German canonical key
+    /// used for image lookup and "Letztes Mal" history).
+    var displayName: String { ExerciseLocalization.exercise(name) }
+    /// Localized muscle group for display.
+    var displayMuscleGroup: String { ExerciseLocalization.muscleGroup(muscleGroup) }
+
     // MARK: - Formatted Display
 
     var weightFormatted: String {
-        if weight == 0 {
-            return "—"
-        } else if weight.truncatingRemainder(dividingBy: 1) == 0 {
-            return "\(Int(weight)) KG"
-        } else {
-            return String(format: "%.1f KG", weight)
-        }
+        WeightDisplay.string(kg: weight, uppercase: true)
     }
 
     var repsFormatted: String {

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="frame.css">
+<style>
+  :root{ --accent:#FF4F00; --bg:#0A0A0B; --txt:#FAFAFA; --txt2:#A1A1A6; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1600px;height:1000px;overflow:hidden}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;-webkit-font-smoothing:antialiased}
+  .stage{position:relative;width:1600px;height:1000px;overflow:hidden;
+     background:radial-gradient(120% 120% at 72% 50%, #1d1410 0%, #0c0c0e 44%, #060607 100%);}
+  .grain{position:absolute;inset:0;opacity:.5;background:
+     repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px);mix-blend-mode:overlay}
+  /* concentric rings echoing the timer */
+  .rings{position:absolute;right:300px;top:50%;transform:translateY(-50%);width:900px;height:900px;z-index:1;opacity:.5}
+  .rings span{position:absolute;border-radius:50%;border:1px solid rgba(255,79,0,.10);inset:0;margin:auto}
+  .rings span:nth-child(1){width:520px;height:520px}
+  .rings span:nth-child(2){width:700px;height:700px;border-color:rgba(255,79,0,.07)}
+  .rings span:nth-child(3){width:880px;height:880px;border-color:rgba(255,79,0,.045)}
+
+  .copy{position:absolute;left:100px;top:50%;transform:translateY(-50%);max-width:600px;z-index:6}
+  .wordmark{font-size:24px;font-weight:900;letter-spacing:7px;margin-bottom:30px}
+  .wordmark .g{color:var(--accent)} .wordmark .b{color:var(--txt)}
+  .kicker{display:inline-block;font-size:13px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--accent);
+     border:1px solid rgba(255,79,0,.4);border-radius:99px;padding:8px 16px;margin-bottom:26px}
+  h1{font-size:76px;line-height:.98;font-weight:900;letter-spacing:-2px;color:var(--txt)}
+  h1 .o{color:var(--accent)}
+  .sub{margin-top:26px;font-size:20px;line-height:1.6;color:var(--txt2);font-weight:500;max-width:460px}
+  .feat{margin-top:36px;display:flex;flex-direction:column;gap:16px}
+  .feat .row{display:flex;align-items:center;gap:14px;font-size:17px;color:var(--txt);font-weight:600}
+  .feat .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px rgba(255,79,0,.85);flex-shrink:0}
+
+  .glow{position:absolute;right:300px;top:50%;width:600px;height:600px;border-radius:50%;
+     background:radial-gradient(circle, rgba(255,79,0,.40), transparent 60%);filter:blur(36px);z-index:2;transform:translateY(-50%)}
+  .phoneWrap{position:absolute;right:175px;top:50%;transform:translateY(-50%) rotate(-2deg);z-index:4}
+  .device{box-shadow:0 70px 130px rgba(0,0,0,.74), 0 22px 48px rgba(0,0,0,.6), 0 0 90px rgba(255,79,0,.12);border-radius:64px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="grain"></div>
+  <div class="rings"><span></span><span></span><span></span></div>
+
+  <div class="copy">
+    <div class="wordmark"><span class="g">GYM</span><span class="b">BUDDY</span></div>
+    <span class="kicker">Rest Timer</span>
+    <h1>Pause läuft.<br><span class="o">Du auch gleich.</span></h1>
+    <p class="sub">Großer Countdown, der auch aus der Tasche heraus tickt. ±15 Sekunden on the fly, ein Tap zum Überspringen — und die nächste Übung schon im Blick.</p>
+    <div class="feat">
+      <div class="row"><span class="dot"></span>Kreis-Timer mit ±15&nbsp;s-Anpassung</div>
+      <div class="row"><span class="dot"></span>„Coming up": nächste Übung &amp; Satz</div>
+      <div class="row"><span class="dot"></span>Haptik &amp; Lockscreen-Mitteilung</div>
+    </div>
+  </div>
+
+  <div class="glow"></div>
+  <div class="phoneWrap">
+    <div class="device" style="--w:356px">
+      <span class="btn act"></span><span class="btn vup"></span><span class="btn vdn"></span><span class="btn pow"></span><span class="btn cam"></span>
+      <div class="bezel"><img class="screen" src="assets/rest.png" alt=""></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -6,6 +6,8 @@ import SwiftData
 enum ExerciseTab: String, CaseIterable {
     case all = "Alle"
     case favorites = "Favoriten"
+
+    var displayName: String { self == .all ? L.all : L.favorites }
 }
 
 struct ExercisePickerView: View {
@@ -72,12 +74,12 @@ struct ExercisePickerView: View {
                     }
                 }
             }
-            .navigationTitle("Übungen hinzufügen")
+            .navigationTitle(L.addExercisesTitle)
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $searchText, prompt: "Übung suchen …")
+            .searchable(text: $searchText, prompt: L.searchExercises)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Abbrechen") {
+                    Button(L.cancel) {
                         dismiss()
                     }
                     .foregroundStyle(Theme.Colors.textSecondary)
@@ -103,7 +105,7 @@ struct ExercisePickerView: View {
                             Image(systemName: "heart.fill")
                                 .font(.system(size: 12))
                         }
-                        Text(tab.rawValue.uppercased())
+                        Text(tab.displayName.uppercased())
                             .font(.system(size: 12, weight: .bold))
                             .tracking(1)
                     }
@@ -127,15 +129,15 @@ struct ExercisePickerView: View {
             HStack(spacing: Theme.Spacing.small) {
                 // "All" chip
                 FilterChip(
-                    title: "Alle",
+                    title: L.all,
                     isSelected: selectedFilter == nil,
                     action: { selectedFilter = nil }
                 )
 
-                // Muscle group chips
+                // Muscle group chips (localized label, raw value drives filtering)
                 ForEach(exerciseManager.muscleGroups, id: \.self) { group in
                     FilterChip(
-                        title: group,
+                        title: ExerciseLocalization.muscleGroup(group),
                         isSelected: selectedFilter == group,
                         action: { selectedFilter = group }
                     )
@@ -172,7 +174,7 @@ struct ExercisePickerView: View {
             HStack(spacing: Theme.Spacing.small) {
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .semibold))
-                Text("Hinzufügen (\(selectedExercises.count))")
+                Text(L.addCount(selectedExercises.count))
                     .font(Theme.Fonts.h3)
             }
             .foregroundColor(Theme.Colors.textPrimary)
@@ -262,14 +264,14 @@ struct ExerciseListItem: View {
 
                 // Text
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(exercise.name)
+                    Text(exercise.displayName)
                         .font(Theme.Fonts.body)
                         .fontWeight(.medium)
                         .foregroundStyle(Theme.Colors.textPrimary)
 
                     // Show category only if not filtered
                     if showCategory {
-                        Text(exercise.muscleGroup.uppercased())
+                        Text(exercise.displayMuscleGroup.uppercased())
                             .font(Theme.Fonts.caption)
                             .foregroundStyle(Theme.Colors.textSecondary)
                             .tracking(1)

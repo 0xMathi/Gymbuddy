@@ -112,11 +112,13 @@ struct WorkoutSession {
         return volume
     }
 
-    /// Formatted: "4.800 KG" or "—" if no weight tracked
+    /// Formatted in the active unit, e.g. "4.800 KG" / "10.580 LB". "—" if no weight tracked.
     var totalVolumeFormatted: String {
         guard totalVolume > 0 else { return "—" }
-        let formatted = NumberFormatter.localizedString(from: NSNumber(value: totalVolume), number: .decimal)
-        return "\(formatted) KG"
+        let unit = AppSettings.shared.weightUnit
+        let value = unit.value(fromKg: totalVolume).rounded()
+        let formatted = NumberFormatter.localizedString(from: NSNumber(value: value), number: .decimal)
+        return "\(formatted) \(unit.labelUpper)"
     }
 
     /// Total exercises in the workout

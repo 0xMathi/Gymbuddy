@@ -474,8 +474,8 @@ class WorkoutSessionManager {
         guard seconds > 0 else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Pause vorbei!"
-        content.body = "Mach dich bereit für den nächsten Satz."
+        content.title = L.notifRestOverTitle
+        content.body = L.notifRestOverBody
         content.sound = .default
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(seconds), repeats: false)
