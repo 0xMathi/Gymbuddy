@@ -1,7 +1,11 @@
 import Foundation
 import SwiftData
 
-// MARK: - PPL Plan Seed Data
+// MARK: - Starter Plan Seed Data
+//
+// Generic Push/Pull/Legs starter templates shipped to new users.
+// (The developer's personal plans are archived in docs/personal-plans-backup.json.)
+// Exercise names match ExerciseSeed definitions and have matching image assets.
 
 private struct PlanExerciseSeed {
     let exerciseName: String
@@ -17,124 +21,70 @@ private struct PlanSeed {
     let exercises: [PlanExerciseSeed]
 }
 
-// MARK: - Default Superset Plans
-
-private let defaultPPLPlans: [PlanSeed] = [
-    // MARK: Montag (Push-Pull)
-    PlanSeed(name: "MONTAG — Schwerer Tag (Push-Pull)", orderIndex: 0, exercises: [
-        PlanExerciseSeed(exerciseName: "KH-Bankdrücken", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS1"),
-        PlanExerciseSeed(exerciseName: "Einarmiges KH-Rudern", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS1"),
-        PlanExerciseSeed(exerciseName: "Schrägbankdrücken KH", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS2"),
-        PlanExerciseSeed(exerciseName: "Klimmzüge", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS2"),
-        PlanExerciseSeed(exerciseName: "Rumänisches Kreuzheben", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS3"),
-        PlanExerciseSeed(exerciseName: "Langhantel-Rudern stehend", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS3"),
-        PlanExerciseSeed(exerciseName: "Kabelzug-Seitenheben", sets: 3, reps: 15, restSeconds: 60, supersetId: "SS4"),
-        PlanExerciseSeed(exerciseName: "Face Pulls", sets: 3, reps: 15, restSeconds: 60, supersetId: "SS4"),
-        PlanExerciseSeed(exerciseName: "Kabel-Bizeps-Curls", sets: 3, reps: 15, restSeconds: 60, supersetId: "FINISHER"),
-        PlanExerciseSeed(exerciseName: "Kabel-Overhead-Trizeps", sets: 3, reps: 15, restSeconds: 60, supersetId: "FINISHER")
+private let starterPlans: [PlanSeed] = [
+    PlanSeed(name: "Push Day", orderIndex: 0, exercises: [
+        PlanExerciseSeed(exerciseName: "Bankdrücken", sets: 4, reps: 8, restSeconds: 120),
+        PlanExerciseSeed(exerciseName: "Schrägbankdrücken", sets: 3, reps: 10, restSeconds: 90),
+        PlanExerciseSeed(exerciseName: "Schulterdrücken", sets: 3, reps: 10, restSeconds: 90),
+        PlanExerciseSeed(exerciseName: "Kurzhantel-Flys", sets: 3, reps: 12, restSeconds: 60),
+        PlanExerciseSeed(exerciseName: "Seitheben", sets: 3, reps: 15, restSeconds: 45),
+        PlanExerciseSeed(exerciseName: "Trizepsdrücken am Kabel", sets: 3, reps: 12, restSeconds: 60),
     ]),
 
-    // MARK: Mittwoch (Hypertrophie)
-    PlanSeed(name: "MITTWOCH — Hypertrophie-Tag", orderIndex: 1, exercises: [
-        PlanExerciseSeed(exerciseName: "Kniebeuge Langhantel", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS1"),
-        PlanExerciseSeed(exerciseName: "Ausfallschritte KH", sets: 4, reps: 10, restSeconds: 90, supersetId: "SS1"),
-        PlanExerciseSeed(exerciseName: "Beinstrecker", sets: 4, reps: 12, restSeconds: 75, supersetId: "SS2"),
-        PlanExerciseSeed(exerciseName: "Beinbeuger", sets: 4, reps: 12, restSeconds: 75, supersetId: "SS2"),
-        PlanExerciseSeed(exerciseName: "Hip Thrusts", sets: 3, reps: 12, restSeconds: 60, supersetId: "SS3"),
-        PlanExerciseSeed(exerciseName: "Wadenheben stehend", sets: 3, reps: 15, restSeconds: 60, supersetId: "SS3"),
-        PlanExerciseSeed(exerciseName: "KH-Bankdrücken", sets: 3, reps: 12, restSeconds: 75, supersetId: "SS4"),
-        PlanExerciseSeed(exerciseName: "Einarmiges KH-Rudern", sets: 3, reps: 12, restSeconds: 75, supersetId: "SS4"),
-        PlanExerciseSeed(exerciseName: "Bizeps-Curls KH", sets: 3, reps: 15, restSeconds: 60, supersetId: "FINISHER"),
-        PlanExerciseSeed(exerciseName: "Trizeps-Drücken Seil", sets: 3, reps: 15, restSeconds: 60, supersetId: "FINISHER")
+    PlanSeed(name: "Pull Day", orderIndex: 1, exercises: [
+        PlanExerciseSeed(exerciseName: "Klimmzüge", sets: 4, reps: 8, restSeconds: 120),
+        PlanExerciseSeed(exerciseName: "Langhantel-Rudern", sets: 4, reps: 8, restSeconds: 90),
+        PlanExerciseSeed(exerciseName: "Kabelrudern", sets: 3, reps: 12, restSeconds: 75),
+        PlanExerciseSeed(exerciseName: "Face Pulls", sets: 3, reps: 15, restSeconds: 45),
+        PlanExerciseSeed(exerciseName: "Langhantel-Curls", sets: 3, reps: 10, restSeconds: 60),
+        PlanExerciseSeed(exerciseName: "Hammer Curls", sets: 3, reps: 12, restSeconds: 45),
     ]),
 
-    // MARK: Freitag (Power)
-    PlanSeed(name: "FREITAG — Power-Tag", orderIndex: 2, exercises: [
-        PlanExerciseSeed(exerciseName: "Kniebeuge Langhantel", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS1"),
-        PlanExerciseSeed(exerciseName: "T-Bar Rudern / KH-Rudern", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS1"),
-        PlanExerciseSeed(exerciseName: "KH-Bankdrücken flach", sets: 4, reps: 8, restSeconds: 90, supersetId: "SS2"),
-        PlanExerciseSeed(exerciseName: "Face Pulls", sets: 4, reps: 12, restSeconds: 90, supersetId: "SS2"),
-        PlanExerciseSeed(exerciseName: "KH-Kreuzheben oder RDL", sets: 3, reps: 8, restSeconds: 90, supersetId: "SS3"),
-        PlanExerciseSeed(exerciseName: "Hanging Leg Raises", sets: 3, reps: 12, restSeconds: 90, supersetId: "SS3"),
-        PlanExerciseSeed(exerciseName: "Ausfallschritte KH", sets: 3, reps: 8, restSeconds: 60, supersetId: "SS4"),
-        PlanExerciseSeed(exerciseName: "Wadenheben stehend", sets: 3, reps: 15, restSeconds: 60, supersetId: "SS4"),
-        PlanExerciseSeed(exerciseName: "Dips", sets: 2, reps: 8, restSeconds: 60, supersetId: "FINISHER")
+    PlanSeed(name: "Leg Day", orderIndex: 2, exercises: [
+        PlanExerciseSeed(exerciseName: "Kniebeugen", sets: 4, reps: 8, restSeconds: 150),
+        PlanExerciseSeed(exerciseName: "Rumänisches Kreuzheben", sets: 3, reps: 10, restSeconds: 120),
+        PlanExerciseSeed(exerciseName: "Beinpresse", sets: 3, reps: 12, restSeconds: 90),
+        PlanExerciseSeed(exerciseName: "Beinbeuger", sets: 3, reps: 12, restSeconds: 60),
+        PlanExerciseSeed(exerciseName: "Beinstrecker", sets: 3, reps: 15, restSeconds: 60),
+        PlanExerciseSeed(exerciseName: "Wadenheben stehend", sets: 4, reps: 15, restSeconds: 45),
     ]),
 ]
 
-// MARK: - PPL Plan Names (for validation)
+// MARK: - Seeder
 
-private let pplPlanNames = Set(defaultPPLPlans.map { $0.name })
-
-// MARK: - Seeder Function
-
+/// Seeds the generic starter plans on first launch only.
+/// Existing installs (flag already set) keep all of their own data untouched.
 func seedDefaultPlans(modelContext: ModelContext) {
-    // Step -1: Force migration of Friday Power-Tag plan
-    let hasMigratedFridayV2 = UserDefaults.standard.bool(forKey: "hasMigratedFridayV2")
-    if !hasMigratedFridayV2 {
-        let descriptor = FetchDescriptor<WorkoutPlan>()
-        if let plans = try? modelContext.fetch(descriptor) {
-            for plan in plans {
-                if plan.name == "FREITAG — Power-Tag" {
-                    modelContext.delete(plan)
-                    print("Deleted old FREITAG — Power-Tag to trigger recreation")
-                }
-            }
-        }
-        UserDefaults.standard.set(false, forKey: "hasSeededDefaultPlans")
-        UserDefaults.standard.set(true, forKey: "hasMigratedFridayV2")
-        try? modelContext.save()
+    let hasSeeded = UserDefaults.standard.bool(forKey: "hasSeededDefaultPlans")
+    guard !hasSeeded else { return }
+
+    let definitionDescriptor = FetchDescriptor<ExerciseDefinition>()
+    guard let definitions = try? modelContext.fetch(definitionDescriptor), !definitions.isEmpty else {
+        // Exercise library not ready yet — try again on the next launch (don't set the flag).
+        print("No exercise definitions found - skipping plan seeding")
+        return
+    }
+    var definitionsByName = Dictionary(definitions.map { ($0.name, $0) }, uniquingKeysWith: { a, _ in a })
+
+    for planSeed in starterPlans where !planExists(named: planSeed.name, in: modelContext) {
+        createPlan(from: planSeed, definitions: &definitionsByName, modelContext: modelContext)
     }
 
-    // Step 0: Migrate old exercise names to exact screenshot names
-    migrateExerciseNames(modelContext: modelContext)
-
-    // Step 1: Cleanup old/invalid plans (one-time migration)
-    cleanupInvalidPlans(modelContext: modelContext)
-
-    let hasSeeded = UserDefaults.standard.bool(forKey: "hasSeededDefaultPlans")
-    if !hasSeeded {
-        // Step 2: Fetch all exercise definitions for lookup
-        let definitionDescriptor = FetchDescriptor<ExerciseDefinition>()
-        guard let definitions = try? modelContext.fetch(definitionDescriptor), !definitions.isEmpty else {
-            print("No exercise definitions found - skipping plan seeding")
-            return
-        }
-        var definitionsByName = Dictionary(uniqueKeysWithValues: definitions.map { ($0.name, $0) })
-
-        // Step 3: Check and create each PPL plan individually
-        for planSeed in defaultPPLPlans {
-            if !planExists(named: planSeed.name, in: modelContext) {
-                createPlan(from: planSeed, definitions: &definitionsByName, modelContext: modelContext)
-            }
-        }
-
-        // Step 4: Save all changes
-        do {
-            try modelContext.save()
-            UserDefaults.standard.set(true, forKey: "hasSeededDefaultPlans")
-            print("PPL plan seeding completed")
-        } catch {
-            print("Failed to save PPL plans: \(error)")
-        }
+    do {
+        try modelContext.save()
+        UserDefaults.standard.set(true, forKey: "hasSeededDefaultPlans")
+        print("Starter plan seeding completed")
+    } catch {
+        print("Failed to save starter plans: \(error)")
     }
 }
 
-// MARK: - Helper Functions
+// MARK: - Helpers
 
 private func planExists(named name: String, in modelContext: ModelContext) -> Bool {
-    var descriptor = FetchDescriptor<WorkoutPlan>(
-        predicate: #Predicate { $0.name == name }
-    )
+    var descriptor = FetchDescriptor<WorkoutPlan>(predicate: #Predicate { $0.name == name })
     descriptor.fetchLimit = 1
-
-    do {
-        let count = try modelContext.fetchCount(descriptor)
-        return count > 0
-    } catch {
-        print("Failed to check if plan '\(name)' exists: \(error)")
-        return false
-    }
+    return (try? modelContext.fetchCount(descriptor)) ?? 0 > 0
 }
 
 private func createPlan(
@@ -145,45 +95,21 @@ private func createPlan(
     let plan = WorkoutPlan(name: seed.name, orderIndex: seed.orderIndex)
     modelContext.insert(plan)
 
-    // Add exercises with Copy-on-Write pattern
     for (index, exerciseSeed) in seed.exercises.enumerated() {
-        var definition = definitions[exerciseSeed.exerciseName]
-        if definition == nil {
+        let definition: ExerciseDefinition
+        if let existing = definitions[exerciseSeed.exerciseName] {
+            definition = existing
+        } else {
+            // Safety fallback — should not happen for starter plans, but never crash.
             print("Auto-creating missing exercise: '\(exerciseSeed.exerciseName)'")
-            var muscleGroup = "Sonstiges"
-            var equipment = "Sonstiges"
-            let name = exerciseSeed.exerciseName
-            
-            if name == "T-Bar Rudern / KH-Rudern" {
-                muscleGroup = "Rücken"
-                equipment = "Kurzhantel"
-            } else if name == "KH-Bankdrücken flach" {
-                muscleGroup = "Brust"
-                equipment = "Kurzhantel"
-            } else if name == "KH-Kreuzheben oder RDL" {
-                muscleGroup = "Rücken"
-                equipment = "Kurzhantel"
-            } else if name.contains("Rudern") {
-                muscleGroup = "Rücken"
-                equipment = "Kurzhantel"
-            } else if name.contains("Bankdrücken") {
-                muscleGroup = "Brust"
-                equipment = "Kurzhantel"
-            } else if name.contains("Kreuzheben") || name.contains("RDL") {
-                muscleGroup = "Rücken"
-                equipment = "Kurzhantel"
-            }
-            
-            let newDef = ExerciseDefinition(name: name, muscleGroup: muscleGroup, equipment: equipment, isCustom: false)
+            let newDef = ExerciseDefinition(name: exerciseSeed.exerciseName, muscleGroup: "Sonstiges", equipment: "Sonstiges", isCustom: false)
             modelContext.insert(newDef)
-            definitions[name] = newDef
+            definitions[exerciseSeed.exerciseName] = newDef
             definition = newDef
         }
 
-        guard let validDef = definition else { continue }
-
         let exercise = Exercise(
-            from: validDef,
+            from: definition,
             sets: exerciseSeed.sets,
             reps: exerciseSeed.reps,
             weight: 0,
@@ -191,88 +117,7 @@ private func createPlan(
             orderIndex: index,
             supersetId: exerciseSeed.supersetId
         )
-
         exercise.plan = plan
         modelContext.insert(exercise)
     }
-
-    print("Created plan: \(seed.name) with \(seed.exercises.count) exercises")
-}
-
-private func cleanupInvalidPlans(modelContext: ModelContext) {
-    let descriptor = FetchDescriptor<WorkoutPlan>()
-    guard let allPlans = try? modelContext.fetch(descriptor) else { return }
-
-    // Step A: collect obviously invalid plans to delete
-    var toDelete: [WorkoutPlan] = []
-    for plan in allPlans {
-        if plan.name == "New Plan" {
-            toDelete.append(plan)
-        } else if plan.name == "Push" || plan.name == "Pull" || plan.name == "Legs" {
-            toDelete.append(plan)
-        } else if plan.name.hasPrefix("Tag ") && plan.name.contains(" – ") {
-            // Old German-named PPL plans ("Tag 1 – PUSH", "Tag 2 – PULL", "Tag 3 – LEGS")
-            toDelete.append(plan)
-        } else if plan.name == "Montag (Schwer)" || plan.name == "Mittwoch (Hypertrophie)" || plan.name == "Freitag (Power)" {
-            // Delete the old default plans to make way for the new exact ones
-            toDelete.append(plan)
-        } else if plan.exercises.isEmpty && !pplPlanNames.contains(plan.name) {
-            toDelete.append(plan)
-        }
-    }
-    for plan in toDelete {
-        modelContext.delete(plan)
-        print("Cleaned up invalid plan: '\(plan.name)'")
-    }
-
-    // Step B: deduplicate by name — keep the one with the most exercises
-    let remaining = allPlans.filter { !toDelete.contains($0) }
-    let grouped = Dictionary(grouping: remaining, by: { $0.name })
-    for (name, dupes) in grouped where dupes.count > 1 {
-        let sorted = dupes.sorted { $0.exercises.count > $1.exercises.count }
-        for dupe in sorted.dropFirst() {
-            modelContext.delete(dupe)
-            print("Removed duplicate plan: '\(name)'")
-        }
-    }
-
-    let totalRemoved = toDelete.count + grouped.values.reduce(0) { $0 + max($1.count - 1, 0) }
-    if totalRemoved > 0 {
-        print("Cleanup: Removed \(totalRemoved) invalid/duplicate plan(s)")
-    }
-}
-
-private func migrateExerciseNames(modelContext: ModelContext) {
-    let renameMap: [String: String] = [
-        "Kurzhantel-Bankdrücken": "KH-Bankdrücken",
-        "Kurzhantel-Rudern": "Einarmiges KH-Rudern",
-        "Schrägbankdrücken": "Schrägbankdrücken KH",
-        "Langhantel-Rudern": "Langhantel-Rudern stehend",
-        "Seitheben": "Kabelzug-Seitenheben",
-        "Kabelzug-Curls": "Kabel-Bizeps-Curls",
-        "Trizepsdrücken am Kabel": "Kabel-Overhead-Trizeps",
-        "Kniebeugen": "Kniebeuge Langhantel",
-        "Kurzhantel-Schulterdrücken": "Schulterdrücken KH",
-        "Ausfallschritte": "Ausfallschritte KH",
-        "Dips (Brust)": "Dips",
-        "Beinheben hängend": "Hanging Leg Raises",
-        "Kurzhantel-Curls": "Bizeps-Curls KH"
-    ]
-    
-    let descriptor = FetchDescriptor<ExerciseDefinition>()
-    guard let definitions = try? modelContext.fetch(descriptor) else { return }
-    
-    for definition in definitions {
-        if let newName = renameMap[definition.name] {
-            definition.name = newName
-        }
-    }
-    
-    let existingNames = Set(definitions.map { $0.name })
-    if !existingNames.contains("Trizeps-Drücken Seil") {
-        let newDef = ExerciseDefinition(name: "Trizeps-Drücken Seil", muscleGroup: "Trizeps", equipment: "Kabelzug", isCustom: false)
-        modelContext.insert(newDef)
-    }
-    
-    try? modelContext.save()
 }
