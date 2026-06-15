@@ -24,13 +24,6 @@
 		A0000038280A00010001 /* ExercisePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000039280A00010001 /* ExercisePickerView.swift */; };
 		A000003A280A00010001 /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000003B280A00010001 /* PlanEditView.swift */; };
 		A000003C280A00010001 /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000003D280A00010001 /* NowPlayingService.swift */; };
-		A0000040280A00010001 /* DesignLabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000041280A00010001 /* DesignLabView.swift */; };
-		A0000042280A00010001 /* Variant1_JustDoIt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000043280A00010001 /* Variant1_JustDoIt.swift */; };
-		A0000044280A00010001 /* Variant2_SplitCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000045280A00010001 /* Variant2_SplitCards.swift */; };
-		A0000046280A00010001 /* Variant3_StatsHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000047280A00010001 /* Variant3_StatsHero.swift */; };
-		A0000048280A00010001 /* Variant4_Editorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000049280A00010001 /* Variant4_Editorial.swift */; };
-		A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004B280A00010001 /* Variant5_MinimalPower.swift */; };
-		A000004C280A00010001 /* FinalStartScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004D280A00010001 /* FinalStartScreen.swift */; };
 		A000004E280A00010001 /* StartScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004F280A00010001 /* StartScreenView.swift */; };
 		C7AA10072F4D100000000007 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA10082F4D100000000008 /* OnboardingView.swift */; };
 		C7660E052F278286007D9059 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E012F278286007D9059 /* SettingsView.swift */; };
@@ -64,13 +57,6 @@
 		A000003B280A00010001 /* PlanEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditView.swift; sourceTree = "<group>"; };
 		A000003D280A00010001 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		A000003E280A00010001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A0000041280A00010001 /* DesignLabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignLabView.swift; sourceTree = "<group>"; };
-		A0000043280A00010001 /* Variant1_JustDoIt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant1_JustDoIt.swift; sourceTree = "<group>"; };
-		A0000045280A00010001 /* Variant2_SplitCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant2_SplitCards.swift; sourceTree = "<group>"; };
-		A0000047280A00010001 /* Variant3_StatsHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant3_StatsHero.swift; sourceTree = "<group>"; };
-		A0000049280A00010001 /* Variant4_Editorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant4_Editorial.swift; sourceTree = "<group>"; };
-		A000004B280A00010001 /* Variant5_MinimalPower.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Variant5_MinimalPower.swift; sourceTree = "<group>"; };
-		A000004D280A00010001 /* FinalStartScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinalStartScreen.swift; sourceTree = "<group>"; };
 		A000004F280A00010001 /* StartScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartScreenView.swift; sourceTree = "<group>"; };
 		C7AA10082F4D100000000008 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		C7660E012F278286007D9059 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -114,7 +100,6 @@
 				A0000023280A00010001 /* Components */,
 				A0000024280A00010001 /* Views */,
 				A0000027280A00010001 /* ViewModels */,
-				A000003F280A00010001 /* DesignLab */,
 				A000001C280A00010001 /* Assets.xcassets */,
 				A000003E280A00010001 /* Info.plist */,
 			);
@@ -202,20 +187,6 @@
 				A000001A280A00010001 /* WorkoutSessionManager.swift */,
 			);
 			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		A000003F280A00010001 /* DesignLab */ = {
-			isa = PBXGroup;
-			children = (
-				A0000041280A00010001 /* DesignLabView.swift */,
-				A0000043280A00010001 /* Variant1_JustDoIt.swift */,
-				A0000045280A00010001 /* Variant2_SplitCards.swift */,
-				A0000047280A00010001 /* Variant3_StatsHero.swift */,
-				A0000049280A00010001 /* Variant4_Editorial.swift */,
-				A000004B280A00010001 /* Variant5_MinimalPower.swift */,
-				A000004D280A00010001 /* FinalStartScreen.swift */,
-			);
-			path = DesignLab;
 			sourceTree = "<group>";
 		};
 		C7660E032F278286007D9059 /* Settings */ = {
@@ -320,14 +291,7 @@
 				C7AA10092F4D100000000009 /* ExerciseLocalization.swift in Sources */,
 				C7AA100B2F4D10000000000B /* Strings.swift in Sources */,
 				A000003C280A00010001 /* NowPlayingService.swift in Sources */,
-				A0000040280A00010001 /* DesignLabView.swift in Sources */,
-				A0000042280A00010001 /* Variant1_JustDoIt.swift in Sources */,
-				A0000044280A00010001 /* Variant2_SplitCards.swift in Sources */,
-				A0000046280A00010001 /* Variant3_StatsHero.swift in Sources */,
 				C7660E052F278286007D9059 /* SettingsView.swift in Sources */,
-				A0000048280A00010001 /* Variant4_Editorial.swift in Sources */,
-				A000004A280A00010001 /* Variant5_MinimalPower.swift in Sources */,
-				A000004C280A00010001 /* FinalStartScreen.swift in Sources */,
 				A000004E280A00010001 /* StartScreenView.swift in Sources */,
 				C7AA10072F4D100000000007 /* OnboardingView.swift in Sources */,
 			);
