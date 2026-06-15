@@ -78,7 +78,7 @@ struct OnboardingView: View {
                     .font(.system(size: 12, weight: .black)).tracking(5)
                     .foregroundStyle(.white)
 
-                Text("Track every set.\nBeat last time.")
+                Text("Your plan.\nEvery set. Tracked.")
                     .font(.system(size: 38, weight: .black, design: .default))
                     .tracking(-1)
                     .foregroundStyle(.white)

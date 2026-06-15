@@ -27,7 +27,7 @@ No word repeats the title/subtitle. Covers strength/PPL/bodybuilding search inte
 
 ### Description (conversion only — not indexed)
 ```
-Track every set. Beat last time.
+Your plan. Every set. Tracked.
 
 GymBuddy is a fast, focused workout tracker for people who actually lift.
 No subscription, no account, no noise — just you and the gym.
@@ -62,7 +62,7 @@ Made for the gym.
 
 ### Beschreibung
 ```
-Jeden Satz tracken. Letztes Mal schlagen.
+Dein Plan. Jeder Satz. Getrackt.
 
 GymBuddy ist ein schneller, fokussierter Workout-Tracker für alle, die wirklich trainieren.
 Kein Abo, kein Account, kein Lärm — nur du und das Eisen.
