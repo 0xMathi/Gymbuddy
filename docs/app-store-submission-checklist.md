@@ -52,7 +52,7 @@ with these exact product IDs (must match the code), set prices, and submit them 
 - Sandbox: also testable via a Sandbox Apple ID once the IAPs exist in ASC.
 
 ## 5. App Store listing — ⬜ (paste from `docs/app-store-listing.md`)
-- **Name:** GymBuddy: Workout Tracker · **Subtitle:** Lifting log, sets & rest timer
+- **Name:** GymBuddy: Workout Log · **Subtitle:** Lifting tracker, sets & timer
 - **Keywords:** the 99-byte string (EN), plus the German set under the German localization
 - **Description** + **Promotional text** (EN and DE)
 - **Screenshots:** upload `docs/app-store/en/01…06` to the 6.9" slot (EN), `docs/app-store/de/01…06` under German

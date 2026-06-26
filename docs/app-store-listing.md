@@ -9,16 +9,16 @@ the description is **not** indexed (pure conversion). Screenshot captions ARE in
 ## 🇬🇧 English (primary)
 
 ### App Name — 30 char limit
-> **GymBuddy: Workout Tracker** — `25 chars`
+> **GymBuddy: Workout Log** — `21 chars`
 
-Brand + the highest-volume generic keyword ("workout tracker").
-⚠️ **Check name availability** in App Store Connect first — if "GymBuddy" is taken, fallbacks:
-`GymBuddy: Lifting Tracker` (25) · `GymBuddy — Gym Workout Log` (26).
+Brand + high-volume keywords ("workout", "log"). Chosen because "GymBuddy: Workout Tracker"
+was already taken in App Store Connect (also-free alternative: `GymBuddy: Lifting Tracker`).
 
 ### Subtitle — 30 char limit
-> **Lifting log, sets & rest timer** — `30 chars`
+> **Lifting tracker, sets & timer** — `29 chars`
 
-Adds new keywords (lifting, log, sets, rest, timer) — none repeated from the title.
+Adds new keywords (lifting, tracker, sets, timer) — none repeated from the title.
+("Tracker" recovered here since the title dropped it; "log" not repeated since the title now owns it.)
 
 ### Keyword field — 100 byte limit (commas, no spaces)
 > `strength,training,gym,weight,exercise,planner,routine,reps,bodybuilding,powerlifting,push,pull,legs` — `99 bytes`
