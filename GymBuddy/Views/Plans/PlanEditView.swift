@@ -779,15 +779,20 @@ struct ExerciseDropDelegate: DropDelegate {
 
 struct SwipeToDeleteView<Content: View>: View {
     let action: () -> Void
+    /// Opaque backdrop the row slides over (default matches the plan editor rows).
+    var background: Color = Theme.Colors.surface
+    /// Reports whether a horizontal swipe is in progress, so callers can suppress
+    /// any competing horizontal gesture (e.g. the active workout's preview swipe).
+    var onSwipeActive: ((Bool) -> Void)? = nil
     @ViewBuilder let content: () -> Content
-    
+
     @State private var offset: CGFloat = 0
     @State private var isSwiped: Bool = false
-    
+
     var body: some View {
         ZStack(alignment: .trailing) {
             Color.red
-            
+
             Button {
                 withAnimation {
                     offset = 0
@@ -799,15 +804,20 @@ struct SwipeToDeleteView<Content: View>: View {
                     .foregroundColor(.white)
                     .frame(width: 80, alignment: .center)
             }
-            
+
             content()
-                .background(Theme.Colors.surface)
+                .background(background)
                 .offset(x: offset)
                 .gesture(
                     DragGesture()
                         .onChanged { value in
                             if value.translation.width < 0 {
                                 offset = value.translation.width + (isSwiped ? -80 : 0)
+                                // Claim the gesture once it's clearly a leftward swipe.
+                                if value.translation.width < -12,
+                                   abs(value.translation.width) > abs(value.translation.height) {
+                                    onSwipeActive?(true)
+                                }
                             } else if isSwiped && value.translation.width > 0 {
                                 offset = value.translation.width - 80
                             }
@@ -821,6 +831,11 @@ struct SwipeToDeleteView<Content: View>: View {
                                     offset = 0
                                     isSwiped = false
                                 }
+                            }
+                            // Release on the next runloop so a simultaneous parent
+                            // gesture still sees the row as active this cycle.
+                            if onSwipeActive != nil {
+                                DispatchQueue.main.async { onSwipeActive?(false) }
                             }
                         }
                 )

@@ -12,6 +12,8 @@ struct ActiveWorkoutView: View {
     @State private var showSettings = false
     /// Browsing preview via horizontal swipe — nil means the active exercise is shown
     @State private var previewIndex: Int? = nil
+    /// True while a set row is being swiped — suppresses the preview swipe so the two don't fight
+    @State private var isSwipingSetRow = false
 
     var body: some View {
         ZStack {
@@ -377,84 +379,20 @@ struct ActiveWorkoutView: View {
                     let setsArray = exercise.resolvedSets
                     ForEach(Array(setsArray.enumerated()), id: \.offset) { index, exerciseSet in
                         let setNum = index + 1
-                        let isActive = setNum == session.currentSetNumber
-                        let isDone = setNum < session.currentSetNumber
-                        
-                        HStack(spacing: Theme.Spacing.medium) {
-                            Button {
-                                editSetPayload = EditSetPayload(
-                                    exercise: exercise,
-                                    setIndex: index,
-                                    reps: exerciseSet.reps,
-                                    weight: exerciseSet.weight,
-                                    restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
-                                )
-                            } label: {
-                                HStack(spacing: 0) {
-                                    // "SATZ 1"
-                                    Text(L.setN(setNum))
-                                        .font(.system(size: isActive ? 15 : 13, weight: .black))
-                                        .foregroundStyle(isActive ? Theme.Colors.accent : Theme.Colors.textSecondary)
-                                        .frame(width: 76, alignment: .leading)
 
-                                    VStack(alignment: .leading, spacing: 3) {
-                                        // "8 × 35 kg"
-                                        Text("\(exerciseSet.reps) × \(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")")
-                                            .font(.system(size: isActive ? 23 : 17, weight: isActive ? .bold : .semibold, design: .monospaced))
-                                            .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.6)
-
-                                        // "LETZTES MAL · 32,5 KG × 8" (only when a weight was logged)
-                                        if isActive, let last = lastSet(for: exercise, index: index), last.weight > 0 {
-                                            Text(L.lastTime(formatWeight(last.weight), last.reps))
-                                                .font(Theme.Fonts.ghostLabel)
-                                                .tracking(0.8)
-                                                .foregroundStyle(Theme.Colors.textSecondary.opacity(0.65))
-                                                .lineLimit(1)
-                                        }
-                                    }
-
-                                    Spacer(minLength: 4)
-                                }
+                        // Swipe-to-delete, but keep at least one set per exercise.
+                        if setsArray.count > 1 {
+                            SwipeToDeleteView(
+                                action: { manager.deleteSet(from: exercise, at: index) },
+                                background: Theme.Colors.bg,
+                                onSwipeActive: { active in isSwipingSetRow = active }
+                            ) {
+                                setRow(exercise: exercise, exerciseSet: exerciseSet, index: index, session: session)
                             }
-                            .buttonStyle(.plain)
-                            
-                            Spacer(minLength: 4)
-                            
-                            // Checkbox (Action to complete set)
-                            Button {
-                                if isActive && !manager.isPaused {
-                                    HapticService.shared.heavy()
-                                    manager.completeSet()
-                                }
-                            } label: {
-                                ZStack {
-                                    Circle()
-                                        .strokeBorder(isDone ? Theme.Colors.accent : Theme.Colors.surfaceElevated, lineWidth: 3)
-                                        .frame(width: 36, height: 36)
-                                    
-                                    if isDone {
-                                        Circle()
-                                            .fill(Theme.Colors.accent)
-                                            .frame(width: 20, height: 20)
-                                    }
-                                }
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(!isActive || manager.isPaused)
+                        } else {
+                            setRow(exercise: exercise, exerciseSet: exerciseSet, index: index, session: session)
                         }
-                        .padding(.vertical, 18)
-                        .padding(.horizontal, Theme.Spacing.large)
-                        .background(isActive ? Theme.Colors.surfaceElevated.opacity(0.45) : Color.clear)
-                        .overlay(alignment: .leading) {
-                            if isActive {
-                                Rectangle()
-                                    .fill(Theme.Colors.accent)
-                                    .frame(width: 3)
-                            }
-                        }
-                        
+
                         // Separator between rows
                         if setNum < exercise.sets {
                             Rectangle()
@@ -498,6 +436,90 @@ struct ActiveWorkoutView: View {
         }
     }
 
+    // MARK: - Set Row (active section)
+
+    @ViewBuilder
+    private func setRow(exercise: Exercise, exerciseSet: ExerciseSet, index: Int, session: WorkoutSession) -> some View {
+        let setNum = index + 1
+        let isActive = setNum == session.currentSetNumber
+        let isDone = setNum < session.currentSetNumber
+
+        HStack(spacing: Theme.Spacing.medium) {
+            Button {
+                editSetPayload = EditSetPayload(
+                    exercise: exercise,
+                    setIndex: index,
+                    reps: exerciseSet.reps,
+                    weight: exerciseSet.weight,
+                    restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
+                )
+            } label: {
+                HStack(spacing: 0) {
+                    // "SATZ 1"
+                    Text(L.setN(setNum))
+                        .font(.system(size: isActive ? 15 : 13, weight: .black))
+                        .foregroundStyle(isActive ? Theme.Colors.accent : Theme.Colors.textSecondary)
+                        .frame(width: 76, alignment: .leading)
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        // "8 × 35 kg"
+                        Text("\(exerciseSet.reps) × \(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")")
+                            .font(.system(size: isActive ? 23 : 17, weight: isActive ? .bold : .semibold, design: .monospaced))
+                            .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+
+                        // "LETZTES MAL · 32,5 KG × 8" (only when a weight was logged)
+                        if isActive, let last = lastSet(for: exercise, index: index), last.weight > 0 {
+                            Text(L.lastTime(formatWeight(last.weight), last.reps))
+                                .font(Theme.Fonts.ghostLabel)
+                                .tracking(0.8)
+                                .foregroundStyle(Theme.Colors.textSecondary.opacity(0.65))
+                                .lineLimit(1)
+                        }
+                    }
+
+                    Spacer(minLength: 4)
+                }
+            }
+            .buttonStyle(.plain)
+
+            Spacer(minLength: 4)
+
+            // Checkbox (Action to complete set)
+            Button {
+                if isActive && !manager.isPaused {
+                    HapticService.shared.heavy()
+                    manager.completeSet()
+                }
+            } label: {
+                ZStack {
+                    Circle()
+                        .strokeBorder(isDone ? Theme.Colors.accent : Theme.Colors.surfaceElevated, lineWidth: 3)
+                        .frame(width: 36, height: 36)
+
+                    if isDone {
+                        Circle()
+                            .fill(Theme.Colors.accent)
+                            .frame(width: 20, height: 20)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+            .disabled(!isActive || manager.isPaused)
+        }
+        .padding(.vertical, 18)
+        .padding(.horizontal, Theme.Spacing.large)
+        .background(isActive ? Theme.Colors.surfaceElevated.opacity(0.45) : Color.clear)
+        .overlay(alignment: .leading) {
+            if isActive {
+                Rectangle()
+                    .fill(Theme.Colors.accent)
+                    .frame(width: 3)
+            }
+        }
+    }
+
     private func formatRestTime(_ seconds: Int) -> String {
         let mins = seconds / 60
         let secs = seconds % 60
@@ -521,6 +543,9 @@ struct ActiveWorkoutView: View {
 
     /// Horizontal swipe browses exercises as a preview; the active exercise stays anchored.
     private func handleSwipe(_ value: DragGesture.Value, session: WorkoutSession, count: Int) {
+        // A set row is being swiped to delete — don't also browse exercises.
+        guard !isSwipingSetRow else { return }
+
         let dx = value.translation.width
         let dy = value.translation.height
         guard abs(dx) > 60, abs(dx) > abs(dy) * 1.5 else { return }

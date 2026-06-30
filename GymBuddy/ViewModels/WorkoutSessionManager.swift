@@ -191,6 +191,36 @@ class WorkoutSessionManager {
         }
     }
 
+    /// Removes a set from an exercise during an active workout, keeping the
+    /// active-set pointer (`currentSetNumber`) consistent. At least one set is
+    /// always kept — an exercise cannot become set-less.
+    func deleteSet(from exercise: Exercise, at index: Int) {
+        guard var currentSession = session else { return }
+
+        var sets = exercise.resolvedSets
+        guard sets.count > 1, sets.indices.contains(index) else { return }
+
+        sets.remove(at: index)
+        for i in 0..<sets.count { sets[i].index = i + 1 }
+        exercise.specificSets = sets
+        exercise.sets = sets.count
+
+        // Keep the active-set pointer correct, but only for the current exercise.
+        let sorted = currentSession.sortedExercises
+        if let exIndex = sorted.firstIndex(where: { $0.id == exercise.id }),
+           exIndex == currentSession.currentExerciseIndex {
+            // Deleting an already-completed set pulls the active pointer back by one.
+            if index + 1 < currentSession.currentSetNumber {
+                currentSession.currentSetNumber -= 1
+            }
+            currentSession.currentSetNumber = max(1, min(currentSession.currentSetNumber, sets.count))
+            self.session = currentSession
+            updateNowPlayingInfo()
+        }
+
+        haptics.medium()
+    }
+
     func togglePause() {
         guard session != nil else { return }
 
