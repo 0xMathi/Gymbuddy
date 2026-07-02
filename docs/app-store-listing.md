@@ -67,7 +67,7 @@ Made for the gym.
 Dein Plan. Jeder Satz. Getrackt.
 
 GymBuddy ist ein schneller, fokussierter Workout-Tracker für alle, die wirklich trainieren.
-Kein Abo, kein Account, kein Lärm — nur du und das Eisen.
+Kein Abo, kein Account, kein Lärm — nur du und das Gym.
 
 • Push / Pull / Legs sofort startklar — oder bau eigene Pläne
 • Sätze, Wiederholungen & Gewicht mit einem Tap loggen
