@@ -45,7 +45,9 @@ Made for the gym.
 ```
 
 ### Promotional text — 170 char limit (updatable, not indexed)
-> **Free, no subscription, no account. A fast lifting tracker that remembers what you did last time — Push/Pull/Legs ready to go, with a built-in rest timer.** — `153 chars`
+> **A fast, focused lifting tracker that remembers what you did last time — Push/Pull/Legs plans ready to go, rest timer built in. No account, no ads.** — `147 chars`
+
+*(2.3.7: price wording like "free" / "no subscription" stays OUT of screenshots and promo text — the description is the allowed place for it.)*
 
 ---
 
@@ -80,7 +82,7 @@ Gebaut fürs Gym.
 ```
 
 ### Promo-Text — 170 Zeichen
-> **Gratis, kein Abo, kein Account. Ein schneller Trainings-Tracker, der sich merkt, was du letztes Mal geschafft hast — Push/Pull/Legs startklar, mit Pausen-Timer.** — `158 Zeichen`
+> **Ein schneller Trainings-Tracker, der sich merkt, was du letztes Mal geschafft hast — Push/Pull/Legs startklar, Pausen-Timer eingebaut. Kein Account, keine Werbung.** — `163 Zeichen`
 
 ---
 
@@ -92,15 +94,23 @@ Gebaut fürs Gym.
 - **Localizations:** English, German
 
 ## Screenshots — final EN set (`docs/app-store/en/`, 1290×2796, indexed captions)
+Rebuilt 02.07.2026 after the 2.3.7 rejection (no price references in screenshots).
 1. `01-log-every-set` — "Log every set in seconds." (workout, Bench Press 8 × 155 lb)
 2. `02-your-plans` — "Your plans, ready to go." (start screen)
-3. `03-rest-timer` — "A rest timer that finds you." (rest timer)
-4. `04-no-subscription` — "No subscription. No account. No ads." (value statement)
-5. `05-just-you` — "Just you and the gym." (brand hero)
-6. `06-push-pull-legs` — "Push. Pull. Legs. Your way." (start screen)
+3. `03-no-account` — "No account. No ads. No nonsense." (statement — replaces the rejected
+   "No subscription… / Free forever" slide; in the top 3 because it is the key differentiator)
+4. `04-rest-timer` — "A rest timer that finds you." (rest timer)
+5. `05-last-time` — "See what you lifted last time." (workout with "LAST TIME · 155 LB × 8"
+   ghost value — replaces the former slot-6 duplicate of the start screen)
+6. `06-just-you` — "Just you and the gym." (brand hero)
+
+German set (`docs/app-store/de/`, kg): same order — `03-kein-account` ("Kein Account. Keine
+Werbung. Kein Quatsch."), `05-letztes-mal` ("Du siehst immer, was letztes Mal ging.").
+Retired slides live in `docs/app-store/retired/`. Generator: scratchpad `make_slides.py`
+(headless Chrome, 1290×2796) — raw device shots from iPhone 17 Pro simulator, status bar 17:21.
 
 App Store Connect required size is **6.9" (1290×2796)** — a single set is accepted and
-auto-scaled to smaller devices. German set: same layout with German screens + captions (follow-up).
+auto-scaled to smaller devices.
 
 ---
 
