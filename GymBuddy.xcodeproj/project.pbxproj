@@ -23,7 +23,6 @@
 		A0000036280A00010001 /* ExerciseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000037280A00010001 /* ExerciseManager.swift */; };
 		A0000038280A00010001 /* ExercisePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000039280A00010001 /* ExercisePickerView.swift */; };
 		A000003A280A00010001 /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000003B280A00010001 /* PlanEditView.swift */; };
-		A000003C280A00010001 /* NowPlayingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000003D280A00010001 /* NowPlayingService.swift */; };
 		A000004E280A00010001 /* StartScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000004F280A00010001 /* StartScreenView.swift */; };
 		C7AA10072F4D100000000007 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7AA10082F4D100000000008 /* OnboardingView.swift */; };
 		C7660E052F278286007D9059 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7660E012F278286007D9059 /* SettingsView.swift */; };
@@ -57,7 +56,6 @@
 		A0000037280A00010001 /* ExerciseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseManager.swift; sourceTree = "<group>"; };
 		A0000039280A00010001 /* ExercisePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExercisePickerView.swift; sourceTree = "<group>"; };
 		A000003B280A00010001 /* PlanEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditView.swift; sourceTree = "<group>"; };
-		A000003D280A00010001 /* NowPlayingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingService.swift; sourceTree = "<group>"; };
 		A000003E280A00010001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A000004F280A00010001 /* StartScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartScreenView.swift; sourceTree = "<group>"; };
 		C7AA10082F4D100000000008 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -144,7 +142,6 @@
 			children = (
 				A0000010280A00010001 /* HapticService.swift */,
 				A0000037280A00010001 /* ExerciseManager.swift */,
-				A000003D280A00010001 /* NowPlayingService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -300,7 +297,6 @@
 				C7AA100B2F4D10000000000B /* Strings.swift in Sources */,
 				C7AA10112F4D100000000011 /* TipJarStore.swift in Sources */,
 				C7AA10132F4D100000000013 /* TipJarView.swift in Sources */,
-				A000003C280A00010001 /* NowPlayingService.swift in Sources */,
 				C7660E052F278286007D9059 /* SettingsView.swift in Sources */,
 				A000004E280A00010001 /* StartScreenView.swift in Sources */,
 				C7AA10072F4D100000000007 /* OnboardingView.swift in Sources */,
@@ -439,7 +435,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GymBuddy/Info.plist;
@@ -467,7 +463,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GymBuddy/Info.plist;

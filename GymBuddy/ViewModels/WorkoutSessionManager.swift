@@ -16,38 +16,21 @@ class WorkoutSessionManager {
 
     private var timer: Timer?
     private let haptics = HapticService.shared
-    private let nowPlaying = NowPlayingService()
     private var modelContext: ModelContext?
 
     private var targetRestEndTime: Date?
 
     // MARK: - Initialization
 
-    init() {
-        setupRemoteCommands()
-    }
-
     /// Must be called once at app start — history features refuse to work silently without it
     func configure(with context: ModelContext) {
         modelContext = context
-    }
-
-    private func setupRemoteCommands() {
-        nowPlaying.onPlayPause = { [weak self] in
-            self?.togglePause()
-        }
-        nowPlaying.onSkipNext = { [weak self] in
-            self?.completeSet()
-        }
     }
 
     // MARK: - Core Actions
 
     func startWorkout(plan: WorkoutPlan) {
         guard !plan.exercises.isEmpty else { return }
-
-        // Sort exercises by orderIndex
-        let sortedExercises = plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
 
         session = WorkoutSession(
             plan: plan,
@@ -61,13 +44,6 @@ class WorkoutSessionManager {
         isPaused = false
 
         loadHistory(for: plan)
-
-        // Activate Now Playing
-        nowPlaying.activate()
-
-        if sortedExercises.first != nil {
-            updateNowPlayingInfo()
-        }
     }
 
     func completeSet() {
@@ -100,7 +76,6 @@ class WorkoutSessionManager {
             // Jump to next exercise in superset, SAME set number, NO REST
             currentSession.currentExerciseIndex += 1
             self.session = currentSession
-            updateNowPlayingInfo()
             return
             
         } else if hasPrevInSuperset {
@@ -144,7 +119,6 @@ class WorkoutSessionManager {
         }
 
         self.session = currentSession
-        updateNowPlayingInfo()
     }
 
     func skipRest() {
@@ -166,8 +140,6 @@ class WorkoutSessionManager {
         self.session = currentSession
         isPaused = false
         haptics.medium()
-
-        updateNowPlayingInfo()
     }
 
     func markExerciseComplete(index: Int) {
@@ -184,7 +156,6 @@ class WorkoutSessionManager {
             currentSession.restTimeRemaining = 0
             self.session = currentSession
             haptics.success()
-            updateNowPlayingInfo()
         } else {
             // Last exercise — finish the workout
             finishWorkout()
@@ -215,7 +186,6 @@ class WorkoutSessionManager {
             }
             currentSession.currentSetNumber = max(1, min(currentSession.currentSetNumber, sets.count))
             self.session = currentSession
-            updateNowPlayingInfo()
         }
 
         haptics.medium()
@@ -241,63 +211,13 @@ class WorkoutSessionManager {
                 }
             }
         }
-
-        updateNowPlayingInfo()
     }
 
     func cancelWorkout() {
         stopTimer()
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
-        nowPlaying.deactivate()
         session = nil
         isPaused = false
-    }
-
-    // MARK: - Now Playing Updates
-
-    private func updateNowPlayingInfo() {
-        guard let currentSession = session else {
-            nowPlaying.clearNowPlayingInfo()
-            return
-        }
-
-        let sortedExercises = currentSession.plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
-        guard sortedExercises.indices.contains(currentSession.currentExerciseIndex) else { return }
-        let exercise = sortedExercises[currentSession.currentExerciseIndex]
-
-        nowPlaying.updateNowPlaying(
-            exerciseName: exercise.name,
-            currentSet: currentSession.currentSetNumber,
-            totalSets: exercise.sets,
-            isResting: currentSession.state == .resting,
-            restTimeRemaining: currentSession.state == .resting ? currentSession.restTimeRemaining : nil
-        )
-    }
-
-    private func updateRestTimerNowPlaying() {
-        guard let currentSession = session, currentSession.state == .resting else { return }
-
-        let sortedExercises = currentSession.plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
-        guard sortedExercises.indices.contains(currentSession.currentExerciseIndex) else { return }
-        let exercise = sortedExercises[currentSession.currentExerciseIndex]
-
-        // Get next exercise name if available
-        let nextExerciseName: String
-        if currentSession.currentSetNumber < exercise.sets {
-            nextExerciseName = exercise.name
-        } else if currentSession.currentExerciseIndex < sortedExercises.count - 1 {
-            nextExerciseName = sortedExercises[currentSession.currentExerciseIndex + 1].name
-        } else {
-            nextExerciseName = "Finish"
-        }
-
-        nowPlaying.updateRestTimer(
-            exerciseName: nextExerciseName,
-            currentSet: currentSession.currentSetNumber,
-            totalSets: exercise.sets,
-            remaining: currentSession.restTimeRemaining,
-            total: exercise.restSeconds
-        )
     }
 
     // MARK: - Internal Logic
@@ -335,7 +255,6 @@ class WorkoutSessionManager {
 
         self.session = currentSession
         haptics.light()
-        updateRestTimerNowPlaying()
     }
 
     private func tick() {
@@ -350,9 +269,7 @@ class WorkoutSessionManager {
             currentSession.restTimeRemaining -= 1
         }
 
-        // Update lockscreen
         session = currentSession
-        updateRestTimerNowPlaying()
 
         // 10 second warning
         if currentSession.restTimeRemaining == 10 {
@@ -383,7 +300,6 @@ class WorkoutSessionManager {
 
         // Strong haptic feedback - must be noticeable even in pocket/armband
         haptics.heavy()
-        updateNowPlayingInfo()
     }
 
     private func stopTimer() {
@@ -404,7 +320,6 @@ class WorkoutSessionManager {
         saveCompletedWorkout(currentSession)
 
         haptics.success()
-        nowPlaying.deactivate()
     }
 
     // MARK: - History (Letztes Mal)
