@@ -1,4 +1,6 @@
 import SwiftUI
+import SwiftData
+import StoreKit
 
 struct WorkoutSummaryView: View {
     let session: WorkoutSession
@@ -6,6 +8,15 @@ struct WorkoutSummaryView: View {
     let onDismiss: () -> Void
 
     @State private var isAnimating = false
+    @State private var showTipJar = false
+    @Environment(\.requestReview) private var requestReview
+    // The workout being summarized is already persisted, so it is included in this count.
+    @Query private var completedWorkouts: [CompletedWorkout]
+
+    /// Milestones at which the system rating prompt may appear (iOS caps at 3 per year).
+    private var isReviewMilestone: Bool {
+        [3, 10, 25].contains(completedWorkouts.count)
+    }
 
     var body: some View {
         ZStack {
@@ -89,6 +100,25 @@ struct WorkoutSummaryView: View {
 
                 Spacer()
 
+                // Quiet tip-jar entry — the post-workout high is the honest moment to ask
+                Button {
+                    HapticService.shared.light()
+                    showTipJar = true
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.Colors.accent)
+                        Text(L.supportGymBuddy)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Theme.Colors.textSecondary)
+                    }
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, Theme.Spacing.medium)
+                .opacity(isAnimating ? 1 : 0)
+                .animation(.easeOut(duration: 0.5).delay(0.55), value: isAnimating)
+
                 // Done Button (Training neu starten / Beenden)
                 Button(action: {
                     HapticService.shared.medium()
@@ -118,6 +148,13 @@ struct WorkoutSummaryView: View {
             withAnimation(.easeOut(duration: 0.6)) {
                 isAnimating = true
             }
+        }
+        .sheet(isPresented: $showTipJar) { TipJarView() }
+        .task {
+            guard isReviewMilestone else { return }
+            // Let the confetti and stats settle before the system prompt appears
+            try? await Task.sleep(for: .seconds(2.5))
+            requestReview()
         }
     }
 
