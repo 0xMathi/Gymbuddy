@@ -144,6 +144,30 @@ enum L {
     static var tipThanksBody: String { t("That means a lot. Now go hit a PR.", "Das bedeutet mir viel. Jetzt geh und reiß 'nen PR.") }
     static var tipClose: String { t("You're welcome", "Gern geschehen") }
 
+    // MARK: - Accessibility (VoiceOver only — never rendered)
+    static func a11ySetLabel(_ n: Int, _ reps: Int, _ weight: String) -> String {
+        weight.isEmpty
+            ? t("Set \(n): \(reps) reps", "Satz \(n): \(reps) Wiederholungen")
+            : t("Set \(n): \(reps) reps at \(weight)", "Satz \(n): \(reps) Wiederholungen mit \(weight)")
+    }
+    static var a11yStateDone: String { t("done", "erledigt") }
+    static var a11yStateActive: String { t("active", "aktiv") }
+    static var a11yStateUpcoming: String { t("upcoming", "ausstehend") }
+    static var a11yCheckOffHint: String { t("Marks the set as done", "Hakt den Satz ab") }
+    static func a11yEditSet(_ n: Int) -> String { t("Edit set \(n)", "Satz \(n) bearbeiten") }
+    static func a11yAdoptLast(_ weight: String, _ reps: Int) -> String {
+        t("Use last time's values: \(weight), \(reps) reps", "Werte vom letzten Mal übernehmen: \(weight), \(reps) Wiederholungen")
+    }
+    static func a11yRestRemaining(_ time: String) -> String { t("Rest timer: \(time) remaining", "Pausen-Timer: noch \(time)") }
+    static var a11yRestShorter: String { t("15 seconds less rest", "15 Sekunden weniger Pause") }
+    static var a11yRestLonger: String { t("15 seconds more rest", "15 Sekunden mehr Pause") }
+    static var a11ySettings: String { t("Settings", "Einstellungen") }
+    static var a11yPauseWorkout: String { t("Pause workout", "Workout pausieren") }
+    static var a11yResumeWorkout: String { t("Resume workout", "Workout fortsetzen") }
+    static var a11yStartsWorkoutHint: String { t("Starts this workout", "Startet dieses Workout") }
+    static var a11yWeightKeyboard: String { t("Enter weight with keyboard", "Gewicht per Tastatur eingeben") }
+    static var a11yWeightWheel: String { t("Pick weight with wheel", "Gewicht per Rad wählen") }
+
     // MARK: - Notifications
     static var notifRestOverTitle: String { t("Rest's over!", "Pause vorbei!") }
     static var notifRestOverBody: String { t("Get ready for your next set.", "Mach dich bereit für den nächsten Satz.") }

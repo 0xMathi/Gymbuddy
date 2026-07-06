@@ -290,6 +290,7 @@ struct ActiveWorkoutView: View {
                     .cornerRadius(Theme.Layout.cornerRadiusSmall)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(L.a11ySettings)
 
             Button {
                 manager.togglePause()
@@ -302,6 +303,7 @@ struct ActiveWorkoutView: View {
                     .cornerRadius(Theme.Layout.cornerRadiusSmall)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(manager.isPaused ? L.a11yResumeWorkout : L.a11yPauseWorkout)
         }
     }
 
@@ -448,6 +450,7 @@ struct ActiveWorkoutView: View {
         let setNum = index + 1
         let isActive = setNum == session.currentSetNumber
         let isDone = setNum < session.currentSetNumber
+        let a11yWeight = exerciseSet.weight > 0 ? exerciseSet.weightFormatted : ""
 
         HStack(spacing: Theme.Spacing.medium) {
             Button {
@@ -466,6 +469,7 @@ struct ActiveWorkoutView: View {
                     .frame(width: 76, alignment: .leading)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(L.a11yEditSet(setNum))
 
             VStack(alignment: .leading, spacing: 3) {
                 Button {
@@ -485,6 +489,8 @@ struct ActiveWorkoutView: View {
                         .minimumScaleFactor(0.6)
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(L.a11ySetLabel(setNum, exerciseSet.reps, a11yWeight))
+                .accessibilityHint(L.a11yEditSet(setNum))
 
                 // "LETZTES MAL · 32,5 KG × 8" — tap adopts last time's values into this set
                 if isActive, let last = lastSet(for: exercise, index: index), last.weight > 0 {
@@ -499,6 +505,7 @@ struct ActiveWorkoutView: View {
                             .lineLimit(1)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(L.a11yAdoptLast(formatWeight(last.weight), last.reps))
                 }
             }
 
@@ -525,6 +532,9 @@ struct ActiveWorkoutView: View {
             }
             .buttonStyle(.plain)
             .disabled(!isActive || manager.isPaused)
+            .accessibilityLabel(L.a11ySetLabel(setNum, exerciseSet.reps, a11yWeight))
+            .accessibilityValue(isDone ? L.a11yStateDone : (isActive ? L.a11yStateActive : L.a11yStateUpcoming))
+            .accessibilityHint(isActive && !manager.isPaused ? L.a11yCheckOffHint : "")
         }
         .padding(.vertical, 18)
         .padding(.horizontal, Theme.Spacing.large)
@@ -781,6 +791,8 @@ struct ActiveWorkoutView: View {
             }
             .frame(width: 224, height: 224)
             .padding(.vertical, Theme.Spacing.small)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(L.a11yRestRemaining(formatRestTimeDigital(session.restTimeRemaining)))
 
             VStack(spacing: Theme.Spacing.large) {
                 HStack(spacing: Theme.Spacing.xl) {
@@ -795,6 +807,7 @@ struct ActiveWorkoutView: View {
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(L.a11yRestShorter)
 
                     Text(L.restRunning)
                         .font(Theme.Fonts.label)
@@ -812,6 +825,7 @@ struct ActiveWorkoutView: View {
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel(L.a11yRestLonger)
                 }
 
                 Button {
@@ -1180,6 +1194,7 @@ struct EditSetSheet: View {
                                         .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityLabel(useWeightKeyboard ? L.a11yWeightWheel : L.a11yWeightKeyboard)
                             }
 
                             if useWeightKeyboard {

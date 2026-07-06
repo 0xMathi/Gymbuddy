@@ -10,6 +10,7 @@ struct WorkoutSummaryView: View {
     @State private var isAnimating = false
     @State private var showTipJar = false
     @Environment(\.requestReview) private var requestReview
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // The workout being summarized is already persisted, so it is included in this count.
     @Query private var completedWorkouts: [CompletedWorkout]
 
@@ -138,8 +139,8 @@ struct WorkoutSummaryView: View {
                 .animation(.easeOut(duration: 0.5).delay(0.5), value: isAnimating)
             }
 
-            // Confetti particles (simple version)
-            if isAnimating {
+            // Confetti particles (simple version) — skipped under Reduce Motion
+            if isAnimating && !reduceMotion {
                 ConfettiView()
                     .allowsHitTesting(false)
             }

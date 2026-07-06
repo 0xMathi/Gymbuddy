@@ -401,6 +401,8 @@ private struct StartPlanCard: View {
             .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isPressed)
         }
         .buttonStyle(SquishableButtonStyle(isPressed: $isPressed))
+        .accessibilityLabel("\(plan.name), \(L.exercisesCount(plan.exercises.count))")
+        .accessibilityHint(L.a11yStartsWorkoutHint)
     }
 
     private func relativeLabel(for date: Date) -> String {
