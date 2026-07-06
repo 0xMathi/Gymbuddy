@@ -25,7 +25,7 @@ struct WorkoutSummaryView: View {
             VStack(spacing: 0) {
                 // Header (Title and Date)
                 VStack(spacing: 4) {
-                    Text(session.plan.name.components(separatedBy: " ").last?.uppercased() ?? "WORKOUT")
+                    Text(session.plan.name.uppercased())
                         .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(Theme.Colors.textPrimary)
                     

@@ -62,6 +62,9 @@ enum L {
     // MARK: - Active workout
     static var endWorkoutQuestion: String { t("End workout?", "Workout beenden?") }
     static var end: String { t("End", "Beenden") }
+    static var endAndSave: String { t("Finish & save", "Beenden & speichern") }
+    static var discardWorkout: String { t("Discard workout", "Workout verwerfen") }
+    static var endWorkoutMessageSave: String { t("Save your completed sets, or discard the workout.", "Speichere deine erledigten Sätze — oder verwirf das Workout.") }
     static var cancel: String { t("Cancel", "Abbrechen") }
     static var progressLost: String { t("Your progress will be lost.", "Dein Fortschritt geht verloren.") }
     static var supersetNoRest: String { t("SUPERSET · NO REST", "SUPERSET · KEINE PAUSE") }

@@ -11,6 +11,9 @@ struct WorkoutSession {
 
     let plan: WorkoutPlan
     var state: State = .active
+    /// True when the workout was finished via "Finish & save" — the set that was
+    /// active at that moment was never completed and must not be counted.
+    var endedEarly: Bool = false
 
     var currentExerciseIndex: Int = 0
     var currentSetNumber: Int = 1 // 1-based
@@ -51,7 +54,7 @@ struct WorkoutSession {
         }
 
         // If completed, add the final set
-        if state == .completed {
+        if state == .completed && !endedEarly {
             completed += 1
         }
 
@@ -76,7 +79,7 @@ struct WorkoutSession {
         }
 
         // If completed, add the final set's reps
-        if state == .completed, let exercise = currentExercise {
+        if state == .completed, !endedEarly, let exercise = currentExercise {
             let setsArray = exercise.resolvedSets
             if let lastSet = setsArray.last {
                 completed += lastSet.reps
@@ -99,7 +102,7 @@ struct WorkoutSession {
             } else if index == currentExerciseIndex {
                 // currentSetNumber points at the upcoming set; the final set
                 // only counts once the workout is completed
-                completedCount = min(currentSetNumber - 1 + (state == .completed ? 1 : 0), sets.count)
+                completedCount = min(currentSetNumber - 1 + ((state == .completed && !endedEarly) ? 1 : 0), sets.count)
             } else {
                 completedCount = 0
             }

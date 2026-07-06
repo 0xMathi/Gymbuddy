@@ -35,12 +35,17 @@ struct ActiveWorkoutView: View {
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: manager.session?.state)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: manager.isPaused)
         .confirmationDialog(L.endWorkoutQuestion, isPresented: $showCancelConfirmation, titleVisibility: .visible) {
-            Button(L.end, role: .destructive) {
+            if (manager.session?.totalSetsCompleted ?? 0) > 0 {
+                Button(L.endAndSave) {
+                    manager.finishWorkout(includeActiveSet: false)
+                }
+            }
+            Button(L.discardWorkout, role: .destructive) {
                 manager.cancelWorkout()
             }
             Button(L.cancel, role: .cancel) {}
         } message: {
-            Text(L.progressLost)
+            Text((manager.session?.totalSetsCompleted ?? 0) > 0 ? L.endWorkoutMessageSave : L.progressLost)
         }
     }
 
@@ -454,35 +459,48 @@ struct ActiveWorkoutView: View {
                     restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
                 )
             } label: {
-                HStack(spacing: 0) {
-                    // "SATZ 1"
-                    Text(L.setN(setNum))
-                        .font(.system(size: isActive ? 15 : 13, weight: .black))
-                        .foregroundStyle(isActive ? Theme.Colors.accent : Theme.Colors.textSecondary)
-                        .frame(width: 76, alignment: .leading)
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        // "8 × 35 kg"
-                        Text("\(exerciseSet.reps) × \(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")")
-                            .font(.system(size: isActive ? 23 : 17, weight: isActive ? .bold : .semibold, design: .monospaced))
-                            .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
-
-                        // "LETZTES MAL · 32,5 KG × 8" (only when a weight was logged)
-                        if isActive, let last = lastSet(for: exercise, index: index), last.weight > 0 {
-                            Text(L.lastTime(formatWeight(last.weight), last.reps))
-                                .font(Theme.Fonts.ghostLabel)
-                                .tracking(0.8)
-                                .foregroundStyle(Theme.Colors.textSecondary.opacity(0.65))
-                                .lineLimit(1)
-                        }
-                    }
-
-                    Spacer(minLength: 4)
-                }
+                // "SATZ 1"
+                Text(L.setN(setNum))
+                    .font(.system(size: isActive ? 15 : 13, weight: .black))
+                    .foregroundStyle(isActive ? Theme.Colors.accent : Theme.Colors.textSecondary)
+                    .frame(width: 76, alignment: .leading)
             }
             .buttonStyle(.plain)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Button {
+                    editSetPayload = EditSetPayload(
+                        exercise: exercise,
+                        setIndex: index,
+                        reps: exerciseSet.reps,
+                        weight: exerciseSet.weight,
+                        restSeconds: exerciseSet.restSeconds ?? exercise.restSeconds
+                    )
+                } label: {
+                    // "8 × 35 kg"
+                    Text("\(exerciseSet.reps) × \(exerciseSet.weight > 0 ? exerciseSet.weightFormatted : "—")")
+                        .font(.system(size: isActive ? 23 : 17, weight: isActive ? .bold : .semibold, design: .monospaced))
+                        .foregroundStyle(isActive ? Theme.Colors.textPrimary : Theme.Colors.textSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                }
+                .buttonStyle(.plain)
+
+                // "LETZTES MAL · 32,5 KG × 8" — tap adopts last time's values into this set
+                if isActive, let last = lastSet(for: exercise, index: index), last.weight > 0 {
+                    Button {
+                        HapticService.shared.light()
+                        exercise.updateSet(at: index, reps: last.reps, weight: last.weight)
+                    } label: {
+                        Text(L.lastTime(formatWeight(last.weight), last.reps))
+                            .font(Theme.Fonts.ghostLabel)
+                            .tracking(0.8)
+                            .foregroundStyle(Theme.Colors.textSecondary.opacity(0.65))
+                            .lineLimit(1)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
 
             Spacer(minLength: 4)
 

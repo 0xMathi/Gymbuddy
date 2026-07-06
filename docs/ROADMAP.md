@@ -131,6 +131,12 @@ den eine App haben kann.
 
 ---
 
+## Vereinbarte Strategie (06.07.2026)
+
+**Bauen in einem Fluss, releasen in zwei Schnitten:** durchgehend auf `main` entwickeln;
+sobald der Timer-Block fertig ist, geht 1.1 raus, während der Verlauf nahtlos weiterwächst.
+Zwei Updates = zwei Geschichten (Matti: „mehr zu erzählen statt alles abzufrühstücken").
+
 ## Empfohlene Reihenfolge & Rhythmus
 
 | Release | Thema | Kern | Bauch-Aufwand |

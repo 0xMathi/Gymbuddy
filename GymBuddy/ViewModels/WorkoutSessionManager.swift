@@ -307,12 +307,18 @@ class WorkoutSessionManager {
         timer = nil
     }
 
-    private func finishWorkout() {
+    /// Also called directly from the end-workout dialog ("Finish & save") —
+    /// persists only the sets that were actually completed.
+    /// `includeActiveSet` is true for the normal flow (the final set was just checked off
+    /// without advancing `currentSetNumber`) and false when ending early, where the
+    /// active set was never completed.
+    func finishWorkout(includeActiveSet: Bool = true) {
         stopTimer()
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
         guard var currentSession = session else { return }
 
         currentSession.plan.lastUsedAt = Date()
+        currentSession.endedEarly = !includeActiveSet
         currentSession.state = .completed
         currentSession.endTime = Date()
         session = currentSession
@@ -382,7 +388,7 @@ class WorkoutSessionManager {
             if index < session.currentExerciseIndex {
                 completedCount = sets.count
             } else if index == session.currentExerciseIndex {
-                completedCount = min(session.currentSetNumber - 1 + (session.state == .completed ? 1 : 0), sets.count)
+                completedCount = min(session.currentSetNumber - 1 + ((session.state == .completed && !session.endedEarly) ? 1 : 0), sets.count)
             } else {
                 completedCount = 0
             }
