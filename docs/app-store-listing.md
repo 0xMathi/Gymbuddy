@@ -113,6 +113,13 @@ Werbung. Kein Quatsch."), `05-letztes-mal` ("Du siehst immer, was letztes Mal gi
 Retired slides live in `docs/app-store/retired/`. Generator: scratchpad `make_slides.py`
 (headless Chrome, 1290×2796) — raw device shots from iPhone 17 Pro simulator, status bar 17:21.
 
+**Slot 4 DE updated 06.07.2026 (for 1.1):** now shows the Live Activity on a real lock screen
+("Dein Timer lebt auf dem Lockscreen.") — raw shot from Matti's device in
+`docs/app-store/raw/Lockscreen_DE.png` (NOT reproducible in the simulator: locked screens
+render the ticking countdown as "1:--"). Old in-app timer slide retired as
+`retired/de/04-pausen-timer-v1-inapp.png`. **EN slot 4 still pending** — needs the same shot
+with device language English ("Your timer lives on your Lock Screen.").
+
 App Store Connect required size is **6.9" (1290×2796)** — a single set is accepted and
 auto-scaled to smaller devices.
 
