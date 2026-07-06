@@ -14,7 +14,7 @@
 Ein Thema, klar erzählbar: **Der Pausen-Timer lebt jetzt auf dem Lockscreen.**
 Plus die UX-Lücken, die beim echten Benutzen auffallen.
 
-### 1. Live Activity + Dynamic Island für den Pausen-Timer ⭐ Headline-Feature
+### 1. ✅ Live Activity + Dynamic Island für den Pausen-Timer ⭐ Headline-Feature (06.07.)
 Ersetzt sauber (und Apple-konform) das entfernte Now-Playing-Widget aus der Rejection.
 
 **Verhalten:**
@@ -36,7 +36,7 @@ Ersetzt sauber (und Apple-konform) das entfernte Now-Playing-Widget aus der Reje
 
 **Bonus fast gratis:** Das Widget-Target ermöglicht später Home-Screen-Widgets (1.2).
 
-### 2. „Beenden & speichern" — die größte UX-Lücke 🔴
+### 2. ✅ „Beenden & speichern" — die größte UX-Lücke 🔴 (06.07.)
 Heute gilt: ENDE-Button = alles verwerfen („Dein Fortschritt geht verloren"). Wer nach 4 von
 6 Übungen legitim aufhört, verliert sein Log — außer er kennt den Umweg über „Als erledigt
 markieren" bei der letzten Übung. Das weiß niemand.
@@ -46,12 +46,12 @@ markieren" bei der letzten Übung. Das weiß niemand.
 - „Verwerfen" (destruktiv, rot) → wie bisher
 Aufwand: winzig. Wirkung: groß — verlorene Workouts sind der schnellste Weg zu 1-Sterne-Reviews.
 
-### 3. Summary-Titel-Bug fixen 🐛
+### 3. ✅ Summary-Titel-Bug fixen 🐛 (06.07.)
 `WorkoutSummaryView` zeigt als Titel `plan.name.components(separatedBy: " ").last` —
 bei „Push Day" steht da nur **„DAY"** (heute im Simulator gesehen). Fix: kompletten
 Plan-Namen anzeigen. Einzeiler.
 
-### 4. Ghost-Werte antippen = übernehmen ⭐ Klein, aber Liebling
+### 4. ✅ Ghost-Werte antippen = übernehmen ⭐ Klein, aber Liebling (06.07.)
 Die „LETZTES MAL · 80 KG × 8"-Zeile ist heute nur Anzeige. **Tap auf die Ghost-Zeile
 übernimmt Gewicht + Wiederholungen in den aktuellen Satz.** Ein Tap statt sechs
 Picker-Interaktionen — genau der Flow „gleiches Gewicht wie letztes Mal", der 80 % der

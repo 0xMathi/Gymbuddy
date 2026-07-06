@@ -5,6 +5,10 @@ import UserNotifications
 
 @Observable
 class WorkoutSessionManager {
+    /// The app's single instance — SkipRestIntent (Live Activity button) needs
+    /// process-wide access. Previews may still create their own instances.
+    static let shared = WorkoutSessionManager()
+
     var session: WorkoutSession?
     var isActive: Bool { session != nil }
     var isPaused: Bool = false
@@ -131,6 +135,7 @@ class WorkoutSessionManager {
         guard exercises.indices.contains(index) else { return }
 
         stopTimer()
+        RestActivityController.shared.end()
 
         currentSession.currentExerciseIndex = index
         currentSession.currentSetNumber = 1
@@ -148,6 +153,7 @@ class WorkoutSessionManager {
         guard exercises.indices.contains(index) else { return }
 
         stopTimer()
+        RestActivityController.shared.end()
 
         if index + 1 < exercises.count {
             currentSession.currentExerciseIndex = index + 1
@@ -201,11 +207,20 @@ class WorkoutSessionManager {
             // Pause the timer
             stopTimer()
             UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
+            // Freeze the Live Activity countdown at the remaining time
+            if let currentSession = session, currentSession.state == .resting {
+                RestActivityController.shared.update(
+                    activityState(for: currentSession, endDate: targetRestEndTime ?? Date())
+                )
+            }
         } else {
             // Resume if we were resting
             if let currentSession = session, currentSession.state == .resting {
                 targetRestEndTime = Date().addingTimeInterval(TimeInterval(currentSession.restTimeRemaining))
                 scheduleRestEndNotification(in: currentSession.restTimeRemaining)
+                if let end = targetRestEndTime {
+                    RestActivityController.shared.update(activityState(for: currentSession, endDate: end))
+                }
                 timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
                     self?.tick()
                 }
@@ -216,6 +231,7 @@ class WorkoutSessionManager {
     func cancelWorkout() {
         stopTimer()
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
+        RestActivityController.shared.end()
         session = nil
         isPaused = false
     }
@@ -229,6 +245,9 @@ class WorkoutSessionManager {
 
         targetRestEndTime = Date().addingTimeInterval(TimeInterval(duration))
         scheduleRestEndNotification(in: duration)
+        if let end = targetRestEndTime {
+            RestActivityController.shared.start(activityState(for: session, endDate: end))
+        }
 
         stopTimer()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
@@ -252,6 +271,9 @@ class WorkoutSessionManager {
         
         targetRestEndTime = Date().addingTimeInterval(TimeInterval(currentSession.restTimeRemaining))
         scheduleRestEndNotification(in: currentSession.restTimeRemaining)
+        if let end = targetRestEndTime {
+            RestActivityController.shared.update(activityState(for: currentSession, endDate: end))
+        }
 
         self.session = currentSession
         haptics.light()
@@ -293,6 +315,7 @@ class WorkoutSessionManager {
     private func endRest() {
         stopTimer()
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
+        RestActivityController.shared.end()
         guard var currentSession = session else { return }
 
         currentSession.state = .active
@@ -307,6 +330,20 @@ class WorkoutSessionManager {
         timer = nil
     }
 
+    /// Live Activity content for the current rest phase. `session` is passed
+    /// explicitly because startRest works on an inout copy that is not yet
+    /// published to `self.session`.
+    private func activityState(for session: WorkoutSession, endDate: Date) -> RestActivityAttributes.ContentState {
+        RestActivityAttributes.ContentState(
+            topLabel: session.restTopLabel,
+            exerciseLabel: session.restMainLabel,
+            nextLabel: session.restNextLabel,
+            startDate: endDate.addingTimeInterval(-TimeInterval(session.originalRestDuration)),
+            endDate: endDate,
+            pausedRemaining: isPaused ? session.restTimeRemaining : nil
+        )
+    }
+
     /// Also called directly from the end-workout dialog ("Finish & save") —
     /// persists only the sets that were actually completed.
     /// `includeActiveSet` is true for the normal flow (the final set was just checked off
@@ -315,6 +352,7 @@ class WorkoutSessionManager {
     func finishWorkout(includeActiveSet: Bool = true) {
         stopTimer()
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
+        RestActivityController.shared.end()
         guard var currentSession = session else { return }
 
         currentSession.plan.lastUsedAt = Date()

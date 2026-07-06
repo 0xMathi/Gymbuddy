@@ -734,38 +734,10 @@ struct ActiveWorkoutView: View {
 
     @ViewBuilder
     private func restSection(session: WorkoutSession, exercises: [Exercise]) -> some View {
-        let exercise = exercises.indices.contains(session.currentExerciseIndex)
-            ? exercises[session.currentExerciseIndex] : nil
-
-        let topLabel: String = {
-            if let ex = exercise, session.currentSetNumber <= ex.sets {
-                return L.restSetN(session.currentSetNumber)
-            }
-            return L.rest
-        }()
-
-        let mainLabel: String = {
-            guard let ex = exercise else { return L.finishUpper }
-            if session.currentSetNumber <= ex.sets {
-                return ex.displayName.uppercased()
-            } else if session.currentExerciseIndex + 1 < exercises.count {
-                return exercises[session.currentExerciseIndex + 1].displayName.uppercased()
-            } else {
-                return L.lastSetUpper
-            }
-        }()
-
-        let nextLabel: String? = {
-            guard let ex = exercise else { return nil }
-            if session.currentSetNumber <= ex.sets {
-                if session.currentExerciseIndex + 1 < exercises.count {
-                    return L.then(exercises[session.currentExerciseIndex + 1].displayName.uppercased())
-                }
-            } else if session.currentExerciseIndex + 2 < exercises.count {
-                return L.then(exercises[session.currentExerciseIndex + 2].displayName.uppercased())
-            }
-            return nil
-        }()
+        // Label logic lives on WorkoutSession — shared with the Live Activity
+        let topLabel = session.restTopLabel
+        let mainLabel = session.restMainLabel
+        let nextLabel = session.restNextLabel
 
         VStack(spacing: Theme.Spacing.xl) {
             // Header

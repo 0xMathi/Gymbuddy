@@ -4,7 +4,8 @@ import UserNotifications
 
 @main
 struct GymBuddyApp: App {
-    @State private var sessionManager = WorkoutSessionManager()
+    // Shared instance so the Live Activity skip intent reaches the same manager
+    @State private var sessionManager = WorkoutSessionManager.shared
     @State private var exerciseManager = ExerciseManager()
 
     let modelContainer: ModelContainer
@@ -48,6 +49,12 @@ struct GymBuddyApp: App {
                     exerciseManager.configure(with: modelContainer.mainContext)
                     sessionManager.configure(with: modelContainer.mainContext)
                     seedDefaultPlans(modelContext: modelContainer.mainContext)
+
+                    // Sessions are in-memory only — a rest-timer Live Activity that
+                    // survived a force-quit belongs to no workout and must go.
+                    if !sessionManager.isActive {
+                        Task { await RestActivityController.shared.endAllStale() }
+                    }
                 }
         }
         .modelContainer(modelContainer)

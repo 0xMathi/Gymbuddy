@@ -157,3 +157,42 @@ struct WorkoutSession {
         return currentSetNumber >= exercise.sets
     }
 }
+
+// MARK: - Rest labels (shared by the in-app rest section and the Live Activity)
+
+extension WorkoutSession {
+    /// "REST · SET 3" while more sets of the current exercise follow, plain "REST" otherwise
+    var restTopLabel: String {
+        if let exercise = currentExercise, currentSetNumber <= exercise.sets {
+            return L.restSetN(currentSetNumber)
+        }
+        return L.rest
+    }
+
+    /// The exercise the athlete is resting for, uppercased
+    var restMainLabel: String {
+        let exercises = sortedExercises
+        guard let exercise = currentExercise else { return L.finishUpper }
+        if currentSetNumber <= exercise.sets {
+            return exercise.displayName.uppercased()
+        } else if currentExerciseIndex + 1 < exercises.count {
+            return exercises[currentExerciseIndex + 1].displayName.uppercased()
+        } else {
+            return L.lastSetUpper
+        }
+    }
+
+    /// "THEN: <exercise>" — nil when nothing follows
+    var restNextLabel: String? {
+        let exercises = sortedExercises
+        guard let exercise = currentExercise else { return nil }
+        if currentSetNumber <= exercise.sets {
+            if currentExerciseIndex + 1 < exercises.count {
+                return L.then(exercises[currentExerciseIndex + 1].displayName.uppercased())
+            }
+        } else if currentExerciseIndex + 2 < exercises.count {
+            return L.then(exercises[currentExerciseIndex + 2].displayName.uppercased())
+        }
+        return nil
+    }
+}
