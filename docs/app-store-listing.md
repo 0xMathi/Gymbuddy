@@ -123,7 +123,7 @@ auto-scaled to smaller devices.
 ### What's New — EN
 > **THE TIMER GROWS UP.**
 >
-> • Live Activity: your rest timer now lives on the Lock Screen and in the Dynamic Island — skip a rest without opening the app
+> • Live Activity: your rest timer now lives on the Lock Screen and in the Dynamic Island – skip a rest without opening the app
 > • Finish & save: end a workout early and keep every completed set
 > • One tap: adopt "last time" values straight into the current set
 > • Type your weight: keyboard entry in the set editor, plus finer 1.25 kg / 2.5 lb steps
@@ -132,7 +132,7 @@ auto-scaled to smaller devices.
 ### What's New — DE
 > **DER TIMER WIRD ERWACHSEN.**
 >
-> • Live Activity: Der Pausen-Timer läuft jetzt auf dem Lockscreen und in der Dynamic Island — Pause überspringen, ohne die App zu öffnen
+> • Live Activity: Der Pausen-Timer läuft jetzt auf dem Lockscreen und in der Dynamic Island – Pause überspringen, ohne die App zu öffnen
 > • Beenden & speichern: Workout vorzeitig beenden, alle erledigten Sätze bleiben im Log
 > • Ein Tap: „Letztes Mal"-Werte direkt in den aktuellen Satz übernehmen
 > • Gewicht tippen statt kurbeln: Tastatur-Eingabe im Satz-Editor, plus feinere 1,25-kg-Schritte

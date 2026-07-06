@@ -29,8 +29,8 @@ enum L {
     static func lastUsedOn(_ date: String) -> String { t("LAST · \(date)", "ZULETZT · \(date)") }
 
     // MARK: - Onboarding
-    static var onbSub: String { t("A fast, focused workout tracker. No subscriptions, no noise — just you and the iron.",
-                                  "Ein schneller, fokussierter Workout-Tracker. Kein Abo, kein Lärm — nur du und das Eisen.") }
+    static var onbSub: String { t("A fast, focused workout tracker. No subscriptions, no noise – just you and the iron.",
+                                  "Ein schneller, fokussierter Workout-Tracker. Kein Abo, kein Lärm – nur du und das Eisen.") }
     static var onbGetStarted: String { t("Get started", "Los geht's") }
     static var onbUnitTitle: String { t("Your unit.", "Deine Einheit.") }
     static var onbUnitQuestion: String { t("Which unit do you train in?", "In welcher Einheit trainierst du?") }
@@ -39,10 +39,10 @@ enum L {
     static var onbUnitChangeable: String { t("Change it anytime in Settings.", "Jederzeit in den Einstellungen änderbar.") }
     static var onbContinue: String { t("Continue", "Weiter") }
     static var onbReadyTitle: String { t("You're set.", "Bereit.") }
-    static var onbReadyBody: String { t("Push, Pull & Leg Day are ready to go — tweak them or build your own. Tap a plan, and go.",
-                                        "Push, Pull & Leg Day sind schon eingerichtet — pass sie an oder bau eigene. Tipp einen Plan, und los.") }
-    static var onbNotifPrime: String { t("The rest timer buzzes you — even from your pocket.",
-                                         "Der Pause-Timer piept dich an — auch aus der Tasche.") }
+    static var onbReadyBody: String { t("Push, Pull & Leg Day are ready to go – tweak them or build your own. Tap a plan, and go.",
+                                        "Push, Pull & Leg Day sind schon eingerichtet – pass sie an oder bau eigene. Tipp einen Plan, und los.") }
+    static var onbNotifPrime: String { t("The rest timer buzzes you – even from your pocket.",
+                                         "Der Pause-Timer piept dich an – auch aus der Tasche.") }
     static var onbAllowNotifs: String { t("Allow notifications", "Mitteilungen erlauben") }
     static var onbMaybeLater: String { t("Maybe later", "Vielleicht später") }
 
@@ -64,7 +64,7 @@ enum L {
     static var end: String { t("End", "Beenden") }
     static var endAndSave: String { t("Finish & save", "Beenden & speichern") }
     static var discardWorkout: String { t("Discard workout", "Workout verwerfen") }
-    static var endWorkoutMessageSave: String { t("Save your completed sets, or discard the workout.", "Speichere deine erledigten Sätze — oder verwirf das Workout.") }
+    static var endWorkoutMessageSave: String { t("Save your completed sets, or discard the workout.", "Speichere deine erledigten Sätze – oder verwirf das Workout.") }
     static var cancel: String { t("Cancel", "Abbrechen") }
     static var progressLost: String { t("Your progress will be lost.", "Dein Fortschritt geht verloren.") }
     static var supersetNoRest: String { t("SUPERSET · NO REST", "SUPERSET · KEINE PAUSE") }
@@ -133,13 +133,13 @@ enum L {
     // MARK: - Tip Jar
     static var supportGymBuddy: String { t("Support GymBuddy", "GymBuddy unterstützen") }
     static var tipTitle: String { t("Support GymBuddy", "GymBuddy unterstützen") }
-    static var tipIntro: String { t("GymBuddy is free — no ads, no account. If it earned a spot in your gym bag, you can leave a tip. Completely optional, hugely appreciated.",
-                                    "GymBuddy ist gratis — keine Werbung, kein Account. Wenn die App einen Platz in deiner Gym-Bag verdient hat, kannst du was dalassen. Komplett freiwillig, riesig wertgeschätzt.") }
-    static var tipSubSmall: String { t("Spot me a set.", "Gib mir 'nen Satz aus.") }
-    static var tipSubMedium: String { t("Fuel the gains.", "Treibstoff für die Gains.") }
-    static var tipSubLarge: String { t("Absolute legend.", "Absolute Legende.") }
+    static var tipIntro: String { t("GymBuddy is free – no ads, no account. If it helps your training, you're welcome to leave something: a rating on the App Store or a small tip. Completely optional of course, but hugely appreciated.",
+                                    "GymBuddy ist gratis – keine Werbung, kein Account. Wenn die App dir beim Training hilft, kannst du mir gern was dalassen: eine Bewertung im App Store oder eine kleine Spende. Komplett freiwillig natürlich, aber riesig wertgeschätzt.") }
+    static var tipSubSmall: String { t("The pump is real.", "Der Pump ist real.") }
+    static var tipSubMedium: String { t("Steady gains for the app.", "Stabile Gains für die App.") }
+    static var tipSubLarge: String { t("As good as it gets.", "Mehr geht nicht.") }
     static var tipUnavailable: String { t("Tips aren't available right now.", "Tips sind gerade nicht verfügbar.") }
-    static var tipNoUnlock: String { t("Nothing gets unlocked — it's pure goodwill.", "Es wird nichts freigeschaltet — reine Wertschätzung.") }
+    static var tipNoUnlock: String { t("Nothing gets unlocked – it's pure goodwill.", "Es wird nichts freigeschaltet – reine Wertschätzung.") }
     static var tipThanksTitle: String { t("Thank you. Seriously.", "Danke. Wirklich.") }
     static var tipThanksBody: String { t("That means a lot. Now go hit a PR.", "Das bedeutet mir viel. Jetzt geh und reiß 'nen PR.") }
     static var tipClose: String { t("You're welcome", "Gern geschehen") }
