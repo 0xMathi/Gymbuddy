@@ -26,6 +26,25 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
     }
 }
 
+// MARK: - AppLanguage
+
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case system = "system"
+    case german = "de"
+    case english = "en"
+
+    var id: String { rawValue }
+
+    /// Language names are proper nouns — shown in their own language on purpose
+    var displayName: String {
+        switch self {
+        case .system: return L.languageSystem
+        case .german: return "Deutsch"
+        case .english: return "English"
+        }
+    }
+}
+
 // MARK: - AppSettings
 
 @Observable
@@ -38,6 +57,7 @@ final class AppSettings {
         static let appearanceMode = "appearanceMode"
         static let defaultRestSeconds = "defaultRestSeconds"
         static let weightUnit = "weightUnit"
+        static let appLanguage = "appLanguage"
     }
 
     // MARK: - Properties
@@ -52,6 +72,21 @@ final class AppSettings {
 
     var weightUnit: WeightUnit {
         didSet { save(weightUnit.rawValue, forKey: Keys.weightUnit) }
+    }
+
+    var appLanguage: AppLanguage {
+        didSet { save(appLanguage.rawValue, forKey: Keys.appLanguage) }
+    }
+
+    /// Single source of truth for the UI language, used by `L` and
+    /// ExerciseLocalization. Reading it inside a view body makes the view
+    /// re-render when the in-app language changes (@Observable tracking).
+    var resolvedLanguageIsGerman: Bool {
+        switch appLanguage {
+        case .system: return (Bundle.main.preferredLocalizations.first ?? "en").hasPrefix("de")
+        case .german: return true
+        case .english: return false
+        }
     }
 
     // MARK: - Init
@@ -77,6 +112,14 @@ final class AppSettings {
             self.weightUnit = unit
         } else {
             self.weightUnit = WeightUnit.regionDefault
+        }
+
+        // Load app language (default: follow the system)
+        if let rawLang = defaults.string(forKey: Keys.appLanguage),
+           let lang = AppLanguage(rawValue: rawLang) {
+            self.appLanguage = lang
+        } else {
+            self.appLanguage = .system
         }
     }
 

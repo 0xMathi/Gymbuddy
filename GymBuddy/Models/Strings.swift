@@ -6,8 +6,10 @@ import Foundation
 /// Brand statement headlines (e.g. "TIME TO WORK.", "NEXT UP", "COMING UP",
 /// "BEAST MODE COMPLETED") stay English in both languages by design and are not listed here.
 enum L {
+    /// Resolved via AppSettings so the in-app language switch takes effect
+    /// immediately (views reading L re-render through @Observable tracking).
     private static var isGerman: Bool {
-        (Bundle.main.preferredLocalizations.first ?? "en").hasPrefix("de")
+        AppSettings.shared.resolvedLanguageIsGerman
     }
     private static func t(_ en: String, _ de: String) -> String { isGerman ? de : en }
 
@@ -55,6 +57,9 @@ enum L {
     static var unitKgLong: String { t("Kilograms (kg)", "Kilogramm (kg)") }
     static var unitLbLong: String { t("Pounds (lb)", "Pfund (lb)") }
     static var defaultRest: String { t("Default Rest", "Standard-Pause") }
+    static var language: String { t("Language", "Sprache") }
+    static var languageUpper: String { t("LANGUAGE", "SPRACHE") }
+    static var languageSystem: String { t("System", "System") }
     static var appearanceSystem: String { t("System", "System") }
     static var appearanceLight: String { t("Light", "Hell") }
     static var appearanceDark: String { t("Dark", "Dunkel") }

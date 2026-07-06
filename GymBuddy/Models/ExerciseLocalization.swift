@@ -6,9 +6,9 @@ import Foundation
 enum ExerciseLocalization {
 
     /// Follows the resolved UI language so exercise names match the rest of the app
-    /// ("de" → German canonical; everything else → English).
+    /// ("de" → German canonical; everything else → English). Includes the in-app override.
     private static var isGerman: Bool {
-        (Bundle.main.preferredLocalizations.first ?? "en").hasPrefix("de")
+        AppSettings.shared.resolvedLanguageIsGerman
     }
 
     // MARK: - Exercises (German key → English display)

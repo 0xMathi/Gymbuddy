@@ -9,6 +9,7 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 appearanceSection
+                languageSection
                 workoutDefaultsSection
                 supportSection
             }
@@ -46,6 +47,26 @@ struct SettingsView: View {
             .pickerStyle(.menu)
         } header: {
             Text(L.appearanceUpper)
+                .font(Theme.Fonts.label)
+                .foregroundStyle(Theme.Colors.textSecondary)
+        }
+        .listRowBackground(Theme.Colors.surface)
+    }
+
+    // MARK: - Language Section
+
+    private var languageSection: some View {
+        Section {
+            Picker(selection: $settings.appLanguage) {
+                ForEach(AppLanguage.allCases) { lang in
+                    Text(lang.displayName).tag(lang)
+                }
+            } label: {
+                Label(L.language, systemImage: "globe")
+            }
+            .pickerStyle(.menu)
+        } header: {
+            Text(L.languageUpper)
                 .font(Theme.Fonts.label)
                 .foregroundStyle(Theme.Colors.textSecondary)
         }
