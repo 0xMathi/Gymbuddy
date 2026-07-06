@@ -32,12 +32,12 @@ Your plan. Every set. Tracked.
 GymBuddy is a fast, focused workout tracker for people who actually lift.
 No subscription, no account, no noise — just you and the gym.
 
-• Push / Pull / Legs plans, ready to go — or build your own
+• Push / Pull / Legs plans, ready to go – or build your own
 • Log sets, reps & weight in one tap
 • See exactly what you lifted last time, on every set
-• Built-in rest timer with lock-screen alerts
+• Rest timer live on your Lock Screen and in the Dynamic Island
 • Supersets, custom rest, kg or lb
-• 100% offline — your data never leaves your phone
+• 100% offline – your data never leaves your phone
 
 No ads. No sign-up. No monthly fee. Open the app, pick a plan, train.
 
@@ -69,20 +69,20 @@ Dein Plan. Jeder Satz. Getrackt.
 GymBuddy ist ein schneller, fokussierter Workout-Tracker für alle, die nur trainieren wollen.
 Kein Abo, kein Account, kein Lärm — nur du und das Gym.
 
-• Push / Pull / Legs sofort startklar — oder bau eigene Pläne
+• Push / Pull / Legs sofort startklar – oder bau eigene Pläne
 • Sätze, Wiederholungen & Gewicht mit einem Tap loggen
 • Sieh bei jedem Satz, was du letztes Mal geschafft hast
-• Eingebauter Pausen-Timer mit Lockscreen-Hinweis
+• Pausen-Timer live auf dem Lockscreen und in der Dynamic Island
 • Supersätze, individuelle Pausen, kg oder lb
-• 100% offline — deine Daten verlassen nie dein Handy
+• 100% offline – deine Daten verlassen nie dein Handy
 
 Keine Werbung. Keine Anmeldung. Keine Monatsgebühr. App auf, Plan wählen, trainieren.
 
 Gebaut für dich und das Gym.
 
-*(Die zwei Beschreibungs-Änderungen oben — „nur trainieren wollen" + „für dich und das Gym" —
-sind noch NICHT live: Beschreibung ist bei live geschalteter App eingefroren → geht mit dem
-1.0.1-Update raus. Der Promo-Text oben ist bereits live.)*
+*(Stand 06.07.2026: exakt dieser Text ist mit Version 1.1 in ASC eingereicht — inkl. neuer
+Live-Activity-Bullet. EN-Beschreibung analog aktualisiert. Werbetexte EN+DE waren in ASC
+leer und sind jetzt beide eingetragen, alle mit „–" statt „—".)*
 ```
 
 ### Promo-Text — 170 Zeichen (live seit 03.07.2026, ohne Review änderbar)
@@ -146,6 +146,9 @@ auto-scaled to smaller devices.
 > • Gewicht tippen statt kurbeln: Tastatur-Eingabe im Satz-Editor, plus feinere 1,25-kg-Schritte
 > • Sprache direkt in den Einstellungen umschalten (System / Deutsch / English)
 > • VoiceOver-Unterstützung und ein schärferes App-Icon
+
+**✅ SUBMITTED 06.07.2026, ~23:30** — version 1.1 (build 5) is „Warten auf Prüfung" with
+auto-release. Everything below was completed in ASC (checklist kept for reference):
 
 ### ASC checklist for the 1.1 submission
 1. **DE localization in ASC:** the polished German description + promo text above are live-ready
