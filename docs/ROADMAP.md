@@ -57,23 +57,24 @@ Die „LETZTES MAL · 80 KG × 8"-Zeile ist heute nur Anzeige. **Tap auf die Gho
 Picker-Interaktionen — genau der Flow „gleiches Gewicht wie letztes Mal", der 80 % der
 Sätze abdeckt. (Dezente Haptik + kurzes Aufleuchten der Werte als Feedback.)
 
-### 5. Gewichtseingabe: Feinschliff am Edit-Sheet
+### 5. ✅ Gewichtseingabe: Feinschliff am Edit-Sheet (06.07.)
 - **Tastatur-Alternative:** kleines ⌨️-Symbol im Sheet → Zahlenfeld für direkte Eingabe
   (32,5 kg tippen statt kurbeln). Wheel bleibt Standard.
 - **Feinere Schritte:** 1,25-kg-Schritte (kg) bzw. 2,5-lb-Schritte (lb) — Mikro-Progression
   ist Realität am Kabelzug. Alternativ: Wheel behält 2,5er, Tastatur erlaubt alles.
 
-### 6. Accessibility-Pass (klein, aber Apple-relevant)
+### 6. ✅ Accessibility-Pass (klein, aber Apple-relevant) (06.07. — VoiceOver + reduceMotion; Dynamic Type bleibt bewusst fix)
 - VoiceOver-Labels für Satz-Checkboxen („Satz 2, 8 Wiederholungen, abhaken"), Timer, Plan-Cards
 - Dynamic-Type-Check auf den 4 Kernscreens (Start, Workout, Timer, Summary)
 - `reduceMotion` respektieren (Konfetti aus)
 Apple featured gern zugängliche Apps — und es ist schlicht richtig. Aufwand: 1 Session.
 
-### 7. App-Icon nachschärfen (aus dem ASO-Audit)
+### 7. ✅ App-Icon nachschärfen (aus dem ASO-Audit) (06.07. — Variante B „größer & fetter" gewählt)
 Das vertikale „G-Y-M" wird bei 60 px (Suchergebnisse) klein. Variante bauen: größere,
 fettere Buchstaben oder nur „G" mit Orange-Akzent. A/B-Vergleich als Mockup, dann entscheiden.
 
-### 8. Mitfahrende Kleinigkeiten
+### 8. 🔶 Mitfahrende Kleinigkeiten (What's-New-Texte EN/DE fertig in `app-store-listing.md`;
+offen: Lockscreen-Screenshot Slot 4 vom ECHTEN Gerät — Simulator zeigt „1:--" — und ASC-Eintrag beim Release)
 - Beschreibungs-Update DE (liegt fertig in `app-store-listing.md`: „nur trainieren wollen",
   „Gebaut für dich und das Gym.")
 - Neuer Store-Screenshot Slot 4: Timer **mit Dynamic Island** zeigen (Feature verkauft sich selbst)

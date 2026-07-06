@@ -118,5 +118,38 @@ auto-scaled to smaller devices.
 
 ---
 
+## Version 1.1 — release package (prepared 06.07.2026)
+
+### What's New — EN
+> **THE TIMER GROWS UP.**
+>
+> • Live Activity: your rest timer now lives on the Lock Screen and in the Dynamic Island — skip a rest without opening the app
+> • Finish & save: end a workout early and keep every completed set
+> • One tap: adopt "last time" values straight into the current set
+> • Type your weight: keyboard entry in the set editor, plus finer 1.25 kg / 2.5 lb steps
+> • VoiceOver support and a sharper app icon
+
+### What's New — DE
+> **DER TIMER WIRD ERWACHSEN.**
+>
+> • Live Activity: Der Pausen-Timer läuft jetzt auf dem Lockscreen und in der Dynamic Island — Pause überspringen, ohne die App zu öffnen
+> • Beenden & speichern: Workout vorzeitig beenden, alle erledigten Sätze bleiben im Log
+> • Ein Tap: „Letztes Mal"-Werte direkt in den aktuellen Satz übernehmen
+> • Gewicht tippen statt kurbeln: Tastatur-Eingabe im Satz-Editor, plus feinere 1,25-kg-Schritte
+> • VoiceOver-Unterstützung und ein schärferes App-Icon
+
+### ASC checklist for the 1.1 submission
+1. **DE localization in ASC:** the polished German description + promo text above are live-ready
+   in this file — enter them as the German localization if not done with 1.0.x already.
+2. **New screenshot slot 4 (both languages):** replace `04-rest-timer` with a Lock-Screen shot
+   showing the Live Activity banner. ⚠️ Must be captured on a real device — the simulator's
+   locked screen renders the ticking countdown as "1:--". Captions:
+   EN "Your timer lives on your Lock Screen." / DE "Dein Timer lebt auf dem Lockscreen."
+   Then compose via the slides pipeline (`scripts/make_store_slides.py`).
+3. **App icon** is already updated in the asset catalog (bolder GYM, chosen 06.07.).
+4. Version 1.1, build number fortlaufend; What's-New-Texte oben eintragen.
+
+---
+
 *What can't be assessed without paid ASO tools: exact keyword search volumes & rankings.
 The keyword choices above target intent-rich, mid-competition terms typical for gym loggers.*
