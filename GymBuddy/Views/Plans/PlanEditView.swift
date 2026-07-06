@@ -307,9 +307,9 @@ struct ExerciseDetailSheet: View {
     private let restRange = [30, 45, 60, 75, 90, 120, 150, 180, 240, 300]
 
     private var unit: WeightUnit { AppSettings.shared.weightUnit }
-    /// Selectable weight values in the active unit (kg: 2.5-steps, lb: 5-steps).
+    /// Fine-grid wheel values (kg: 1.25-steps, lb: 2.5-steps) incl. the stored value
     private var weightOptions: [Double] {
-        Array(stride(from: unit.step, through: unit.pickerMax, by: unit.step))
+        unit.wheelOptions(including: exercise.weight)
     }
     private func displayNumber(_ kg: Double) -> String { WeightDisplay.number(kg: kg, unit: unit) }
 
@@ -462,7 +462,7 @@ struct ExerciseDetailSheet: View {
                                     )) {
                                         Text("—").tag(Double(0))
                                         ForEach(weightOptions, id: \.self) { v in
-                                            Text(v.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(v)) \(unit.label)" : String(format: "%.1f \(unit.label)", v)).tag(unit.kg(fromValue: v))
+                                            Text("\(WeightDisplay.trim(v)) \(unit.label)").tag(unit.kg(fromValue: v))
                                         }
                                     }
                                     .pickerStyle(.wheel)

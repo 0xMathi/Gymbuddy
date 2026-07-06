@@ -1079,26 +1079,55 @@ struct EditSetSheet: View {
     @State private var reps: Int
     @State private var weight: Double
     @State private var restSeconds: Int
+    /// Keyboard alternative to the wheel: type "32.5" instead of cranking
+    @State private var useWeightKeyboard = false
+    @State private var weightString: String
 
     // Picker ranges
     private let repsRange = Array(1...100)
     private let restRange = Array(stride(from: 0, through: 600, by: 15))
 
     private var unit: WeightUnit { AppSettings.shared.weightUnit }
-    /// Selectable weight values in the active unit (kg: 2.5-steps, lb: 5-steps).
+    /// Fine-grid wheel values (kg: 1.25-steps, lb: 2.5-steps) incl. the stored value
     private var weightOptions: [Double] {
-        Array(stride(from: unit.step, through: unit.pickerMax, by: unit.step))
+        unit.wheelOptions(including: payload.weight)
     }
 
     init(payload: EditSetPayload, onSave: @escaping (Int, Double, Int) -> Void) {
         self.payload = payload
         self.onSave = onSave
         _reps = State(initialValue: payload.reps)
-        // Snap to a valid option in the active unit so the wheel preselects correctly.
+        // Preselect the nearest wheel option. Storing the option's own unit→kg
+        // round-trip guarantees the selection matches a picker tag exactly.
         let u = AppSettings.shared.weightUnit
-        let snapped = (u.value(fromKg: payload.weight) / u.step).rounded() * u.step
-        _weight = State(initialValue: payload.weight > 0 ? u.kg(fromValue: snapped) : 0)
+        let options = u.wheelOptions(including: payload.weight)
+        let target = u.value(fromKg: payload.weight)
+        let nearest = options.min { abs($0 - target) < abs($1 - target) } ?? 0
+        _weight = State(initialValue: payload.weight > 0 ? u.kg(fromValue: nearest) : 0)
+        _weightString = State(initialValue: payload.weight > 0 ? WeightDisplay.number(kg: payload.weight) : "")
         _restSeconds = State(initialValue: payload.restSeconds)
+    }
+
+    /// The weight to persist: typed value when the keyboard is active, wheel value otherwise
+    private var resolvedWeight: Double {
+        guard useWeightKeyboard else { return weight }
+        let normalized = weightString.replacingOccurrences(of: ",", with: ".")
+        guard let typed = Double(normalized), typed > 0 else { return 0 }
+        return unit.kg(fromValue: min(typed, unit.pickerMax))
+    }
+
+    private func toggleWeightKeyboard() {
+        if useWeightKeyboard {
+            // Carry the typed value over to the wheel (nearest selectable option)
+            let kg = resolvedWeight
+            let target = unit.value(fromKg: kg)
+            let nearest = weightOptions.min { abs($0 - target) < abs($1 - target) } ?? 0
+            weight = kg > 0 ? unit.kg(fromValue: nearest) : 0
+        } else {
+            weightString = weight > 0 ? WeightDisplay.number(kg: weight) : ""
+        }
+        useWeightKeyboard.toggle()
+        HapticService.shared.light()
     }
 
     var body: some View {
@@ -1132,21 +1161,51 @@ struct EditSetSheet: View {
                         .background(Theme.Colors.surface)
                         .cornerRadius(Theme.Layout.cornerRadiusSmall)
 
-                        // Weight Picker
+                        // Weight: wheel by default, keyboard on demand (type 32.5 instead of cranking).
+                        // Column title is the unit itself — "GEWICHT" doesn't fit next to the toggle.
                         VStack {
-                            Text(L.weightUpper)
-                                .font(Theme.Fonts.caption)
-                                .tracking(1)
-                                .foregroundStyle(Theme.Colors.textSecondary)
-                            
-                            Picker("Weight", selection: $weight) {
-                                Text("—").tag(Double(0))
-                                ForEach(weightOptions, id: \.self) { v in
-                                    Text(v.truncatingRemainder(dividingBy: 1) == 0 ? "\(Int(v)) \(unit.label)" : String(format: "%.1f \(unit.label)", v)).tag(unit.kg(fromValue: v))
+                            HStack(spacing: 6) {
+                                Text(unit.labelUpper)
+                                    .font(Theme.Fonts.caption)
+                                    .tracking(1)
+                                    .foregroundStyle(Theme.Colors.textSecondary)
+
+                                Button {
+                                    toggleWeightKeyboard()
+                                } label: {
+                                    Image(systemName: useWeightKeyboard ? "dial.medium" : "keyboard")
+                                        .font(.system(size: 13, weight: .bold))
+                                        .foregroundStyle(Theme.Colors.accent)
+                                        .frame(width: 26, height: 22)
+                                        .contentShape(Rectangle())
                                 }
+                                .buttonStyle(.plain)
                             }
-                            .pickerStyle(.wheel)
-                            .frame(height: 140)
+
+                            if useWeightKeyboard {
+                                VStack {
+                                    Spacer()
+                                    TextField("0", text: $weightString)
+                                        .font(.system(size: 26, weight: .black, design: .monospaced))
+                                        .foregroundStyle(Theme.Colors.accent)
+                                        .multilineTextAlignment(.center)
+                                        .keyboardType(.decimalPad)
+                                        .padding(.vertical, 12)
+                                        .background(Theme.Colors.surfaceElevated.opacity(0.5))
+                                        .cornerRadius(Theme.Layout.cornerRadiusSmall)
+                                    Spacer()
+                                }
+                                .frame(height: 140)
+                            } else {
+                                Picker("Weight", selection: $weight) {
+                                    Text("—").tag(Double(0))
+                                    ForEach(weightOptions, id: \.self) { v in
+                                        Text(WeightDisplay.trim(v)).tag(unit.kg(fromValue: v))
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                                .frame(height: 140)
+                            }
                         }
                         .padding()
                         .background(Theme.Colors.surface)
@@ -1189,7 +1248,7 @@ struct EditSetSheet: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(L.saveUpper) {
-                        onSave(reps, weight, restSeconds)
+                        onSave(reps, resolvedWeight, restSeconds)
                         dismiss()
                     }
                     .font(Theme.Fonts.label)
