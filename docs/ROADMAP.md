@@ -73,8 +73,8 @@ Apple featured gern zugängliche Apps — und es ist schlicht richtig. Aufwand: 
 Das vertikale „G-Y-M" wird bei 60 px (Suchergebnisse) klein. Variante bauen: größere,
 fettere Buchstaben oder nur „G" mit Orange-Akzent. A/B-Vergleich als Mockup, dann entscheiden.
 
-### 8. 🔶 Mitfahrende Kleinigkeiten (What's-New-Texte EN/DE fertig in `app-store-listing.md`;
-offen: Lockscreen-Screenshot Slot 4 vom ECHTEN Gerät — Simulator zeigt „1:--" — und ASC-Eintrag beim Release)
+### 8. ✅ Mitfahrende Kleinigkeiten (06.07. — What's-New EN/DE + stilisierte Slot-4-Slides in
+beiden Sprachen fertig; dazu ungeplant: In-App-Sprachschalter. Offen nur noch: ASC-Eintrag beim Release)
 - Beschreibungs-Update DE (liegt fertig in `app-store-listing.md`: „nur trainieren wollen",
   „Gebaut für dich und das Gym.")
 - Neuer Store-Screenshot Slot 4: Timer **mit Dynamic Island** zeigen (Feature verkauft sich selbst)
