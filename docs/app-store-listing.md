@@ -66,7 +66,7 @@ Made for the gym.
 ```
 Dein Plan. Jeder Satz. Getrackt.
 
-GymBuddy ist ein schneller, fokussierter Workout-Tracker für alle, die wirklich trainieren.
+GymBuddy ist ein schneller, fokussierter Workout-Tracker für alle, die nur trainieren wollen.
 Kein Abo, kein Account, kein Lärm — nur du und das Gym.
 
 • Push / Pull / Legs sofort startklar — oder bau eigene Pläne
@@ -78,11 +78,15 @@ Kein Abo, kein Account, kein Lärm — nur du und das Gym.
 
 Keine Werbung. Keine Anmeldung. Keine Monatsgebühr. App auf, Plan wählen, trainieren.
 
-Gebaut fürs Gym.
+Gebaut für dich und das Gym.
+
+*(Die zwei Beschreibungs-Änderungen oben — „nur trainieren wollen" + „für dich und das Gym" —
+sind noch NICHT live: Beschreibung ist bei live geschalteter App eingefroren → geht mit dem
+1.0.1-Update raus. Der Promo-Text oben ist bereits live.)*
 ```
 
-### Promo-Text — 170 Zeichen
-> **Ein schneller Trainings-Tracker, der sich merkt, was du letztes Mal geschafft hast — Push/Pull/Legs startklar, Pausen-Timer eingebaut. Kein Account, keine Werbung.** — `163 Zeichen`
+### Promo-Text — 170 Zeichen (live seit 03.07.2026, ohne Review änderbar)
+> **Schneller Trainings-Tracker, der sich merkt, was du letztes Mal geschafft hast — Push/Pull/Legs startklar, intuitive Bedienung, Pausen-Timer. Kein Account, keine Werbung.** — `170 Zeichen`
 
 ---
 
