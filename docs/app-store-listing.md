@@ -150,6 +150,27 @@ auto-scaled to smaller devices.
 **✅ SUBMITTED 06.07.2026, ~23:30** — version 1.1 (build 5) is „Warten auf Prüfung" with
 auto-release. Everything below was completed in ASC (checklist kept for reference):
 
+## Version 1.1.1 — release package (13.07.2026)
+
+### What's New — EN
+> **FINE-TUNING.**
+>
+> • Edit plans right from the start screen – every plan card has its own menu now
+> • Link supersets in the plan editor: toggle "Superset with previous exercise"
+> • Every exercise in the catalog now has its own artwork
+> • The app stays in portrait – no more accidental sideways screens mid-set
+
+### What's New — DE
+> **FEINSCHLIFF.**
+>
+> • Pläne direkt vom Startscreen bearbeiten – jede Plan-Karte hat jetzt ihr eigenes Menü
+> • Supersätze im Plan-Editor koppeln: Schalter „Superset mit vorheriger Übung"
+> • Jede Übung im Katalog hat jetzt ihr eigenes Bild
+> • Die App bleibt im Hochformat – kein versehentliches Querformat mehr mitten im Satz
+
+*(Screenshots, Beschreibung, Keywords, Werbetexte unverändert aus 1.1 — nur What's New
+eintragen + Build 6 anhängen.)*
+
 ### ASC checklist for the 1.1 submission
 1. **DE localization in ASC:** the polished German description + promo text above are live-ready
    in this file — enter them as the German localization if not done with 1.0.x already.
