@@ -1304,6 +1304,7 @@ struct ActiveWorkoutDropDelegate: DropDelegate {
                     for (idx, exercise) in sorted.enumerated() {
                         exercise.orderIndex = idx
                     }
+                    session.plan.normalizeSupersets()
                 }
             }
         }

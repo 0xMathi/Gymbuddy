@@ -313,6 +313,34 @@ struct ExerciseDetailSheet: View {
     }
     private func displayNumber(_ kg: Double) -> String { WeightDisplay.number(kg: kg, unit: unit) }
 
+    // MARK: - Superset linking
+
+    private var previousExercise: Exercise? {
+        guard let plan = exercise.plan else { return nil }
+        let sorted = plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
+        guard let i = sorted.firstIndex(where: { $0.id == exercise.id }), i > 0 else { return nil }
+        return sorted[i - 1]
+    }
+
+    private var isLinkedToPrevious: Bool {
+        guard let prev = previousExercise, let gid = exercise.supersetId else { return false }
+        return prev.supersetId == gid
+    }
+
+    private func setLinkedToPrevious(_ linked: Bool) {
+        guard let prev = previousExercise, let plan = exercise.plan else { return }
+        if linked {
+            // Join the previous exercise's group, or open a new one for both.
+            let gid = prev.supersetId ?? UUID().uuidString
+            prev.supersetId = gid
+            exercise.supersetId = gid
+        } else {
+            exercise.supersetId = nil
+        }
+        plan.normalizeSupersets()
+        HapticService.shared.light()
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -486,6 +514,33 @@ struct ExerciseDetailSheet: View {
                                 }
                                 .pickerStyle(.wheel)
                                 .frame(height: 120)
+                            }
+
+                            // Superset Card — link this exercise to the one before it
+                            if previousExercise != nil {
+                                VStack(alignment: .leading, spacing: Theme.Spacing.small) {
+                                    Toggle(isOn: Binding(
+                                        get: { isLinkedToPrevious },
+                                        set: { setLinkedToPrevious($0) }
+                                    )) {
+                                        HStack(spacing: Theme.Spacing.small) {
+                                            Image(systemName: "link")
+                                                .font(.system(size: 14, weight: .bold))
+                                                .foregroundStyle(Theme.Colors.accent)
+                                            Text(L.supersetLinkPrev)
+                                                .font(.system(size: 15, weight: .semibold))
+                                                .foregroundStyle(Theme.Colors.textPrimary)
+                                        }
+                                    }
+                                    .tint(Theme.Colors.accent)
+
+                                    Text(L.supersetHint)
+                                        .font(Theme.Fonts.caption)
+                                        .foregroundStyle(Theme.Colors.textSecondary)
+                                }
+                                .padding(Theme.Spacing.large)
+                                .background(Theme.Colors.surface)
+                                .cornerRadius(Theme.Layout.cornerRadius)
                             }
 
                             // Specific Sets Card

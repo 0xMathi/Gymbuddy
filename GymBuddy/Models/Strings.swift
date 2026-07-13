@@ -91,6 +91,10 @@ enum L {
     static var restRunning: String { t("REST RUNNING", "PAUSE LÄUFT") }
     static var delete: String { t("Delete", "Löschen") }
     static var edit: String { t("Edit", "Bearbeiten") }
+    static var supersetLinkPrev: String { t("Superset with previous exercise", "Superset mit vorheriger Übung") }
+    static var supersetHint: String { t("Performed back-to-back – rest starts after the last linked exercise.",
+                                        "Direkt nacheinander ausgeführt – Pause erst nach der letzten gekoppelten Übung.") }
+    static var a11yPlanOptions: String { t("Plan options", "Plan-Optionen") }
     static func previewExercise(_ i: Int, _ n: Int) -> String { t("PREVIEW · EXERCISE \(i) / \(n)", "VORSCHAU · ÜBUNG \(i) / \(n)") }
     static var previewDone: String { t("PREVIEW · DONE ✓", "VORSCHAU · ERLEDIGT ✓") }
     static var skip: String { t("SKIP", "ÜBERSPRINGEN") }

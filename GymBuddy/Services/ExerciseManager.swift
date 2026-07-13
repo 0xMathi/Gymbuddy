@@ -165,6 +165,7 @@ class ExerciseManager {
             for (index, ex) in plan.exercises.enumerated() {
                 ex.orderIndex = index
             }
+            plan.normalizeSupersets()
 
             do {
                 try context.save()
@@ -184,6 +185,7 @@ class ExerciseManager {
         for (index, exercise) in exercises.enumerated() {
             exercise.orderIndex = index
         }
+        plan.normalizeSupersets()
 
         do {
             try context.save()

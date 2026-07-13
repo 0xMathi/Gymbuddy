@@ -206,7 +206,9 @@ struct StartScreenView: View {
                         sessionManager.startWorkout(plan: plan)
                     }
                 }
-            }
+            },
+            onEdit: { planToEdit = plan },
+            onDelete: { deletePlan(plan) }
         )
         .listRowInsets(EdgeInsets(top: Theme.Spacing.small, leading: Theme.Spacing.large, bottom: Theme.Spacing.small, trailing: Theme.Spacing.large))
         .swipeActions(edge: .trailing, allowsFullSwipe: !isEditMode) {
@@ -334,6 +336,8 @@ private struct StartPlanCard: View {
     let icon: String
     let muscles: String
     let onTap: () -> Void
+    let onEdit: () -> Void
+    let onDelete: () -> Void
 
     @State private var isPressed = false
 
@@ -403,6 +407,29 @@ private struct StartPlanCard: View {
         .buttonStyle(SquishableButtonStyle(isPressed: $isPressed))
         .accessibilityLabel("\(plan.name), \(L.exercisesCount(plan.exercises.count))")
         .accessibilityHint(L.a11yStartsWorkoutHint)
+        // Visible edit access — long-press context menu alone was too hidden
+        .overlay(alignment: .topTrailing) {
+            Menu {
+                Button {
+                    onEdit()
+                } label: {
+                    Label(L.edit, systemImage: "pencil")
+                }
+                Button(role: .destructive) {
+                    onDelete()
+                } label: {
+                    Label(L.delete, systemImage: "trash.fill")
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(Theme.Colors.textSecondary)
+                    .frame(width: 44, height: 40)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(L.a11yPlanOptions)
+        }
     }
 
     private func relativeLabel(for date: Date) -> String {
