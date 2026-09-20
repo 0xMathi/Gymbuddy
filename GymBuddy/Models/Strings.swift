@@ -29,6 +29,11 @@ enum L {
     static var lastUsedYesterday: String { t("LAST · YESTERDAY", "ZULETZT · GESTERN") }
     static func lastUsedDaysAgo(_ d: Int) -> String { t("LAST · \(d) DAYS AGO", "ZULETZT · VOR \(d) TAGEN") }
     static func lastUsedOn(_ date: String) -> String { t("LAST · \(date)", "ZULETZT · \(date)") }
+    static var deletePlanQuestion: String { t("Delete plan?", "Plan löschen?") }
+    static func deletePlanMessage(_ name: String) -> String {
+        t("“\(name)” and all its exercises will be deleted. This can’t be undone.",
+          "„\(name)“ wird mit allen Übungen gelöscht. Das lässt sich nicht rückgängig machen.")
+    }
 
     // MARK: - Onboarding
     static var onbSub: String { t("A fast, focused workout tracker. No subscriptions, no noise – just you and the iron.",
