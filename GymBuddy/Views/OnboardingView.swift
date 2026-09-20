@@ -183,8 +183,8 @@ struct OnboardingView: View {
     /// The three things the app never spells out.
     private var howCards: [HowCard] {
         [
-            HowCard(visual: .swipe, title: L.onbHowSwipeTitle, body: L.onbHowSwipeBody),
             HowCard(visual: .editSet, title: L.onbHowSetTitle, body: L.onbHowSetBody),
+            HowCard(visual: .swipe, title: L.onbHowSwipeTitle, body: L.onbHowSwipeBody),
             HowCard(visual: .superset, title: L.onbHowSupersetTitle, body: L.onbHowSupersetBody),
         ]
     }
