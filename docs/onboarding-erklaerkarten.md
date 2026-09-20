@@ -56,13 +56,18 @@ Worauf zu achten ist:
   zwischen die Ränder passen.
 - Einmal auf Englisch gegenlesen (Gerätesprache umstellen).
 
-**Build-Stand:** Gebaut und im Simulator angesehen (iPhone 17 Pro, iOS 26.5),
-alle drei Karten auf Deutsch. Dabei fiel auf, dass der rote Lösch-Hintergrund der
-dritten Karte über die halbe Seite lief – ein `RoundedRectangle` als ZStack-
-Geschwister hat keine eigene Höhe. Gefixt: die Satz-Zeile gibt die Höhe vor.
+**Build-Stand:** Durchgeklickt im Simulator, 20.09.2026.
 
-Zwei Fallen für das nächste Mal: Simulator.app fehlt in der aktuellen
-Xcode-Installation, Tippen im Simulator geht also nicht. Die einzelnen Seiten
-lassen sich trotzdem ansehen, indem man `page` temporär aus den UserDefaults
-liest und die App mit `simctl launch … -VerifyStartPage 3` startet.
-Auf Englisch und auf einem kleinen Gerät (iPhone SE) ist noch nicht gegengelesen.
+- iPhone 17 Pro, Deutsch: alle drei Karten, Wischen zwischen den Karten,
+  „Überspringen" landet auf der Mitteilungen-Seite.
+- iPhone SE (3. Gen.), Englisch, lb: Text und Mockups passen zwischen die Ränder.
+
+Drei Fehler kamen dabei raus und sind gefixt: der rote Lösch-Hintergrund der
+dritten Karte lief über die halbe Seite (ein `RoundedRectangle` als
+ZStack-Geschwister hat keine eigene Höhe – die Satz-Zeile gibt sie jetzt vor);
+und auf dem SE brachen in lb beide Mockup-Zeilen ab, statt zu schrumpfen.
+
+Zum Ansehen einzelner Seiten ohne Neuinstallation: `page` temporär aus den
+UserDefaults lesen und mit `simctl launch … -VerifyStartPage 3` starten.
+Sprache/Einheit lassen sich mit `-AppleLanguages "(en)" -AppleLocale en_US`
+mitgeben.
