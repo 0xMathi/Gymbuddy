@@ -340,7 +340,7 @@ struct OnboardingView: View {
                         .font(.system(size: 21, weight: .bold, design: .monospaced))
                         .foregroundStyle(Theme.Colors.textPrimary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.6)
+                        .minimumScaleFactor(0.45)
 
                     if showTapHint {
                         Image(systemName: "hand.tap.fill")
@@ -354,7 +354,7 @@ struct OnboardingView: View {
                         Text(L.lastTime(WeightDisplay.string(kg: 32.5, unit: unit, uppercase: true), 8))
                             .font(Theme.Fonts.ghostLabel).tracking(0.8)
                             .lineLimit(1)
-                            .minimumScaleFactor(0.7)
+                            .minimumScaleFactor(0.45)
 
                         Image(systemName: "hand.tap.fill")
                             .font(.system(size: 11, weight: .bold))
