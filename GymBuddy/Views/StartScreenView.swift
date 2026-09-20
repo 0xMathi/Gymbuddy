@@ -11,6 +11,15 @@ struct StartScreenView: View {
     @State private var planToEdit: WorkoutPlan?
     @State private var showSettings = false
     @State private var isEditMode = false
+    /// Plan, für den die Löschen-Rückfrage offen ist
+    @State private var planPendingDeletion: PendingPlanDeletion?
+
+    /// Hält den Namen als Kopie, damit der Dialog beim Ausblenden nicht mehr
+    /// auf das bereits gelöschte Modell zugreift
+    private struct PendingPlanDeletion {
+        let name: String
+        let plan: WorkoutPlan
+    }
 
     // Map plan names to icons (fallback when no image asset exists)
     private func iconFor(_ name: String) -> String {
@@ -89,6 +98,22 @@ struct StartScreenView: View {
             }
             .sheet(isPresented: $showSettings) {
                 SettingsView()
+            }
+            .confirmationDialog(
+                L.deletePlanQuestion,
+                isPresented: Binding(
+                    get: { planPendingDeletion != nil },
+                    set: { if !$0 { planPendingDeletion = nil } }
+                ),
+                titleVisibility: .visible,
+                presenting: planPendingDeletion
+            ) { pending in
+                Button(L.delete, role: .destructive) {
+                    deletePlan(pending.plan)
+                }
+                Button(L.cancel, role: .cancel) {}
+            } message: { pending in
+                Text(L.deletePlanMessage(pending.name))
             }
         }
     }
@@ -209,10 +234,10 @@ struct StartScreenView: View {
             }
         )
         .listRowInsets(EdgeInsets(top: Theme.Spacing.small, leading: Theme.Spacing.large, bottom: Theme.Spacing.small, trailing: Theme.Spacing.large))
-        .swipeActions(edge: .trailing, allowsFullSwipe: !isEditMode) {
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if !isEditMode {
                 Button(role: .destructive) {
-                    deletePlan(plan)
+                    planPendingDeletion = PendingPlanDeletion(name: plan.name, plan: plan)
                 } label: {
                     Label(L.delete, systemImage: "trash.fill")
                 }
@@ -225,7 +250,7 @@ struct StartScreenView: View {
                 Label(L.edit, systemImage: "pencil")
             }
             Button(role: .destructive) {
-                deletePlan(plan)
+                planPendingDeletion = PendingPlanDeletion(name: plan.name, plan: plan)
             } label: {
                 Label("Löschen", systemImage: "trash.fill")
             }
