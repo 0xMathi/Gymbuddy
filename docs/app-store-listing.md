@@ -171,6 +171,25 @@ auto-release. Everything below was completed in ASC (checklist kept for referenc
 *(Screenshots, Beschreibung, Keywords, Werbetexte unverändert aus 1.1 — nur What's New
 eintragen + Build 6 anhängen.)*
 
+## Version 1.2 — release package (20.09.2026)
+
+### What's New — EN
+> **LESS TAPPING.**
+>
+> • Finish a whole exercise in one tap – every remaining set ticked off, no rest timer in between
+> • Deleting a plan asks first, so nothing disappears by accident
+> • New on first launch: a short walkthrough – adjusting sets, swiping between exercises, supersets
+
+### What's New — DE
+> **WENIGER TIPPEN.**
+>
+> • Eine ganze Übung mit einem Tipp abschließen – alle restlichen Sätze abgehakt, keine Pause dazwischen
+> • Pläne löschen fragt jetzt nach, damit nichts aus Versehen verschwindet
+> • Neu beim ersten Start: eine kurze Einführung – Sätze anpassen, zwischen Übungen wischen, Supersätze
+
+*(Screenshots, Beschreibung, Keywords unverändert aus 1.1 — What's New eintragen,
+WERBETEXTE in BEIDEN Sprachen neu eintragen (werden pro Version geleert), Build 7 anhängen.)*
+
 ### ASC checklist for the 1.1 submission
 1. **DE localization in ASC:** the polished German description + promo text above are live-ready
    in this file — enter them as the German localization if not done with 1.0.x already.

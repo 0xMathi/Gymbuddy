@@ -84,7 +84,21 @@ beiden Sprachen fertig; dazu ungeplant: In-App-Sprachschalter. Offen nur noch: A
 
 ---
 
-## Version 1.2 — „Verlauf" (das frühere ‚Pro'-Feature, jetzt für alle)
+## Version 1.2 — ✅ „Weniger Tippen" (20.09.2026)
+
+Ungeplant dazwischengekommen, aus dem Training heraus entstanden:
+
+- ✅ **„Übung abschließen":** hakt alle restlichen Sätze einer Übung ab und springt
+  weiter, ohne Pausen-Timer dazwischen (`markExerciseComplete` gab es schon, war
+  aber nur über das Quick-Action-Sheet fremder Übungen erreichbar).
+- ✅ **Löschen-Rückfrage für Pläne** auf allen drei Wegen (Swipe, ⋯-Menü, Long-Press).
+- ✅ **Onboarding-Erklärkarten:** Sätze anpassen, zwischen Übungen wischen, Supersätze.
+
+Der Verlauf rutscht dadurch auf 1.3, die „Öffnung" auf 1.4.
+
+---
+
+## Version 1.3 — „Verlauf" (das frühere ‚Pro'-Feature, jetzt für alle)
 
 Da keine Pro-Version kommt: **Der Verlauf wird das kostenlose Herzstück-Update.**
 Die Daten existieren seit 1.0 (`CompletedWorkout` wird längst gespeichert) — Bestandsnutzer
@@ -108,7 +122,7 @@ den eine App haben kann.
 
 ---
 
-## Version 1.3 — „Öffnung" (Kandidaten, Reihenfolge nach Lust & Feedback)
+## Version 1.4 — „Öffnung" (Kandidaten, Reihenfolge nach Lust & Feedback)
 
 1. **Apple-Health-Export (opt-in):** Abgeschlossene Workouts als Krafttraining-Workout
    in Health schreiben (write-only, keine Lese-Rechte). Bleibt on-device → „Data Not
@@ -143,8 +157,9 @@ Zwei Updates = zwei Geschichten (Matti: „mehr zu erzählen statt alles abzufr�
 | Release | Thema | Kern | Bauch-Aufwand |
 |---|---|---|---|
 | **1.1** | Timer & Feinschliff | Live Activity, Beenden&Speichern, Ghost-Tap, Bug | ~4–6 Sessions |
-| **1.2** | Verlauf | History + PRs + 2 Charts + Widget | ~5–8 Sessions |
-| **1.3** | Öffnung | Health-Export, Plan-Teilen, Plate Calculator | à la carte |
+| **1.2** | ✅ Weniger Tippen | Übung abschließen, Löschen-Rückfrage, Onboarding-Karten | erledigt 20.09. |
+| **1.3** | Verlauf | History + PRs + 2 Charts + Widget | ~5–8 Sessions |
+| **1.4** | Öffnung | Health-Export, Plan-Teilen, Plate Calculator | à la carte |
 
 Faustregel: lieber alle 4–6 Wochen ein kleines, rundes Update (hält das „zuletzt
 aktualisiert"-Signal im Store frisch — Rankingfaktor!) als ein Riesen-Update im Winter.
