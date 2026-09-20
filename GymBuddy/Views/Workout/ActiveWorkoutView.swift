@@ -409,48 +409,55 @@ struct ActiveWorkoutView: View {
                         }
                     }
                     
-                    // Add Set Button Row
-                    Button {
-                        var sets = exercise.resolvedSets
-                        let lastSet = sets.last ?? ExerciseSet(index: 1, reps: exercise.reps, weight: exercise.weight)
-                        let newSet = ExerciseSet(index: sets.count + 1, reps: lastSet.reps, weight: lastSet.weight)
-                        sets.append(newSet)
-                        exercise.specificSets = sets
-                        exercise.sets = sets.count
-                        HapticService.shared.light()
-                    } label: {
-                        HStack {
-                            Image(systemName: "plus")
-                            Text(L.addSet)
+                    // Both actions share one row: stacked, the card grows taller
+                    // than the screen on a four-set exercise and the lower button
+                    // ends up pinned to the bottom edge.
+                    HStack(spacing: 0) {
+                        Button {
+                            var sets = exercise.resolvedSets
+                            let lastSet = sets.last ?? ExerciseSet(index: 1, reps: exercise.reps, weight: exercise.weight)
+                            let newSet = ExerciseSet(index: sets.count + 1, reps: lastSet.reps, weight: lastSet.weight)
+                            sets.append(newSet)
+                            exercise.specificSets = sets
+                            exercise.sets = sets.count
+                            HapticService.shared.light()
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "plus")
+                                Text(L.addSet)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(Theme.Colors.accent)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Theme.Spacing.large)
                         }
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Theme.Colors.accent)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, Theme.Spacing.large)
-                    }
-                    .buttonStyle(.plain)
+                        .buttonStyle(.plain)
 
-                    Rectangle()
-                        .fill(Theme.Colors.surface)
-                        .frame(height: 1)
-                        .padding(.horizontal, Theme.Spacing.large)
+                        Rectangle()
+                            .fill(Theme.Colors.surface)
+                            .frame(width: 1, height: 22)
 
-                    // Ticks off every remaining set of this exercise and moves on
-                    // without a rest timer in between - same action the quick-action
-                    // sheet offers for the other exercises.
-                    Button {
-                        manager.markExerciseComplete(index: session.currentExerciseIndex)
-                    } label: {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                            Text(L.finishExercise)
+                        // Ticks off every remaining set of this exercise and moves on
+                        // without a rest timer in between - same action the quick-action
+                        // sheet offers for the other exercises.
+                        Button {
+                            manager.markExerciseComplete(index: session.currentExerciseIndex)
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark.circle.fill")
+                                Text(L.finishExercise)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(Theme.Colors.accent)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Theme.Spacing.large)
                         }
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Theme.Colors.accent)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, Theme.Spacing.large)
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
                 .background(Theme.Colors.surfaceElevated.opacity(0.1))
                 .cornerRadius(Theme.Layout.cornerRadiusLarge)
