@@ -99,13 +99,14 @@ struct StartScreenView: View {
             .sheet(isPresented: $showSettings) {
                 SettingsView()
             }
-            .confirmationDialog(
+            // alert, not confirmationDialog: on iOS 26 the dialog renders without a
+            // visible cancel row, leaving "delete" as the only affordance.
+            .alert(
                 L.deletePlanQuestion,
                 isPresented: Binding(
                     get: { planPendingDeletion != nil },
                     set: { if !$0 { planPendingDeletion = nil } }
                 ),
-                titleVisibility: .visible,
                 presenting: planPendingDeletion
             ) { pending in
                 Button(L.delete, role: .destructive) {

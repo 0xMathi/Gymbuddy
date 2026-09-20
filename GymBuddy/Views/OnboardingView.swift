@@ -273,20 +273,22 @@ struct OnboardingView: View {
 
     /// The same row mid-swipe, delete revealed behind it.
     private var editSetVisual: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius)
-                .fill(Theme.Colors.destructive)
-                .overlay(alignment: .trailing) {
-                    Image(systemName: "trash.fill")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(.white)
-                        .padding(.trailing, Theme.Spacing.large)
-                }
-
-            mockSetRow(showLastTime: false, showTapHint: true)
-                .offset(x: -60)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius))
+        // The row has to size this, not the red shape: a bare RoundedRectangle
+        // has no intrinsic height and would stretch over the whole page.
+        mockSetRow(showLastTime: false, showTapHint: true)
+            .offset(x: -60)
+            .frame(maxWidth: .infinity)
+            .background {
+                RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius)
+                    .fill(Theme.Colors.destructive)
+                    .overlay(alignment: .trailing) {
+                        Image(systemName: "trash.fill")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(.white)
+                            .padding(.trailing, Theme.Spacing.large)
+                    }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius))
     }
 
     private func mockExerciseCard(name: String, meta: String, progress: Double) -> some View {
