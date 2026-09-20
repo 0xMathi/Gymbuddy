@@ -46,6 +46,21 @@ enum L {
     static var onbAllowNotifs: String { t("Allow notifications", "Mitteilungen erlauben") }
     static var onbMaybeLater: String { t("Maybe later", "Vielleicht später") }
 
+    // Onboarding — explainer cards (the gestures the app never spells out)
+    static var onbHowKicker: String { t("HOW IT WORKS", "SO GEHT'S") }
+    static var onbHowSwipeTitle: String { t("Swipe through.", "Wisch dich durch.") }
+    static var onbHowSwipeBody: String { t("In a workout, swipe left or right to look through every exercise. Your running set stays where it is — only \u{201C}Continue here\u{201D} actually moves you.",
+                                           "Wisch im Training nach links oder rechts und sieh dir jede Übung an. Dein laufender Satz bleibt, wo er ist — erst \u{201E}Hier weitermachen\u{201C} springt wirklich hin.") }
+    static var onbHowLastTimeTitle: String { t("Last time, one tap.", "Letztes Mal, ein Tipp.") }
+    static var onbHowLastTimeBody: String { t("Under the active set you see what you lifted last time. Tap it and the weight and reps are already in.",
+                                              "Unter dem aktiven Satz steht, was du letztes Mal gestemmt hast. Tipp drauf, und Gewicht und Wiederholungen stehen drin.") }
+    static var onbHowSetTitle: String { t("Every set, yours.", "Jeder Satz, deiner.") }
+    static var onbHowSetBody: String { t("Tap a set to change weight, reps and rest for that one set. Swipe it left to delete it.",
+                                         "Tipp einen Satz an und ändere Gewicht, Wiederholungen und Pause nur für diesen Satz. Nach links wischen löscht ihn.") }
+    /// Sample exercise names used only in the onboarding mockups.
+    static var onbHowSampleExercise: String { t("BENCH PRESS", "BANKDRÜCKEN") }
+    static var onbHowSampleNext: String { t("LATERAL RAISES", "SEITHEBEN") }
+
     // MARK: - Settings
     static var settings: String { t("Settings", "Einstellungen") }
     static var appearance: String { t("Appearance", "Darstellung") }
