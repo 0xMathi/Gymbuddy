@@ -11,11 +11,11 @@ struct StartScreenView: View {
     @State private var planToEdit: WorkoutPlan?
     @State private var showSettings = false
     @State private var isEditMode = false
-    /// Plan, für den die Löschen-Rückfrage offen ist
+    /// Plan whose delete confirmation is currently open
     @State private var planPendingDeletion: PendingPlanDeletion?
 
-    /// Hält den Namen als Kopie, damit der Dialog beim Ausblenden nicht mehr
-    /// auf das bereits gelöschte Modell zugreift
+    /// Keeps a copy of the name so the dialog does not read from an
+    /// already-deleted model while it fades out
     private struct PendingPlanDeletion {
         let name: String
         let plan: WorkoutPlan
@@ -109,7 +109,7 @@ struct StartScreenView: View {
                 presenting: planPendingDeletion
             ) { pending in
                 Button(L.delete, role: .destructive) {
-                    deletePlan(pending.plan)
+                    confirmDeletePlan(pending.plan)
                 }
                 Button(L.cancel, role: .cancel) {}
             } message: { pending in
@@ -239,7 +239,7 @@ struct StartScreenView: View {
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             if !isEditMode {
                 Button(role: .destructive) {
-                    planPendingDeletion = PendingPlanDeletion(name: plan.name, plan: plan)
+                    deletePlan(plan)
                 } label: {
                     Label(L.delete, systemImage: "trash.fill")
                 }
@@ -252,9 +252,9 @@ struct StartScreenView: View {
                 Label(L.edit, systemImage: "pencil")
             }
             Button(role: .destructive) {
-                planPendingDeletion = PendingPlanDeletion(name: plan.name, plan: plan)
+                deletePlan(plan)
             } label: {
-                Label("Löschen", systemImage: "trash.fill")
+                Label(L.delete, systemImage: "trash.fill")
             }
         }
     }
@@ -327,7 +327,12 @@ struct StartScreenView: View {
         }
     }
 
+    /// Every delete path routes through here, so none can skip the confirmation.
     private func deletePlan(_ plan: WorkoutPlan) {
+        planPendingDeletion = PendingPlanDeletion(name: plan.name, plan: plan)
+    }
+
+    private func confirmDeletePlan(_ plan: WorkoutPlan) {
         HapticService.shared.medium()
         withAnimation {
             modelContext.delete(plan)
