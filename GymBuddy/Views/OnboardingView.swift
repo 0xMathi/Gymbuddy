@@ -174,18 +174,18 @@ struct OnboardingView: View {
 
     /// One explainer card: the copy plus which mini-mockup to draw for it.
     private struct HowCard {
-        enum Visual { case swipe, lastTime, editSet }
+        enum Visual { case swipe, editSet, superset }
         let visual: Visual
         let title: String
         let body: String
     }
 
-    /// The three gestures the workout screen never spells out.
+    /// The three things the app never spells out.
     private var howCards: [HowCard] {
         [
             HowCard(visual: .swipe, title: L.onbHowSwipeTitle, body: L.onbHowSwipeBody),
-            HowCard(visual: .lastTime, title: L.onbHowLastTimeTitle, body: L.onbHowLastTimeBody),
             HowCard(visual: .editSet, title: L.onbHowSetTitle, body: L.onbHowSetBody),
+            HowCard(visual: .superset, title: L.onbHowSupersetTitle, body: L.onbHowSupersetBody),
         ]
     }
 
@@ -234,8 +234,8 @@ struct OnboardingView: View {
     private func howVisual(_ visual: HowCard.Visual) -> some View {
         switch visual {
         case .swipe: swipeVisual
-        case .lastTime: lastTimeVisual
         case .editSet: editSetVisual
+        case .superset: supersetVisual
         }
     }
 
@@ -266,29 +266,47 @@ struct OnboardingView: View {
         }
     }
 
-    /// The active set row with the tappable "last time" ghost label.
-    private var lastTimeVisual: some View {
-        mockSetRow(showLastTime: true, showTapHint: false)
+    /// The set row with the tap hint - this is what the copy describes.
+    private var editSetVisual: some View {
+        mockSetRow()
     }
 
-    /// The same row mid-swipe, delete revealed behind it.
-    private var editSetVisual: some View {
-        // The row has to size this, not the red shape: a bare RoundedRectangle
-        // has no intrinsic height and would stretch over the whole page.
-        mockSetRow(showLastTime: false, showTapHint: true)
-            .offset(x: -60)
-            .frame(maxWidth: .infinity)
-            .background {
-                RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius)
-                    .fill(Theme.Colors.destructive)
+    /// The superset switch as it sits in the exercise detail, plus what it buys you.
+    private var supersetVisual: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.medium) {
+            HStack(spacing: Theme.Spacing.medium) {
+                Text(L.supersetLinkPrev)
+                    .font(Theme.Fonts.bodyBold)
+                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.6)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 4)
+
+                Capsule()
+                    .fill(Theme.Colors.accent)
+                    .frame(width: 51, height: 31)
                     .overlay(alignment: .trailing) {
-                        Image(systemName: "trash.fill")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(.white)
-                            .padding(.trailing, Theme.Spacing.large)
+                        Circle()
+                            .fill(.white)
+                            .frame(width: 27, height: 27)
+                            .padding(2)
                     }
             }
-            .clipShape(RoundedRectangle(cornerRadius: Theme.Layout.cornerRadius))
+            .padding(.vertical, 14)
+            .padding(.horizontal, Theme.Spacing.large)
+            .frame(maxWidth: .infinity)
+            .background(Theme.Colors.surface)
+            .cornerRadius(Theme.Layout.cornerRadius)
+
+            Text(L.supersetNoRest)
+                .font(Theme.Fonts.ghostLabel).tracking(1)
+                .foregroundStyle(Theme.Colors.accent)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.leading, Theme.Spacing.xs)
+        }
     }
 
     private func mockExerciseCard(name: String, meta: String, progress: Double) -> some View {
@@ -326,7 +344,7 @@ struct OnboardingView: View {
     }
 
     /// Mirrors the active set row of the workout screen, in the unit just chosen.
-    private func mockSetRow(showLastTime: Bool, showTapHint: Bool) -> some View {
+    private func mockSetRow() -> some View {
         let unit = settings.weightUnit
         return HStack(spacing: Theme.Spacing.medium) {
             Text(L.setN(2))
@@ -334,33 +352,16 @@ struct OnboardingView: View {
                 .foregroundStyle(Theme.Colors.accent)
                 .frame(width: 68, alignment: .leading)
 
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 6) {
-                    Text("8 × \(WeightDisplay.string(kg: 35, unit: unit))")
-                        .font(.system(size: 21, weight: .bold, design: .monospaced))
-                        .foregroundStyle(Theme.Colors.textPrimary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.45)
+            HStack(spacing: 6) {
+                Text("8 × \(WeightDisplay.string(kg: 35, unit: unit))")
+                    .font(.system(size: 21, weight: .bold, design: .monospaced))
+                    .foregroundStyle(Theme.Colors.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.45)
 
-                    if showTapHint {
-                        Image(systemName: "hand.tap.fill")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(Theme.Colors.accent)
-                    }
-                }
-
-                if showLastTime {
-                    HStack(spacing: 6) {
-                        Text(L.lastTime(WeightDisplay.string(kg: 32.5, unit: unit, uppercase: true), 8))
-                            .font(Theme.Fonts.ghostLabel).tracking(0.8)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.45)
-
-                        Image(systemName: "hand.tap.fill")
-                            .font(.system(size: 11, weight: .bold))
-                    }
+                Image(systemName: "hand.tap.fill")
+                    .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(Theme.Colors.accent)
-                }
             }
 
             Spacer(minLength: 4)
