@@ -45,7 +45,7 @@ Made for the gym.
 ```
 
 ### Promotional text — 170 char limit (updatable, not indexed)
-> **A fast, focused lifting tracker that remembers what you did last time – Push/Pull/Legs plans ready to go, rest timer built in. No account, no ads.** — `147 chars`
+> **A fast, focused lifting tracker that remembers what you did last time – Push/Pull/Legs plans ready to go, rest timer built in. No account, no ads.** — `146 chars`
 
 *(2.3.7: price wording like "free" / "no subscription" stays OUT of screenshots and promo text — the description is the allowed place for it.)*
 
