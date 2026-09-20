@@ -446,7 +446,7 @@ struct ActiveWorkoutView: View {
                             Text(L.finishExercise)
                         }
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(Theme.Colors.success)
+                        .foregroundStyle(Theme.Colors.accent)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, Theme.Spacing.large)
                     }
