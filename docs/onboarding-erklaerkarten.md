@@ -56,8 +56,13 @@ Worauf zu achten ist:
   zwischen die Ränder passen.
 - Einmal auf Englisch gegenlesen (Gerätesprache umstellen).
 
-**Build-Stand:** `xcodebuild -scheme GymBuddy -destination 'generic/platform=iOS Simulator' build`
-läuft durch – BUILD SUCCEEDED, der Code ist also getypt und übersetzt. Was fehlt,
-ist das Durchklicken im Simulator: CoreSimulator ist auf dem Rechner veraltet
-(1051.55.0 gegen 1171.7.0 aus Xcode), Simulator-Geräte sind darum nicht
-ansprechbar. Nach einem Neustart bzw. einmal Xcode starten geht das wieder.
+**Build-Stand:** Gebaut und im Simulator angesehen (iPhone 17 Pro, iOS 26.5),
+alle drei Karten auf Deutsch. Dabei fiel auf, dass der rote Lösch-Hintergrund der
+dritten Karte über die halbe Seite lief – ein `RoundedRectangle` als ZStack-
+Geschwister hat keine eigene Höhe. Gefixt: die Satz-Zeile gibt die Höhe vor.
+
+Zwei Fallen für das nächste Mal: Simulator.app fehlt in der aktuellen
+Xcode-Installation, Tippen im Simulator geht also nicht. Die einzelnen Seiten
+lassen sich trotzdem ansehen, indem man `page` temporär aus den UserDefaults
+liest und die App mit `simctl launch … -VerifyStartPage 3` startet.
+Auf Englisch und auf einem kleinen Gerät (iPhone SE) ist noch nicht gegengelesen.
