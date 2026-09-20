@@ -56,6 +56,8 @@ Worauf zu achten ist:
   zwischen die Ränder passen.
 - Einmal auf Englisch gegenlesen (Gerätesprache umstellen).
 
-**Build-Stand:** `swiftc -parse` läuft sauber durch, die Syntax stimmt also.
-Ein echter Build mit Typprüfung steht noch aus – auf diesem Rechner ist die
-Xcode-Lizenz nicht bestätigt (`sudo xcodebuild -license accept`).
+**Build-Stand:** `xcodebuild -scheme GymBuddy -destination 'generic/platform=iOS Simulator' build`
+läuft durch – BUILD SUCCEEDED, der Code ist also getypt und übersetzt. Was fehlt,
+ist das Durchklicken im Simulator: CoreSimulator ist auf dem Rechner veraltet
+(1051.55.0 gegen 1171.7.0 aus Xcode), Simulator-Geräte sind darum nicht
+ansprechbar. Nach einem Neustart bzw. einmal Xcode starten geht das wieder.
