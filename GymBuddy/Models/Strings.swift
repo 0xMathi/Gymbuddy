@@ -59,8 +59,8 @@ enum L {
     static var onbHowSwipeBody: String { t("Swipe through your exercises during a workout. Your running set stays where it is \u{2013} only \u{201C}Continue here\u{201D} actually moves you.",
                                            "Swipe im Training ganz leicht durch deine Übungen. Dein laufender Satz bleibt, wo er ist \u{2013} erst \u{201E}Hier weitermachen\u{201C} springt wirklich hin.") }
     static var onbHowSetTitle: String { t("Every set, your way", "Jeder Satz, wie du ihn willst") }
-    static var onbHowSetBody: String { t("Set weight, reps and rest, easily.",
-                                         "Stelle ganz einfach Gewicht, Wiederholungen und Pause ein.") }
+    static var onbHowSetBody: String { t("Tap a set and adjust weight, reps and rest, easily.",
+                                         "Tipp drauf und stelle ganz einfach Gewicht, Wiederholungen und Pause ein.") }
     static var onbHowSupersetTitle: String { t("Supersets, made easy", "Supersätze made easy") }
     static var onbHowSupersetBody: String { t("In a plan, tap an exercise and switch on \u{201C}Superset with previous exercise\u{201D}. Both run back to back \u{2013} the rest comes after.",
                                               "Tipp im Plan eine Übung an und schalte \u{201E}Superset mit vorheriger Übung\u{201C} ein. Beide laufen direkt nacheinander \u{2013} die Pause kommt danach.") }
