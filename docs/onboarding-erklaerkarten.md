@@ -1,6 +1,6 @@
 # Onboarding-Erklärkarten — Stand & Übergabe
 
-Branch: `claude/onboarding-erklaerkarten-wuu5l2` (auf `main` aufgebaut)
+Branch: `claude/onboarding-erklaerkarten-wuu5l2`, am 20.09.2026 nach `main` gemergt.
 
 ## Was drauf liegt
 
@@ -36,17 +36,11 @@ Gewicht in der Einheit, die eine Seite vorher gewählt wurde.
 
 ## Was offen ist
 
-**Die Supersatz-Karte fehlt — mit Absicht.** Im Code gibt es `supersetId` auf
-`Exercise`, und `WorkoutSessionManager` fährt damit einen echten Supersatz
-(kein Pause-Timer zwischen den Partnern, hin und her, dann erst die Pause).
-Aber: es gibt keine einzige Stelle in der App, an der `supersetId` gesetzt
-wird — nicht im Plan-Editor, nicht im Übungs-Sheet, und keiner der drei
-Starter-Pläne nutzt es. Eine Karte "so stellst du einen Supersatz ein" würde
-also etwas erklären, das man gar nicht einstellen kann.
-
-Die Lücke zu schließen wäre eine eigene, kleine Änderung: im Plan-Editor zwei
-benachbarte Übungen zu einem Supersatz zusammenfassen. Danach passt die vierte
-Karte dazu.
+**Die Supersatz-Karte fehlt.** Der ursprüngliche Grund dafür ist entfallen:
+`supersetId` wird seit 1.1.1 im Plan-Editor gesetzt (`PlanEditView`, Toggle im
+Übungs-Detail; `WorkoutPlan.normalizeSupersets()` hält die Gruppen bei Reorder
+und Delete konsistent). Eine vierte Karte hätte also jetzt etwas zu erklären –
+sie ist bewusst noch nicht gebaut, nicht mehr blockiert.
 
 ## Im Simulator prüfen
 
@@ -62,6 +56,6 @@ Worauf zu achten ist:
   zwischen die Ränder passen.
 - Einmal auf Englisch gegenlesen (Gerätesprache umstellen).
 
-Gebaut wurde bisher nichts — in der Umgebung, in der die Karten entstanden
-sind, gibt es kein Xcode. Der Code ist ungeprüft in dem Sinne, dass er noch
-nie durch den Compiler gelaufen ist.
+**Build-Stand:** `swiftc -parse` läuft sauber durch, die Syntax stimmt also.
+Ein echter Build mit Typprüfung steht noch aus – auf diesem Rechner ist die
+Xcode-Lizenz nicht bestätigt (`sudo xcodebuild -license accept`).
