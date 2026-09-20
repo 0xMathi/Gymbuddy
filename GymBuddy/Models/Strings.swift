@@ -100,6 +100,7 @@ enum L {
     static func setN(_ n: Int) -> String { t("SET \(n)", "SATZ \(n)") }
     static func lastTime(_ weight: String, _ reps: Int) -> String { t("LAST TIME · \(weight) × \(reps)", "LETZTES MAL · \(weight) × \(reps)") }
     static var addSet: String { t("Add set", "Satz hinzufügen") }
+    static var finishExercise: String { t("Finish exercise", "Übung abschließen") }
     static var restartExerciseUpper: String { t("RESTART EXERCISE", "ÜBUNG NEU STARTEN") }
     static var continueHereUpper: String { t("CONTINUE HERE", "HIER WEITERMACHEN") }
     static func backToExercise(_ i: Int) -> String { t("BACK TO EXERCISE \(i)", "ZURÜCK ZU ÜBUNG \(i)") }

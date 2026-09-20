@@ -429,6 +429,28 @@ struct ActiveWorkoutView: View {
                         .padding(.vertical, Theme.Spacing.large)
                     }
                     .buttonStyle(.plain)
+
+                    Rectangle()
+                        .fill(Theme.Colors.surface)
+                        .frame(height: 1)
+                        .padding(.horizontal, Theme.Spacing.large)
+
+                    // Ticks off every remaining set of this exercise and moves on
+                    // without a rest timer in between - same action the quick-action
+                    // sheet offers for the other exercises.
+                    Button {
+                        manager.markExerciseComplete(index: session.currentExerciseIndex)
+                    } label: {
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill")
+                            Text(L.finishExercise)
+                        }
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(Theme.Colors.success)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, Theme.Spacing.large)
+                    }
+                    .buttonStyle(.plain)
                 }
                 .background(Theme.Colors.surfaceElevated.opacity(0.1))
                 .cornerRadius(Theme.Layout.cornerRadiusLarge)
