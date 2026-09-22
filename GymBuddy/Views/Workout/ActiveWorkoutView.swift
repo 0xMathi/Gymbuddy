@@ -33,7 +33,6 @@ struct ActiveWorkoutView: View {
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: manager.session?.state)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: manager.isPaused)
         .confirmationDialog(L.endWorkoutQuestion, isPresented: $showCancelConfirmation, titleVisibility: .visible) {
             if (manager.session?.totalSetsCompleted ?? 0) > 0 {
                 Button(L.endAndSave) {
@@ -79,7 +78,13 @@ struct ActiveWorkoutView: View {
                                 removal: .opacity
                             ))
                     } else if session.state == .resting {
-                        restSection(session: session, exercises: exercises)
+                        // Timer first; the sets hang below it (scroll to adjust the next one)
+                        VStack(spacing: Theme.Spacing.large) {
+                            restSection(session: session, exercises: exercises)
+                            if let exercise = session.currentExercise {
+                                setList(session: session, exercise: exercise)
+                            }
+                        }
                             .padding(.horizontal, Theme.Spacing.xl)
                             .transition(.asymmetric(
                                 insertion: .move(edge: .top).combined(with: .opacity),
@@ -240,11 +245,6 @@ struct ActiveWorkoutView: View {
         .sheet(isPresented: $showSettings) {
             SettingsView()
         }
-
-        if manager.isPaused {
-            pauseOverlay
-                .transition(.opacity.combined(with: .scale(scale: 0.95)))
-        }
     }
 
     // MARK: - Top Bar
@@ -291,19 +291,6 @@ struct ActiveWorkoutView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(L.a11ySettings)
-
-            Button {
-                manager.togglePause()
-            } label: {
-                Image(systemName: manager.isPaused ? "play.fill" : "pause.fill")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(Theme.Colors.textPrimary)
-                    .frame(width: 40, height: 40)
-                    .background(Theme.Colors.surface)
-                    .cornerRadius(Theme.Layout.cornerRadiusSmall)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(manager.isPaused ? L.a11yResumeWorkout : L.a11yPauseWorkout)
         }
     }
 
@@ -381,95 +368,101 @@ struct ActiveWorkoutView: View {
                 .padding(.top, Theme.Spacing.medium)
                 .padding(.horizontal, 4)
                 
-                // SET LIST (Tabular Layout)
-                VStack(spacing: 0) {
-                    let setsArray = exercise.resolvedSets
-                    ForEach(Array(setsArray.enumerated()), id: \.offset) { index, exerciseSet in
-                        let setNum = index + 1
-
-                        // Swipe-to-delete, but keep at least one set per exercise.
-                        if setsArray.count > 1 {
-                            SwipeToDeleteView(
-                                action: { manager.deleteSet(from: exercise, at: index) },
-                                background: Theme.Colors.bg,
-                                onSwipeActive: { active in isSwipingSetRow = active }
-                            ) {
-                                setRow(exercise: exercise, exerciseSet: exerciseSet, index: index, session: session)
-                            }
-                        } else {
-                            setRow(exercise: exercise, exerciseSet: exerciseSet, index: index, session: session)
-                        }
-
-                        // Separator between rows
-                        if setNum < exercise.sets {
-                            Rectangle()
-                                .fill(Theme.Colors.surface)
-                                .frame(height: 1)
-                                .padding(.horizontal, Theme.Spacing.large)
-                        }
-                    }
-                    
-                    // Both actions share one row: stacked, the card grows taller
-                    // than the screen on a four-set exercise and the lower button
-                    // ends up pinned to the bottom edge.
-                    HStack(spacing: 0) {
-                        Button {
-                            var sets = exercise.resolvedSets
-                            let lastSet = sets.last ?? ExerciseSet(index: 1, reps: exercise.reps, weight: exercise.weight)
-                            let newSet = ExerciseSet(index: sets.count + 1, reps: lastSet.reps, weight: lastSet.weight)
-                            sets.append(newSet)
-                            exercise.specificSets = sets
-                            exercise.sets = sets.count
-                            HapticService.shared.light()
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: "plus")
-                                Text(L.addSet)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                            }
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(Theme.Colors.accent)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, Theme.Spacing.large)
-                        }
-                        .buttonStyle(.plain)
-
-                        Rectangle()
-                            .fill(Theme.Colors.surface)
-                            .frame(width: 1, height: 22)
-
-                        // Ticks off every remaining set of this exercise and moves on
-                        // without a rest timer in between - same action the quick-action
-                        // sheet offers for the other exercises.
-                        Button {
-                            manager.markExerciseComplete(index: session.currentExerciseIndex)
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: "checkmark.circle.fill")
-                                Text(L.finishExercise)
-                                    .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
-                            }
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle(Theme.Colors.accent)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, Theme.Spacing.large)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .background(Theme.Colors.surfaceElevated.opacity(0.1))
-                .cornerRadius(Theme.Layout.cornerRadiusLarge)
-                .overlay(
-                    RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusLarge)
-                        .stroke(Theme.Colors.surface, lineWidth: 1)
-                )
+                setList(session: session, exercise: exercise)
 
                 // The old generic "COMPLETE SET" button is removed in favor of the row checkboxes.
                 // But we still need an End Workout button prominently here (or at bottom of scrollview).
             }
         }
+    }
+
+    // MARK: - Set List (active exercise and below the rest timer)
+
+    @ViewBuilder
+    private func setList(session: WorkoutSession, exercise: Exercise) -> some View {
+        VStack(spacing: 0) {
+            let setsArray = exercise.resolvedSets
+            ForEach(Array(setsArray.enumerated()), id: \.offset) { index, exerciseSet in
+                let setNum = index + 1
+
+                // Swipe-to-delete, but keep at least one set per exercise.
+                if setsArray.count > 1 {
+                    SwipeToDeleteView(
+                        action: { manager.deleteSet(from: exercise, at: index) },
+                        background: Theme.Colors.bg,
+                        onSwipeActive: { active in isSwipingSetRow = active }
+                    ) {
+                        setRow(exercise: exercise, exerciseSet: exerciseSet, index: index, session: session)
+                    }
+                } else {
+                    setRow(exercise: exercise, exerciseSet: exerciseSet, index: index, session: session)
+                }
+
+                // Separator between rows
+                if setNum < exercise.sets {
+                    Rectangle()
+                        .fill(Theme.Colors.surface)
+                        .frame(height: 1)
+                        .padding(.horizontal, Theme.Spacing.large)
+                }
+            }
+            
+            // Both actions share one row: stacked, the card grows taller
+            // than the screen on a four-set exercise and the lower button
+            // ends up pinned to the bottom edge.
+            HStack(spacing: 0) {
+                Button {
+                    var sets = exercise.resolvedSets
+                    let lastSet = sets.last ?? ExerciseSet(index: 1, reps: exercise.reps, weight: exercise.weight)
+                    let newSet = ExerciseSet(index: sets.count + 1, reps: lastSet.reps, weight: lastSet.weight)
+                    sets.append(newSet)
+                    exercise.specificSets = sets
+                    exercise.sets = sets.count
+                    HapticService.shared.light()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "plus")
+                        Text(L.addSet)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Theme.Colors.accent)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Theme.Spacing.large)
+                }
+                .buttonStyle(.plain)
+
+                Rectangle()
+                    .fill(Theme.Colors.surface)
+                    .frame(width: 1, height: 22)
+
+                // Ticks off every remaining set of this exercise and moves on
+                // without a rest timer in between - same action the quick-action
+                // sheet offers for the other exercises.
+                Button {
+                    manager.markExerciseComplete(index: session.currentExerciseIndex)
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.circle.fill")
+                        Text(L.finishExercise)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Theme.Colors.accent)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Theme.Spacing.large)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .background(Theme.Colors.surfaceElevated.opacity(0.1))
+        .cornerRadius(Theme.Layout.cornerRadiusLarge)
+        .overlay(
+            RoundedRectangle(cornerRadius: Theme.Layout.cornerRadiusLarge)
+                .stroke(Theme.Colors.surface, lineWidth: 1)
+        )
     }
 
     // MARK: - Set Row (active section)
@@ -479,6 +472,9 @@ struct ActiveWorkoutView: View {
         let setNum = index + 1
         let isActive = setNum == session.currentSetNumber
         let isDone = setNum < session.currentSetNumber
+        let isUndoable = isDone
+            && manager.undoableSet?.exerciseIndex == session.currentExerciseIndex
+            && manager.undoableSet?.setNumber == setNum
         let a11yWeight = exerciseSet.weight > 0 ? exerciseSet.weightFormatted : ""
 
         HStack(spacing: Theme.Spacing.medium) {
@@ -541,10 +537,13 @@ struct ActiveWorkoutView: View {
             Spacer(minLength: 4)
 
             // Checkbox (Action to complete set)
+            // Ticks the active set; tapping the set ticked last takes it back
             Button {
-                if isActive && !manager.isPaused {
+                if isActive {
                     HapticService.shared.heavy()
                     manager.completeSet()
+                } else if isUndoable {
+                    manager.undoLastSet()
                 }
             } label: {
                 ZStack {
@@ -560,10 +559,10 @@ struct ActiveWorkoutView: View {
                 }
             }
             .buttonStyle(.plain)
-            .disabled(!isActive || manager.isPaused)
+            .disabled(!isActive && !isUndoable)
             .accessibilityLabel(L.a11ySetLabel(setNum, exerciseSet.reps, a11yWeight))
             .accessibilityValue(isDone ? L.a11yStateDone : (isActive ? L.a11yStateActive : L.a11yStateUpcoming))
-            .accessibilityHint(isActive && !manager.isPaused ? L.a11yCheckOffHint : "")
+            .accessibilityHint(isActive ? L.a11yCheckOffHint : (isUndoable ? L.a11yUndoSetHint : ""))
         }
         .padding(.vertical, 18)
         .padding(.horizontal, Theme.Spacing.large)
@@ -976,31 +975,6 @@ struct ActiveWorkoutView: View {
         .padding(.vertical, 6)
         .background(Theme.Colors.surface)
         .cornerRadius(8)
-    }
-
-    // MARK: - Pause Overlay (tappable to resume)
-
-    private var pauseOverlay: some View {
-        VStack(spacing: Theme.Spacing.large) {
-            Image(systemName: "pause.circle.fill")
-                .font(.system(size: 80))
-                .foregroundStyle(Theme.Colors.accent)
-
-            Text(L.paused)
-                .font(Theme.Fonts.h2)
-                .foregroundStyle(Theme.Colors.textPrimary)
-                .tracking(2)
-
-            Text(L.tapToResume)
-                .font(Theme.Fonts.body)
-                .foregroundStyle(Theme.Colors.textSecondary)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Theme.Colors.bg.opacity(0.95))
-        .contentShape(Rectangle())
-        .onTapGesture {
-            manager.togglePause()
-        }
     }
 
     // MARK: - Loading

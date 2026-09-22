@@ -5,7 +5,7 @@ import ActivityKit
 /// it appears when rest starts and disappears when rest ends, is skipped, or
 /// the workout finishes. The system renders the countdown itself
 /// (`Text(timerInterval:)`), so no ticking updates are needed — only
-/// start / adjust / pause / end transitions.
+/// start / adjust / end transitions.
 /// All calls come from the main thread (UI actions + main-runloop timer).
 final class RestActivityController {
     static let shared = RestActivityController()
@@ -27,7 +27,7 @@ final class RestActivityController {
 
         do {
             activity = try Activity.request(
-                attributes: RestActivityAttributes(skipLabel: L.skip, pausedLabel: L.paused),
+                attributes: RestActivityAttributes(skipLabel: L.skip),
                 content: content
             )
         } catch {
@@ -36,7 +36,7 @@ final class RestActivityController {
         }
     }
 
-    /// Pushes a new state (±15s adjustment, pause/resume). No-op when no activity runs.
+    /// Pushes a new state (±15s adjustment). No-op when no activity runs.
     func update(_ state: RestActivityAttributes.ContentState) {
         guard let activity else { return }
         let content = ActivityContent(state: state, staleDate: state.endDate)
@@ -52,9 +52,10 @@ final class RestActivityController {
     }
 
     /// App-start cleanup: removes activities that survived a force-quit or crash.
-    /// Workout sessions are in-memory only, so any activity found here is stale.
+    /// Their process is gone, so none of them can be updated or ended anymore.
     func endAllStale() async {
-        for stale in Activity<RestActivityAttributes>.activities {
+        // Skips the one this process owns, should this ever run again mid-workout
+        for stale in Activity<RestActivityAttributes>.activities where stale.id != activity?.id {
             await stale.end(nil, dismissalPolicy: .immediate)
         }
     }

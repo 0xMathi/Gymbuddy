@@ -9,9 +9,16 @@ class WorkoutSessionManager {
     /// process-wide access. Previews may still create their own instances.
     static let shared = WorkoutSessionManager()
 
-    var session: WorkoutSession?
+    /// Every change is mirrored to UserDefaults, so a workout survives iOS
+    /// killing the app in the background (restored in `configure`).
+    var session: WorkoutSession? {
+        didSet { persistSnapshot() }
+    }
     var isActive: Bool { session != nil }
-    var isPaused: Bool = false
+
+    /// The set checked off last (exercise index, 1-based set number) — the only
+    /// one that can be taken back by tapping its checkbox again.
+    private(set) var undoableSet: (exerciseIndex: Int, setNumber: Int)?
 
     /// Per exercise name: the set results from the most recent completed workout
     private(set) var lastResults: [String: [CompletedSetData]] = [:]
@@ -24,11 +31,27 @@ class WorkoutSessionManager {
 
     private var targetRestEndTime: Date?
 
+    /// What survives the app being killed mid-workout. Rest is stored as a
+    /// wall-clock end, so a restored timer continues exactly where it would be.
+    private struct SessionSnapshot: Codable, Equatable {
+        let planID: UUID
+        let startTime: Date
+        let exerciseIndex: Int
+        let setNumber: Int
+        let restEndTime: Date?
+        let restDuration: Int
+    }
+    private static let snapshotKey = "activeWorkoutSnapshot"
+    /// tick() republishes the session every second — only write real changes
+    private var lastSavedSnapshot: SessionSnapshot?
+
     // MARK: - Initialization
 
-    /// Must be called once at app start — history features refuse to work silently without it
+    /// Must be called once at app start — history features refuse to work silently without it.
+    /// Also brings back a workout that was running when the app was killed.
     func configure(with context: ModelContext) {
         modelContext = context
+        restoreSession()
     }
 
     // MARK: - Core Actions
@@ -45,15 +68,22 @@ class WorkoutSessionManager {
         )
 
         plan.lastUsedAt = Date()
-        isPaused = false
+        undoableSet = nil
 
         loadHistory(for: plan)
     }
 
     func completeSet() {
-        guard var currentSession = session, !isPaused else { return }
+        guard var currentSession = session else { return }
 
         haptics.medium()
+        undoableSet = (currentSession.currentExerciseIndex, currentSession.currentSetNumber)
+
+        // Ticking the next set while resting means the rest is over
+        if currentSession.state == .resting {
+            clearRestTimer()
+            currentSession.state = .active
+        }
 
         let sortedExercises = currentSession.plan.exercises.sorted { $0.orderIndex < $1.orderIndex }
         guard sortedExercises.indices.contains(currentSession.currentExerciseIndex) else { return }
@@ -129,13 +159,29 @@ class WorkoutSessionManager {
         endRest()
     }
 
+    /// Takes back the set checked off last: it becomes the active set again
+    /// and the rest it started is dropped.
+    func undoLastSet() {
+        guard var currentSession = session, let ticked = undoableSet else { return }
+
+        clearRestTimer()
+        currentSession.currentExerciseIndex = ticked.exerciseIndex
+        currentSession.currentSetNumber = ticked.setNumber
+        currentSession.state = .active
+        currentSession.restTimeRemaining = 0
+
+        undoableSet = nil
+        session = currentSession
+        haptics.light()
+    }
+
     func jumpToExercise(index: Int) {
         guard var currentSession = session else { return }
         let exercises = currentSession.sortedExercises
         guard exercises.indices.contains(index) else { return }
 
-        stopTimer()
-        RestActivityController.shared.end()
+        clearRestTimer()
+        undoableSet = nil
 
         currentSession.currentExerciseIndex = index
         currentSession.currentSetNumber = 1
@@ -143,7 +189,6 @@ class WorkoutSessionManager {
         currentSession.restTimeRemaining = 0
 
         self.session = currentSession
-        isPaused = false
         haptics.medium()
     }
 
@@ -152,8 +197,8 @@ class WorkoutSessionManager {
         let exercises = currentSession.sortedExercises
         guard exercises.indices.contains(index) else { return }
 
-        stopTimer()
-        RestActivityController.shared.end()
+        clearRestTimer()
+        undoableSet = nil
 
         if index + 1 < exercises.count {
             currentSession.currentExerciseIndex = index + 1
@@ -177,6 +222,7 @@ class WorkoutSessionManager {
         var sets = exercise.resolvedSets
         guard sets.count > 1, sets.indices.contains(index) else { return }
 
+        undoableSet = nil
         sets.remove(at: index)
         for i in 0..<sets.count { sets[i].index = i + 1 }
         exercise.specificSets = sets
@@ -197,43 +243,9 @@ class WorkoutSessionManager {
         haptics.medium()
     }
 
-    func togglePause() {
-        guard session != nil else { return }
-
-        isPaused.toggle()
-        haptics.light()
-
-        if isPaused {
-            // Pause the timer
-            stopTimer()
-            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
-            // Freeze the Live Activity countdown at the remaining time
-            if let currentSession = session, currentSession.state == .resting {
-                RestActivityController.shared.update(
-                    activityState(for: currentSession, endDate: targetRestEndTime ?? Date())
-                )
-            }
-        } else {
-            // Resume if we were resting
-            if let currentSession = session, currentSession.state == .resting {
-                targetRestEndTime = Date().addingTimeInterval(TimeInterval(currentSession.restTimeRemaining))
-                scheduleRestEndNotification(in: currentSession.restTimeRemaining)
-                if let end = targetRestEndTime {
-                    RestActivityController.shared.update(activityState(for: currentSession, endDate: end))
-                }
-                timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-                    self?.tick()
-                }
-            }
-        }
-    }
-
     func cancelWorkout() {
-        stopTimer()
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
-        RestActivityController.shared.end()
+        clearRestTimer()
         session = nil
-        isPaused = false
     }
 
     // MARK: - Internal Logic
@@ -249,16 +261,12 @@ class WorkoutSessionManager {
             RestActivityController.shared.start(activityState(for: session, endDate: end))
         }
 
-        stopTimer()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            self?.tick()
-        }
+        startTicking()
     }
 
     func adjustRest(by seconds: Int) {
         guard var currentSession = session,
-              currentSession.state == .resting,
-              !isPaused else { return }
+              currentSession.state == .resting else { return }
 
         let newTime = currentSession.restTimeRemaining + seconds
         let maxTime = currentSession.originalRestDuration + 60
@@ -280,7 +288,7 @@ class WorkoutSessionManager {
     }
 
     private func tick() {
-        guard var currentSession = session, currentSession.state == .resting, !isPaused else { return }
+        guard var currentSession = session, currentSession.state == .resting else { return }
 
         if let target = targetRestEndTime {
             let remaining = Int(ceil(target.timeIntervalSinceNow))
@@ -313,9 +321,7 @@ class WorkoutSessionManager {
     }
 
     private func endRest() {
-        stopTimer()
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
-        RestActivityController.shared.end()
+        clearRestTimer()
         guard var currentSession = session else { return }
 
         currentSession.state = .active
@@ -330,6 +336,20 @@ class WorkoutSessionManager {
         timer = nil
     }
 
+    private func startTicking() {
+        stopTimer()
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            self?.tick()
+        }
+    }
+
+    /// Stops everything a running rest owns: in-app timer, end notification, Live Activity
+    private func clearRestTimer() {
+        stopTimer()
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
+        RestActivityController.shared.end()
+    }
+
     /// Live Activity content for the current rest phase. `session` is passed
     /// explicitly because startRest works on an inout copy that is not yet
     /// published to `self.session`.
@@ -339,8 +359,7 @@ class WorkoutSessionManager {
             exerciseLabel: session.restMainLabel,
             nextLabel: session.restNextLabel,
             startDate: endDate.addingTimeInterval(-TimeInterval(session.originalRestDuration)),
-            endDate: endDate,
-            pausedRemaining: isPaused ? session.restTimeRemaining : nil
+            endDate: endDate
         )
     }
 
@@ -350,9 +369,7 @@ class WorkoutSessionManager {
     /// without advancing `currentSetNumber`) and false when ending early, where the
     /// active set was never completed.
     func finishWorkout(includeActiveSet: Bool = true) {
-        stopTimer()
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["RestEnd"])
-        RestActivityController.shared.end()
+        clearRestTimer()
         guard var currentSession = session else { return }
 
         currentSession.plan.lastUsedAt = Date()
@@ -455,7 +472,83 @@ class WorkoutSessionManager {
     /// Called from WorkoutSummaryView to dismiss and reset
     func dismissSummary() {
         session = nil
-        isPaused = false
+    }
+
+    // MARK: - Crash / kill survival
+
+    private func persistSnapshot() {
+        guard let session, session.state != .completed else {
+            // No workout, or it is already saved as CompletedWorkout
+            UserDefaults.standard.removeObject(forKey: Self.snapshotKey)
+            lastSavedSnapshot = nil
+            return
+        }
+
+        let snapshot = SessionSnapshot(
+            planID: session.plan.id,
+            startTime: session.startTime,
+            exerciseIndex: session.currentExerciseIndex,
+            setNumber: session.currentSetNumber,
+            restEndTime: session.state == .resting ? targetRestEndTime : nil,
+            restDuration: session.originalRestDuration
+        )
+        guard snapshot != lastSavedSnapshot else { return }
+
+        do {
+            UserDefaults.standard.set(try JSONEncoder().encode(snapshot), forKey: Self.snapshotKey)
+            lastSavedSnapshot = snapshot
+        } catch {
+            assertionFailure("Failed to persist the running workout: \(error)")
+        }
+    }
+
+    private func restoreSession() {
+        guard let data = UserDefaults.standard.data(forKey: Self.snapshotKey),
+              let context = modelContext else { return }
+
+        let snapshot: SessionSnapshot
+        let plan: WorkoutPlan?
+        do {
+            snapshot = try JSONDecoder().decode(SessionSnapshot.self, from: data)
+            let planID = snapshot.planID
+            plan = try context.fetch(FetchDescriptor<WorkoutPlan>(predicate: #Predicate { $0.id == planID })).first
+        } catch {
+            assertionFailure("Failed to restore the running workout: \(error)")
+            UserDefaults.standard.removeObject(forKey: Self.snapshotKey)
+            return
+        }
+
+        // The plan can't change mid-workout, so a mismatch means the snapshot is unusable
+        guard let plan, plan.exercises.indices.contains(snapshot.exerciseIndex) else {
+            UserDefaults.standard.removeObject(forKey: Self.snapshotKey)
+            return
+        }
+
+        var restored = WorkoutSession(
+            plan: plan,
+            currentExerciseIndex: snapshot.exerciseIndex,
+            currentSetNumber: snapshot.setNumber,
+            originalRestDuration: snapshot.restDuration,
+            startTime: snapshot.startTime
+        )
+
+        // A rest that ran out while the app was dead is simply over
+        if let end = snapshot.restEndTime, end > Date() {
+            restored.state = .resting
+            restored.restTimeRemaining = Int(ceil(end.timeIntervalSinceNow))
+            targetRestEndTime = end
+            startTicking()
+        }
+
+        loadHistory(for: plan)
+        session = restored
+    }
+
+    /// The Live Activity of a killed process is orphaned: the app start ends all
+    /// of them, then puts a fresh one up if a restored rest is still running.
+    func restartRestActivityIfNeeded() {
+        guard let session, session.state == .resting, let end = targetRestEndTime else { return }
+        RestActivityController.shared.start(activityState(for: session, endDate: end))
     }
 
     private func scheduleRestEndNotification(in seconds: Int) {

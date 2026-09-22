@@ -120,8 +120,6 @@ enum L {
     static var previewDone: String { t("PREVIEW · DONE ✓", "VORSCHAU · ERLEDIGT ✓") }
     static var skip: String { t("SKIP", "ÜBERSPRINGEN") }
     static func setsRepsMeta(_ sets: Int, _ reps: Int) -> String { t("\(sets) SETS × \(reps) REPS", "\(sets) SÄTZE × \(reps) WDH") }
-    static var paused: String { t("PAUSED", "PAUSIERT") }
-    static var tapToResume: String { t("TAP TO RESUME", "TIPPEN ZUM FORTSETZEN") }
     static var loading: String { t("LOADING …", "LADE …") }
     static var setsUpper: String { t("SETS", "SÄTZE") }
     static var repsUpper: String { t("REPS", "WDH") }
@@ -184,6 +182,7 @@ enum L {
     static var a11yStateActive: String { t("active", "aktiv") }
     static var a11yStateUpcoming: String { t("upcoming", "ausstehend") }
     static var a11yCheckOffHint: String { t("Marks the set as done", "Hakt den Satz ab") }
+    static var a11yUndoSetHint: String { t("Takes the set back", "Nimmt den Satz zurück") }
     static func a11yEditSet(_ n: Int) -> String { t("Edit set \(n)", "Satz \(n) bearbeiten") }
     static func a11yAdoptLast(_ weight: String, _ reps: Int) -> String {
         t("Use last time's values: \(weight), \(reps) reps", "Werte vom letzten Mal übernehmen: \(weight), \(reps) Wiederholungen")
@@ -192,8 +191,6 @@ enum L {
     static var a11yRestShorter: String { t("15 seconds less rest", "15 Sekunden weniger Pause") }
     static var a11yRestLonger: String { t("15 seconds more rest", "15 Sekunden mehr Pause") }
     static var a11ySettings: String { t("Settings", "Einstellungen") }
-    static var a11yPauseWorkout: String { t("Pause workout", "Workout pausieren") }
-    static var a11yResumeWorkout: String { t("Resume workout", "Workout fortsetzen") }
     static var a11yStartsWorkoutHint: String { t("Starts this workout", "Startet dieses Workout") }
     static var a11yWeightKeyboard: String { t("Enter weight with keyboard", "Gewicht per Tastatur eingeben") }
     static var a11yWeightWheel: String { t("Pick weight with wheel", "Gewicht per Rad wählen") }

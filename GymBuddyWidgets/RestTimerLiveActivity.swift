@@ -59,10 +59,7 @@ struct RestTimerLiveActivity: Widget {
                 RestCountdown(context: context, size: 14)
                     .frame(maxWidth: 46)
             } minimal: {
-                if context.state.pausedRemaining != nil {
-                    Image(systemName: "pause.fill")
-                        .foregroundStyle(Theme.Colors.accent)
-                } else if context.isStale {
+                if context.isStale {
                     Image(systemName: "bolt.fill")
                         .foregroundStyle(Theme.Colors.accent)
                 } else {
@@ -90,18 +87,10 @@ private struct LockScreenRestView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
-                        Text(context.isStale ? "GO!" : context.state.topLabel)
-                            .font(.system(size: 12, weight: .black))
-                            .tracking(1.5)
-                            .foregroundStyle(Theme.Colors.accent)
-                        if context.state.pausedRemaining != nil {
-                            Text("· \(context.attributes.pausedLabel)")
-                                .font(.system(size: 12, weight: .black))
-                                .tracking(1.5)
-                                .foregroundStyle(Theme.Colors.textSecondary)
-                        }
-                    }
+                    Text(context.isStale ? "GO!" : context.state.topLabel)
+                        .font(.system(size: 12, weight: .black))
+                        .tracking(1.5)
+                        .foregroundStyle(Theme.Colors.accent)
                     Text(context.state.exerciseLabel)
                         .font(.system(size: 20, weight: .black))
                         .foregroundStyle(.white)
@@ -135,17 +124,13 @@ private struct LockScreenRestView: View {
 
 // MARK: - Shared pieces
 
-/// Countdown number: live system timer, frozen while paused, 0:00 when stale.
+/// Countdown number: live system timer, 0:00 when stale.
 private struct RestCountdown: View {
     let context: ActivityViewContext<RestActivityAttributes>
     let size: CGFloat
 
     var body: some View {
-        if let frozen = context.state.pausedRemaining {
-            Text(timeString(frozen))
-                .font(.system(size: size, weight: .black, design: .monospaced))
-                .foregroundStyle(Theme.Colors.textSecondary)
-        } else if context.isStale {
+        if context.isStale {
             Text("0:00")
                 .font(.system(size: size, weight: .black, design: .monospaced))
                 .foregroundStyle(Theme.Colors.accent)
@@ -160,25 +145,15 @@ private struct RestCountdown: View {
             .multilineTextAlignment(.trailing)
         }
     }
-
-    private func timeString(_ seconds: Int) -> String {
-        String(format: "%d:%02d", seconds / 60, seconds % 60)
-    }
 }
 
 /// Depleting progress bar, mirroring the in-app rest bar.
 private struct RestProgressBar: View {
     let context: ActivityViewContext<RestActivityAttributes>
 
-    private var total: TimeInterval {
-        max(context.state.endDate.timeIntervalSince(context.state.startDate), 1)
-    }
-
     var body: some View {
         Group {
-            if let frozen = context.state.pausedRemaining {
-                ProgressView(value: min(Double(frozen), total), total: total)
-            } else if context.isStale {
+            if context.isStale {
                 ProgressView(value: 0, total: 1)
             } else {
                 ProgressView(

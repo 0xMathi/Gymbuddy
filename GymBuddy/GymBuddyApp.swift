@@ -34,6 +34,10 @@ struct GymBuddyApp: App {
             let context = modelContainer.mainContext
             seedDefaultExercises(modelContext: context)
 
+            // Here rather than in onAppear: a workout restored after the app was
+            // killed must be on screen from the first frame, without a start-screen flash.
+            WorkoutSessionManager.shared.configure(with: context)
+
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -47,13 +51,13 @@ struct GymBuddyApp: App {
                 .onAppear {
                     // Notification permission is requested during onboarding (with rationale).
                     exerciseManager.configure(with: modelContainer.mainContext)
-                    sessionManager.configure(with: modelContainer.mainContext)
                     seedDefaultPlans(modelContext: modelContainer.mainContext)
 
-                    // Sessions are in-memory only — a rest-timer Live Activity that
-                    // survived a force-quit belongs to no workout and must go.
-                    if !sessionManager.isActive {
-                        Task { await RestActivityController.shared.endAllStale() }
+                    // A Live Activity that survived a kill belongs to the dead process:
+                    // end it, and start a fresh one if the restored workout is resting.
+                    Task {
+                        await RestActivityController.shared.endAllStale()
+                        sessionManager.restartRestActivityIfNeeded()
                     }
                 }
         }

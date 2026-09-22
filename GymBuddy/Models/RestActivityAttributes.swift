@@ -17,11 +17,8 @@ struct RestActivityAttributes: ActivityAttributes {
         var startDate: Date
         /// Wall-clock end of the rest; the system counts down on its own
         var endDate: Date
-        /// Set while the workout is paused — the countdown freezes at this value
-        var pausedRemaining: Int?
     }
 
     // Static per activity, pre-localized once at start
     var skipLabel: String
-    var pausedLabel: String
 }
