@@ -98,6 +98,21 @@ Der Verlauf rutscht dadurch auf 1.3, die „Öffnung" auf 1.4.
 
 ---
 
+## Version 1.2.1 — „Nichts geht verloren" (22.09.2026, vorbereitet)
+
+Aus einem UX-Review mit frischem Blick:
+
+- ✅ **Workout übersteht App-Abbruch:** Der laufende Stand wird bei jeder Änderung gesichert
+  und beim Start wiederhergestellt, inkl. laufender Pause (Timer + Live Activity).
+  Vorher war das Training weg, wenn iOS die App im Hintergrund beendet hat.
+- ✅ **Satz zurücknehmen:** Haken des zuletzt abgehakten Satzes nochmal antippen.
+- ✅ **Sätze in der Pause:** hängen unter dem großen Timer, der nächste Satz ist anpassbar.
+- ✅ **Pause-Knopf entfernt** (inkl. Pausiert-Zustand der Live Activity).
+
+Bewusst nicht: „Display anlassen"-Schalter (Matti: brauchen wir nicht).
+
+---
+
 ## Version 1.3 — „Verlauf" (das frühere ‚Pro'-Feature, jetzt für alle)
 
 Da keine Pro-Version kommt: **Der Verlauf wird das kostenlose Herzstück-Update.**
@@ -158,6 +173,7 @@ Zwei Updates = zwei Geschichten (Matti: „mehr zu erzählen statt alles abzufr�
 |---|---|---|---|
 | **1.1** | Timer & Feinschliff | Live Activity, Beenden&Speichern, Ghost-Tap, Bug | ~4–6 Sessions |
 | **1.2** | ✅ Weniger Tippen | Übung abschließen, Löschen-Rückfrage, Onboarding-Karten | erledigt 20.09. |
+| **1.2.1** | Nichts geht verloren | App-Abbruch-Schutz, Satz zurücknehmen, Sätze in der Pause | vorbereitet 22.09. |
 | **1.3** | Verlauf | History + PRs + 2 Charts + Widget | ~5–8 Sessions |
 | **1.4** | Öffnung | Health-Export, Plan-Teilen, Plate Calculator | à la carte |
 

@@ -190,6 +190,27 @@ eintragen + Build 6 anhängen.)*
 *(Screenshots, Beschreibung, Keywords unverändert aus 1.1 — What's New eintragen,
 WERBETEXTE in BEIDEN Sprachen neu eintragen (werden pro Version geleert), Build 7 anhängen.)*
 
+## Version 1.2.1 — release package (22.09.2026)
+
+### What's New — EN
+> **NOTHING GETS LOST.**
+>
+> • Your workout survives: if iOS closes the app in the background, you pick up exactly where you left off – rest timer included
+> • Ticked a set by accident? Tap its checkmark again to take it back
+> • Your sets during rest: scroll below the timer to adjust the next one
+> • A cleaner workout screen: the pause button is gone
+
+### What's New — DE
+> **NICHTS GEHT VERLOREN.**
+>
+> • Dein Workout bleibt: Schließt iOS die App im Hintergrund, machst du genau dort weiter – samt Pausen-Timer
+> • Satz aus Versehen abgehakt? Haken nochmal antippen, und er ist zurück
+> • Deine Sätze auch in der Pause: unter dem Timer scrollen und den nächsten Satz anpassen
+> • Aufgeräumter Workout-Screen: Der Pause-Knopf ist weg
+
+*(Screenshots, Beschreibung, Keywords unverändert — What's New eintragen,
+WERBETEXTE in BEIDEN Sprachen neu eintragen (werden pro Version geleert), Build 8 anhängen.)*
+
 ### ASC checklist for the 1.1 submission
 1. **DE localization in ASC:** the polished German description + promo text above are live-ready
    in this file — enter them as the German localization if not done with 1.0.x already.
