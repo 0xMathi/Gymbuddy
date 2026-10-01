@@ -71,6 +71,9 @@ EXERCISES = {
     "kh_kreuzheben_oder_rdl": "dumbbell Romanian deadlift, dumbbells sliding along the thighs",
     "hanging_leg_raises": "hanging leg raise on a pull-up bar, legs lifted to 90 degrees",
     "dips": "parallel-bar dips, elbows bent at depth, slight forward lean",
+    # Reworked Mon/Wed/Fri plans (added 10/2026)
+    "schulterdruecken_kh": "seated dumbbell overhead press on an upright bench, dumbbells at ear height about to be pressed up",
+    "klimmzuege_maschine": "machine-assisted pull-up, athlete kneeling on the padded platform of an assisted pull-up machine, chin above the handles, weight stack visible",
     # Remaining catalog exercises (added 07/2026 so every seed exercise has art)
     "kurzhantel_bankdruecken": "flat dumbbell bench press, dumbbells pressed above the chest",
     "cable_crossover": "standing cable crossover, arms sweeping together in front of the chest",
