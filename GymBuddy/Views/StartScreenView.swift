@@ -44,6 +44,9 @@ struct StartScreenView: View {
         if lowercased.contains("push") { return "plan_push" }
         if lowercased.contains("pull") { return "plan_pull" }
         if lowercased.contains("leg") || lowercased.contains("bein") { return "plan_legs" }
+        if lowercased.contains("upper") || lowercased.contains("oberkörper") { return "plan_upper" }
+        if lowercased.contains("full body") || lowercased.contains("full-body") || lowercased.contains("fullbody")
+            || lowercased.contains("ganzkörper") { return "plan_full" }
         return "plan_default"
     }
 

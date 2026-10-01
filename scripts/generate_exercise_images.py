@@ -121,6 +121,8 @@ PLANS = {
     "plan_push": "powerful barbell bench press moment, bar driving upward, chest and shoulders engaged",
     "plan_pull": "explosive pull-up at the top position, back muscles flared, gripping the bar",
     "plan_legs": "deep heavy barbell squat in a power rack, quads under tension",
+    "plan_upper": "standing barbell overhead press at lockout, framed from the waist up, shoulders, arms and upper back under tension",
+    "plan_full": "athlete standing tall in a wide power stance, full body visible from head to toe, a heavy dumbbell in each hand",
 }
 
 
